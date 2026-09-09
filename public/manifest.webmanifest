@@ -1,0 +1,17 @@
+{
+  "name": "Lingkunganku - Pantauan Lingkungan Indonesia",
+  "short_name": "Lingkunganku",
+  "description": "Dashboard Real-time Kualitas Udara (AQI), Cuaca BMKG, Indeks UV & Gempa Bumi Indonesia",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0f1d",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "/leaf.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
