@@ -6,6 +6,9 @@ import { INDONESIA_VOLCANOES, VOLCANO_STATUS_LEVELS } from '../../utils/volcanoe
 import { getEarthquakeColor } from '../../utils/aqi';
 import { translations } from '../../utils/i18n';
 
+// Official CARTO Basemaps API Key
+const CARTO_API_KEY = import.meta.env.VITE_CARTO_API_KEY || 'cb1_33y9_1_f8ef25450161f96a4a3aa386';
+
 // Fix default leaflet icons
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -29,11 +32,10 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
   const center = [currentLocation.lat || -2.5489, currentLocation.lon || 118.0149];
   const [showVolcanoes, setShowVolcanoes] = useState(true);
 
-  // Fast, high-reliability CartoDB tile URLs with Dark/Light theme adaptation
-  // Clean public Carto basemap endpoints (Zero watermark & 100% free high-speed CDN)
+  // Official CARTO Basemaps URL with API key
   const tileUrl = isDark
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+    ? `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?api_key=${CARTO_API_KEY}`
+    : `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?api_key=${CARTO_API_KEY}`;
 
   return (
     <div className="flat-card" style={{ padding: '1.5rem' }}>
@@ -74,7 +76,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
 
       <div className="map-wrapper">
         <MapContainer
-          key={isDark ? 'dark-map' : 'light-map'}
+          key={`map-${isDark ? 'dark' : 'light'}-${CARTO_API_KEY.slice(-6)}`}
           center={center}
           zoom={5}
           scrollWheelZoom={false}
