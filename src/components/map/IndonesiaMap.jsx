@@ -1,13 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { MapContainer, Marker, Popup, Circle, useMap } from 'react-leaflet';
+import React, { useEffect, useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'maplibre-gl/dist/maplibre-gl.css';
-import '@maplibre/maplibre-gl-leaflet';
 import { INDONESIA_CITIES } from '../../utils/cities';
 import { INDONESIA_VOLCANOES, VOLCANO_STATUS_LEVELS } from '../../utils/volcanoes';
 import { translations } from '../../utils/i18n';
-import { MapPin, Flame, Activity, Maximize2, Compass, Layers, ZoomIn, ZoomOut } from 'lucide-react';
+import { MapPin, Compass, ZoomIn, ZoomOut } from 'lucide-react';
 
 // Fix Leaflet default icon path issues
 delete L.Icon.Default.prototype._getIconUrl;
@@ -24,7 +22,7 @@ function getEarthquakeColor(mag) {
 }
 
 // Controller component to manage zoom, flyTo, and view resets
-function MapViewManager({ targetView, onAnimationComplete }) {
+function MapViewManager({ targetView }) {
   const map = useMap();
 
   useEffect(() => {
@@ -38,7 +36,7 @@ function MapViewManager({ targetView, onAnimationComplete }) {
   return null;
 }
 
-// Custom on-map floating controls
+// Custom on-map floating navigation controls
 function CustomMapControls({ onResetNusantara, onFocusCity, cityName }) {
   const map = useMap();
 
@@ -54,7 +52,16 @@ function CustomMapControls({ onResetNusantara, onFocusCity, cityName }) {
         gap: '6px'
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-sm)', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', border: '1px solid var(--border-flat)' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          borderRadius: 'var(--radius-sm)',
+          overflow: 'hidden',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          border: '1px solid var(--border-flat)'
+        }}
+      >
         <button
           onClick={() => map.zoomIn()}
           title="Zoom In (Perbesar)"
@@ -145,33 +152,6 @@ function CustomMapControls({ onResetNusantara, onFocusCity, cityName }) {
   );
 }
 
-// OpenFreeMap vector tile layer using MapLibre GL
-function OpenFreeMapLayer({ isDark }) {
-  const map = useMap();
-
-  useEffect(() => {
-    const styleUrl = isDark
-      ? 'https://tiles.openfreemap.org/styles/dark'
-      : 'https://tiles.openfreemap.org/styles/positron';
-
-    const glLayer = L.maplibreGL({
-      style: styleUrl,
-      attribution:
-        '&copy; <a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">OpenFreeMap</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'
-    });
-
-    glLayer.addTo(map);
-
-    return () => {
-      if (map && map.hasLayer && map.hasLayer(glLayer)) {
-        map.removeLayer(glLayer);
-      }
-    };
-  }, [isDark, map]);
-
-  return null;
-}
-
 export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDark = false, lang = 'id' }) {
   const t = translations[lang] || translations.id;
   const initialCenter = [currentLocation.lat || -2.5489, currentLocation.lon || 118.0149];
@@ -220,6 +200,11 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
       zoom: 11
     });
   };
+
+  // 100% Free, Zero-Key, Zero-Watermark ESRI World Canvas tiles
+  const esriTileUrl = isDark
+    ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
+    : 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
 
   return (
     <div className="flat-card" style={{ padding: '1.5rem', position: 'relative' }}>
@@ -314,7 +299,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
           scrollWheelZoom={true}
           doubleClickZoom={true}
           touchZoom={true}
-          zoomControl={false} // We provide sleek custom controls
+          zoomControl={false} // Sleek custom controls provided
           style={{ width: '100%', height: '100%' }}
         >
           <MapViewManager targetView={targetView} />
@@ -324,7 +309,12 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
             cityName={currentLocation.city || currentLocation.name}
           />
           
-          <OpenFreeMapLayer isDark={isDark} />
+          <TileLayer
+            key={isDark ? 'esri-dark' : 'esri-light'}
+            attribution='&copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>, HERE, Garmin, METI/NASA, USGS'
+            url={esriTileUrl}
+            maxZoom={16}
+          />
 
           {/* Current selected city indicator rings */}
           <Circle
