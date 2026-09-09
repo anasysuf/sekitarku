@@ -89,6 +89,7 @@ export function App() {
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
   const [isVolcanoOpen, setIsVolcanoOpen] = useState(false);
+  const [isWidgetOpen, setIsWidgetOpen] = useState(false);
 
   // PWA Prompt
   const [installPrompt, setInstallPrompt] = useState(null);
@@ -221,6 +222,7 @@ export function App() {
         onRequestNotification={handleRequestNotification}
         onOpenShare={() => setIsShareOpen(true)}
         onOpenEmergency={() => setIsEmergencyOpen(true)}
+        onOpenWidget={() => setIsWidgetOpen(true)}
       />
 
       {/* Lazy Loaded City Search Modal */}
@@ -257,6 +259,20 @@ export function App() {
           <EmergencyGuideModal
             isOpen={isEmergencyOpen}
             onClose={() => setIsEmergencyOpen(false)}
+            lang={lang}
+          />
+        </Suspense>
+      )}
+
+      {/* Lazy Loaded Embed Widget Modal */}
+      {isWidgetOpen && (
+        <Suspense fallback={null}>
+          <EmbedWidgetModal
+            isOpen={isWidgetOpen}
+            onClose={() => setIsWidgetOpen(false)}
+            location={location}
+            airQualityData={airQualityData}
+            weatherData={weatherData}
             lang={lang}
           />
         </Suspense>
