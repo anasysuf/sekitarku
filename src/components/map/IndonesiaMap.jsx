@@ -24,6 +24,8 @@ function MapController({ center }) {
   return null;
 }
 
+const CARTO_API_KEY = import.meta.env.VITE_CARTO_API_KEY || 'cb1_33y9_1_f8ef25450161f96a4a3aa386';
+
 export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDark = false, lang = 'id' }) {
   const t = translations[lang] || translations.id;
   const center = [currentLocation.lat || -2.5489, currentLocation.lon || 118.0149];
@@ -31,8 +33,8 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
 
   // Fast, high-reliability CartoDB tile URLs with Dark/Light theme adaptation
   const tileUrl = isDark
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+    ? `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?api_key=${CARTO_API_KEY}`
+    : `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?api_key=${CARTO_API_KEY}`;
 
   return (
     <div className="flat-card" style={{ padding: '1.5rem' }}>
