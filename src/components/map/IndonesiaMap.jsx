@@ -232,11 +232,6 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
     });
   };
 
-  // 100% Free, Zero-Key, Zero-Watermark ESRI World Canvas tiles
-  const esriTileUrl = isDark
-    ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
-    : 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
-
   return (
     <div className="flat-card" style={{ padding: '1.5rem', position: 'relative' }}>
       {/* Header & Layer Filters */}
@@ -341,10 +336,9 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
           />
           
           <TileLayer
-            key={isDark ? 'esri-dark' : 'esri-light'}
-            attribution='&copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>, HERE, Garmin, METI/NASA, USGS'
-            url={esriTileUrl}
-            maxZoom={16}
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            maxZoom={18}
           />
 
           {/* Current selected city indicator rings */}
