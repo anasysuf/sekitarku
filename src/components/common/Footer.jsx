@@ -14,6 +14,28 @@ export function Footer({ onOpenWidget }) {
 
       {/* Traktir Kopi & Widget Action Buttons */}
       <div style={{ marginTop: '1.25rem', display: 'flex', justifyContent: 'center' }}>
+        {onOpenWidget && (
+          <button
+            onClick={onOpenWidget}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.55rem 1.15rem',
+              backgroundColor: 'var(--color-secondary-bg)',
+              color: 'var(--color-secondary)',
+              border: '1px solid var(--color-secondary)',
+              borderRadius: 'var(--radius-md)',
+              fontSize: '0.85rem',
+              fontWeight: '800',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+            }}
+          >
+            <Code size={17} strokeWidth={2.5} />
+            <span>Pasang Widget</span>
+          </button>
+        )}
         <a
           href="https://sociabuzz.com/1rengblox/tribe"
           target="_blank"

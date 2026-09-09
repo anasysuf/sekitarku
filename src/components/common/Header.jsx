@@ -92,6 +92,27 @@ export function Header({
         {/* Priority Actions: Share & Emergency */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
           <button
+            onClick={onOpenWidget}
+            aria-label="Pasang Widget Web & Blog"
+            title="Pasang Widget Live di Website / Blog Anda"
+            className="flat-btn-secondary"
+            style={{
+              padding: '0.5rem 0.95rem',
+              minHeight: '38px',
+              color: 'var(--color-secondary)',
+              borderColor: 'var(--color-secondary)',
+              backgroundColor: 'var(--color-secondary-bg)',
+              fontWeight: '800',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              cursor: 'pointer'
+            }}
+          >
+            <Code size={16} strokeWidth={2.5} />
+            <span>Widget</span>
+          </button>
+          <button
             onClick={onOpenShare}
             aria-label="Bagikan Laporan"
             className="flat-btn-secondary"
