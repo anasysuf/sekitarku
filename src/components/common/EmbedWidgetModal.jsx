@@ -1,29 +1,27 @@
 import React, { useState } from 'react';
-import { X, Copy, Check, Code, Layout, Sparkles, ExternalLink } from 'lucide-react';
+import { X, Copy, Check, Code, Globe } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi';
 
 export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, weatherData, lang = 'id' }) {
   const [copiedType, setCopiedType] = useState(null);
-  const [widgetTheme, setWidgetTheme] = useState('auto'); // auto, light, dark
 
   if (!isOpen) return null;
 
-  const cityName = location?.name || 'Jakarta';
-  const aqiVal = airQualityData?.current?.aqi || 45;
+  const cityName = location?.name || location?.city || 'Jakarta';
+  const aqiVal = airQualityData?.current?.aqi || 42;
   const aqiInfo = getAqiInfo(aqiVal, lang);
-  const temp = Math.round(weatherData?.current?.temperature_2m || 30);
+  const temp = Math.round(weatherData?.current?.temperature || weatherData?.current?.temperature_2m || 30);
   const weatherLabel = weatherData?.current?.weatherCodeInfo?.label || 'Cerah Berawan';
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://sekitarku.vercel.app';
   
   // Embed Iframe URL
-  const iframeUrl = `${baseUrl}/?embed=true&city=${encodeURIComponent(cityName)}&theme=${widgetTheme}`;
+  const iframeUrl = `${baseUrl}/?embed=true&city=${encodeURIComponent(cityName)}`;
   const iframeCode = `<iframe src="${iframeUrl}" width="340" height="190" frameborder="0" style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.1);" title="Sekitarku Live Widget - ${cityName}"></iframe>`;
 
   // Dynamic SVG Badge URL
   const badgeUrl = `${baseUrl}/api/badge?city=${encodeURIComponent(cityName)}&aqi=${aqiVal}&status=${encodeURIComponent(aqiInfo.label)}&temp=${temp}`;
   const markdownBadge = `[![Sekitarku AQI & Cuaca ${cityName}](${badgeUrl})](${baseUrl})`;
-  const htmlBadge = `<a href="${baseUrl}" target="_blank" rel="noopener noreferrer"><img src="${badgeUrl}" alt="Sekitarku AQI & Cuaca ${cityName}" /></a>`;
 
   const handleCopy = (text, type) => {
     navigator.clipboard.writeText(text);

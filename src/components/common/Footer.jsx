@@ -12,30 +12,8 @@ export function Footer({ onOpenWidget }) {
         Sumber Data Resmi: BMKG (Badan Meteorologi, Klimatologi, dan Geofisika) & Open-Meteo.
       </p>
 
-      {/* Traktir Kopi & Widget Action Buttons */}
+      {/* Traktir Kopi Support Button */}
       <div style={{ marginTop: '1.25rem', display: 'flex', justifyContent: 'center' }}>
-        {onOpenWidget && (
-          <button
-            onClick={onOpenWidget}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.55rem 1.15rem',
-              backgroundColor: 'var(--color-secondary-bg)',
-              color: 'var(--color-secondary)',
-              border: '1px solid var(--color-secondary)',
-              borderRadius: 'var(--radius-md)',
-              fontSize: '0.85rem',
-              fontWeight: '800',
-              cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-            }}
-          >
-            <Code size={17} strokeWidth={2.5} />
-            <span>Pasang Widget</span>
-          </button>
-        )}
         <a
           href="https://sociabuzz.com/1rengblox/tribe"
           target="_blank"
@@ -61,20 +39,42 @@ export function Footer({ onOpenWidget }) {
         </a>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '1.25rem', fontSize: '0.85rem', flexWrap: 'wrap' }}>
+      {/* Footer Navigation Links with Widget in between */}
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1.5rem', marginTop: '1.25rem', fontSize: '0.85rem', flexWrap: 'wrap' }}>
         <a
           href="https://github.com/anasysuf/sekitarku"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: 'var(--color-primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: '700' }}
+          style={{ color: 'var(--color-primary)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontWeight: '700' }}
         >
           <Code2 size={16} strokeWidth={2.5} /> GitHub Repository
         </a>
+
+        {onOpenWidget && (
+          <button
+            onClick={onOpenWidget}
+            style={{
+              color: '#0284c7',
+              backgroundColor: 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              fontWeight: '700',
+              fontSize: '0.85rem',
+              padding: 0
+            }}
+          >
+            <Code size={16} strokeWidth={2.5} /> Pasang Widget
+          </button>
+        )}
+
         <a
           href="https://data.bmkg.go.id"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: 'var(--color-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: '700' }}
+          style={{ color: 'var(--color-secondary)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontWeight: '700' }}
         >
           <Globe size={16} strokeWidth={2.5} /> BMKG Open Data
         </a>

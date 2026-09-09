@@ -43,6 +43,11 @@ const VolcanoListModal = lazy(() =>
     default: m.VolcanoListModal
   }))
 );
+const EmbedWidgetModal = lazy(() =>
+  import('./components/common/EmbedWidgetModal').then((m) => ({
+    default: m.EmbedWidgetModal
+  }))
+);
 
 // Loading Fallback Component
 function ComponentSkeleton({ height = '200px', label = 'Memuat komponen...' }) {
