@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { Share2, Download, MessageCircle, Copy, Check, X, Sparkles, MapPin, Calendar, Wind, Sun, HeartPulse, Activity } from 'lucide-react';
+import React, { useState } from 'react';
+import { Share2, Download, MessageCircle, Copy, Check, X } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi';
 import { calculateEcoHealthScore } from '../../utils/healthIndex';
 import { getWeatherVisual } from '../../utils/weatherIcons';
@@ -16,7 +16,6 @@ export function ShareCardModal({
 }) {
   const [copied, setCopied] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const canvasRef = useRef(null);
 
   if (!isOpen) return null;
 
@@ -50,142 +49,139 @@ export function ShareCardModal({
     try {
       const canvas = document.createElement('canvas');
       canvas.width = 1080;
-      canvas.height = 1350; // Instagram/Story portrait aspect ratio 4:5
+      canvas.height = 1350;
       const ctx = canvas.getContext('2d');
 
-      // 1. Background
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(0, 0, 1080, 1350);
-
-      // 2. Top Header Brand Pill
-      ctx.fillStyle = '#1e293b';
-      ctx.roundRect(60, 60, 960, 120, 20);
-      ctx.fill();
-
-      ctx.fillStyle = '#10b981';
-      ctx.beginPath();
-      ctx.arc(120, 120, 30, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '800 42px "Outfit", sans-serif';
-      ctx.fillText('SEKITARKU', 180, 125);
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '600 24px "Outfit", sans-serif';
-      ctx.fillText('Pantauan Lingkungan & Kualitas Hidup', 180, 155);
-
-      // 3. City & Date Block
-      ctx.fillStyle = '#1e293b';
-      ctx.roundRect(60, 210, 960, 150, 20);
-      ctx.fill();
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '800 46px "Outfit", sans-serif';
-      ctx.fillText(location.name, 100, 280);
-
-      ctx.fillStyle = '#10b981';
-      ctx.font = '700 26px "Outfit", sans-serif';
-      ctx.fillText(`${location.province} • ${dateFormatted}`, 100, 325);
-
-      // 4. Main Metric Blocks Grid
-      // Left Card: AQI
-      ctx.fillStyle = '#1e293b';
-      ctx.roundRect(60, 390, 465, 340, 20);
-      ctx.fill();
-
-      ctx.fillStyle = aqiInfo.color;
-      ctx.font = '800 26px "Outfit", sans-serif';
-      ctx.fillText('KUALITAS UDARA (AQI)', 100, 445);
-
-      ctx.font = '800 96px "Outfit", sans-serif';
-      ctx.fillText(String(aqi), 100, 560);
-
-      ctx.fillStyle = aqiInfo.color;
-      ctx.roundRect(100, 595, 385, 55, 12);
-      ctx.fill();
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '800 26px "Outfit", sans-serif';
-      ctx.fillText(aqiInfo.label.toUpperCase(), 125, 634);
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '600 22px "Outfit", sans-serif';
-      ctx.fillText(`PM2.5: ${pm25} µg/m³`, 100, 695);
-
-      // Right Card: Cuaca & Suhu
-      ctx.fillStyle = '#1e293b';
-      ctx.roundRect(555, 390, 465, 340, 20);
-      ctx.fill();
-
-      ctx.fillStyle = '#3b82f6';
-      ctx.font = '800 26px "Outfit", sans-serif';
-      ctx.fillText('CUACA & SUHU', 595, 445);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '800 96px "Outfit", sans-serif';
-      ctx.fillText(`${temp}°C`, 595, 560);
-
-      ctx.fillStyle = '#3b82f6';
-      ctx.roundRect(595, 595, 385, 55, 12);
-      ctx.fill();
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '800 26px "Outfit", sans-serif';
-      ctx.fillText(weatherVisual.label.toUpperCase(), 620, 634);
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '600 22px "Outfit", sans-serif';
-      ctx.fillText(`Kelembapan: ${humidity}% • UV: ${uvIndex}`, 595, 695);
-
-      // 5. Eco-Health Score Banner
-      ctx.fillStyle = '#1e293b';
-      ctx.roundRect(60, 760, 960, 240, 20);
-      ctx.fill();
-
-      ctx.fillStyle = health.color;
-      ctx.roundRect(100, 800, 110, 110, 16);
-      ctx.fill();
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '800 58px "Outfit", sans-serif';
-      ctx.fillText(String(health.score), 125, 875);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '800 36px "Outfit", sans-serif';
-      ctx.fillText(health.category, 240, 845);
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = '600 24px "Outfit", sans-serif';
-      ctx.fillText('Skor Kelayakan Lingkungan Terpadu (0-100)', 240, 885);
-
-      ctx.fillStyle = health.cigs > 1.5 ? '#ef4444' : '#10b981';
-      ctx.font = '700 24px "Outfit", sans-serif';
-      ctx.fillText(`Paparan Polusi: ${health.cigs > 0 ? health.cigs + ' rokok/hari' : 'Udara Bersih'}`, 240, 925);
-
-      // 6. Seismic / BMKG Info (if any)
-      if (latestEarthquake) {
-        ctx.fillStyle = '#1e293b';
-        ctx.roundRect(60, 1030, 960, 130, 20);
-        ctx.fill();
-
-        ctx.fillStyle = '#f59e0b';
-        ctx.font = '800 24px "Outfit", sans-serif';
-        ctx.fillText(`GEMPA TERKINI BMKG: M ${latestEarthquake.magnitude} SR (Kedalaman ${latestEarthquake.depth})`, 100, 1075);
-
-        ctx.fillStyle = '#94a3b8';
-        ctx.font = '600 20px "Outfit", sans-serif';
-        ctx.fillText(`${latestEarthquake.wilayah} • ${latestEarthquake.date} ${latestEarthquake.time}`, 100, 1115);
+      // Helper function for rounded rectangles with explicit beginPath
+      function drawCard(x, y, w, h, radius, fill, stroke) {
+        ctx.beginPath();
+        ctx.roundRect(x, y, w, h, radius);
+        if (fill) {
+          ctx.fillStyle = fill;
+          ctx.fill();
+        }
+        if (stroke) {
+          ctx.lineWidth = 3;
+          ctx.strokeStyle = stroke;
+          ctx.stroke();
+        }
       }
 
-      // 7. Footer Official Watermark
+      // 1. Solid Canvas Background
+      ctx.fillStyle = '#0b1120';
+      ctx.fillRect(0, 0, 1080, 1350);
+
+      // 2. Top Header Brand Block
+      drawCard(60, 60, 960, 110, 20, '#1e293b', '#334155');
+
+      ctx.beginPath();
+      ctx.arc(115, 115, 26, 0, Math.PI * 2);
+      ctx.fillStyle = '#10b981';
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 38px sans-serif';
+      ctx.fillText('SEKITARKU', 165, 122);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillText('Pantauan Lingkungan Hidup Real-Time', 165, 150);
+
+      // 3. Location & Date Block
+      drawCard(60, 195, 960, 150, 20, '#1e293b', '#334155');
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 44px sans-serif';
+      ctx.fillText(location.name || 'DKI Jakarta', 95, 260);
+
+      ctx.fillStyle = '#10b981';
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText(`${location.province || 'Indonesia'} • ${dateFormatted}`, 95, 305);
+
+      // 4. Middle Grid: AQI Block (Left)
+      drawCard(60, 370, 465, 340, 20, '#1e293b', aqiInfo.color);
+
+      ctx.fillStyle = aqiInfo.color;
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText('KUALITAS UDARA (AQI)', 95, 420);
+
+      ctx.font = 'bold 88px sans-serif';
+      ctx.fillText(String(aqi), 95, 525);
+
+      drawCard(95, 560, 395, 52, 10, aqiInfo.color, null);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText(aqiInfo.label.toUpperCase(), 120, 595);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.fillText(`PM2.5: ${pm25} µg/m³`, 95, 660);
+
+      // Middle Grid: Weather Block (Right)
+      drawCard(555, 370, 465, 340, 20, '#1e293b', '#3b82f6');
+
+      ctx.fillStyle = '#3b82f6';
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText('CUACA & SUHU', 590, 420);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 88px sans-serif';
+      ctx.fillText(`${temp}°C`, 590, 525);
+
+      drawCard(590, 560, 395, 52, 10, '#3b82f6', null);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText(weatherVisual.label.toUpperCase(), 615, 595);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 20px sans-serif';
+      ctx.fillText(`Kelembapan: ${humidity}% • UV: ${uvIndex}`, 590, 660);
+
+      // 5. Eco-Health Score Banner
+      drawCard(60, 735, 960, 240, 20, '#1e293b', health.color);
+
+      drawCard(95, 770, 110, 110, 16, health.color, null);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 54px sans-serif';
+      ctx.fillText(String(health.score), 125, 845);
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 34px sans-serif';
+      ctx.fillText(health.category, 235, 815);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillText('Skor Kelayakan Lingkungan Terpadu (0 - 100)', 235, 855);
+
+      ctx.fillStyle = health.cigs > 1.5 ? '#ef4444' : '#10b981';
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillText(`Paparan Polusi: ${health.cigs > 0 ? health.cigs + ' rokok/hari' : 'Udara Bersih'}`, 235, 895);
+
+      // 6. Seismic / BMKG Info
+      if (latestEarthquake) {
+        drawCard(60, 1000, 960, 140, 20, '#1e293b', '#f59e0b');
+
+        ctx.fillStyle = '#f59e0b';
+        ctx.font = 'bold 24px sans-serif';
+        ctx.fillText(`GEMPA TERKINI BMKG: M ${latestEarthquake.magnitude} SR (Kedalaman ${latestEarthquake.depth})`, 95, 1045);
+
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.fillText(`${latestEarthquake.wilayah}`, 95, 1080);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = 'bold 18px sans-serif';
+        ctx.fillText(`Waktu: ${latestEarthquake.date} ${latestEarthquake.time} • ${latestEarthquake.potensi || 'Tidak berpotensi tsunami'}`, 95, 1110);
+      }
+
+      // 7. Footer Watermark
       ctx.fillStyle = '#64748b';
-      ctx.font = '700 22px "Outfit", sans-serif';
+      ctx.font = 'bold 22px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('Data Resmi: BMKG & Open-Meteo • sekitarku.vercel.app', 540, 1290);
+      ctx.fillText('Data Resmi: BMKG & Open-Meteo • sekitarku.vercel.app', 540, 1275);
       ctx.textAlign = 'left';
 
-      // Convert to downloadable image
+      // Download trigger
       const dataUrl = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.download = `Sekitarku-${location.name.replace(/\s+/g, '-')}-${new Date().toISOString().slice(0,10)}.png`;
@@ -203,7 +199,7 @@ export function ShareCardModal({
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        backgroundColor: 'rgba(15, 23, 42, 0.75)',
         backdropFilter: 'blur(6px)',
         zIndex: 9999,
         display: 'flex',
@@ -221,7 +217,7 @@ export function ShareCardModal({
           maxHeight: '90vh',
           display: 'flex',
           flexDirection: 'column',
-          backgroundColor: 'var(--bg-canvas)',
+          backgroundColor: 'var(--bg-card)',
           border: 'var(--border-thick)',
           overflow: 'hidden',
           padding: 0
@@ -229,10 +225,10 @@ export function ShareCardModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div style={{ padding: '1.25rem', borderBottom: 'var(--border-thick)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ padding: '1.25rem 1.5rem', borderBottom: 'var(--border-thick)', backgroundColor: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <Share2 size={20} color="var(--color-primary)" strokeWidth={2.5} />
-            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
               Bagikan Laporan Lingkungan
             </h3>
           </div>
@@ -242,12 +238,12 @@ export function ShareCardModal({
             className="flat-btn-secondary"
             style={{ minHeight: '32px', padding: '4px 8px' }}
           >
-            <X size={16} />
+            <X size={16} strokeWidth={2.5} />
           </button>
         </div>
 
         {/* Story Card Visual Preview */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '1.25rem' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '1.25rem 1.5rem', backgroundColor: 'var(--bg-card)' }}>
           
           <div
             style={{
@@ -283,7 +279,7 @@ export function ShareCardModal({
 
             {/* Quick Metrics Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem', marginBottom: '1rem' }}>
-              <div style={{ padding: '0.85rem', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-canvas)', border: 'var(--border-thick)' }}>
+              <div style={{ padding: '0.85rem', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)', border: 'var(--border-thick)' }}>
                 <span style={{ fontSize: '0.7rem', fontWeight: '700', color: aqiInfo.color, display: 'block' }}>KUALITAS UDARA</span>
                 <div style={{ fontSize: '1.75rem', fontWeight: '800', color: aqiInfo.color, lineHeight: 1.1, margin: '0.2rem 0' }}>
                   AQI {aqi}
@@ -291,7 +287,7 @@ export function ShareCardModal({
                 <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-main)' }}>{aqiInfo.label}</span>
               </div>
 
-              <div style={{ padding: '0.85rem', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-canvas)', border: 'var(--border-thick)' }}>
+              <div style={{ padding: '0.85rem', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)', border: 'var(--border-thick)' }}>
                 <span style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--color-primary)', display: 'block' }}>CUACA & SUHU</span>
                 <div style={{ fontSize: '1.75rem', fontWeight: '800', color: 'var(--text-main)', lineHeight: 1.1, margin: '0.2rem 0' }}>
                   {temp}°C
@@ -314,7 +310,7 @@ export function ShareCardModal({
               className="flat-btn-primary"
               style={{ width: '100%', gap: '0.5rem' }}
             >
-              <Download size={18} />
+              <Download size={18} strokeWidth={2.5} />
               <span>{isGenerating ? 'Membuat Gambar...' : 'Unduh Kartu Gambar (Story PNG)'}</span>
             </button>
 
@@ -329,7 +325,7 @@ export function ShareCardModal({
                   gap: '0.45rem'
                 }}
               >
-                <MessageCircle size={18} />
+                <MessageCircle size={18} strokeWidth={2.5} />
                 <span>WhatsApp</span>
               </button>
 
@@ -338,7 +334,7 @@ export function ShareCardModal({
                 className="flat-btn-secondary"
                 style={{ gap: '0.45rem' }}
               >
-                {copied ? <Check size={18} color="var(--color-secondary)" /> : <Copy size={18} />}
+                {copied ? <Check size={18} color="var(--color-secondary)" strokeWidth={2.5} /> : <Copy size={18} strokeWidth={2.5} />}
                 <span>{copied ? 'Tersalin!' : 'Salin Teks'}</span>
               </button>
             </div>
@@ -348,8 +344,8 @@ export function ShareCardModal({
         </div>
 
         {/* Footer */}
-        <div style={{ padding: '0.75rem 1.25rem', borderTop: 'var(--border-thick)', backgroundColor: 'var(--bg-muted)', fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'center' }}>
-          Format gambar dioptimalkan untuk Instagram Stories & WhatsApp Status
+        <div style={{ padding: '0.85rem 1.5rem', borderTop: 'var(--border-thick)', backgroundColor: 'var(--bg-muted)', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textAlign: 'center' }}>
+          Format gambar beresolusi tinggi untuk Instagram Story & WhatsApp Status
         </div>
       </div>
     </div>

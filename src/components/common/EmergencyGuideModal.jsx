@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { ShieldAlert, PhoneCall, AlertTriangle, Wind, Waves, Sun, X, HeartHandshake, ShieldCheck, Flame } from 'lucide-react';
+import { ShieldAlert, PhoneCall, AlertTriangle, Wind, Waves, Sun, X, HeartHandshake, ShieldCheck, Flame, Activity } from 'lucide-react';
 
 const EMERGENCY_CONTACTS = [
   {
     number: '112',
     name: 'Panggilan Darurat Nasional',
-    desc: 'Layanan Terpadu 24 Jam Bebas Pulsa (Polisi, Ambulans, Damkar, Bencana)',
+    desc: 'Layanan Terpadu Bebas Pulsa (Polisi, Ambulans, Damkar, Bencana)',
     color: '#ef4444',
     bg: '#fef2f2'
   },
@@ -26,7 +26,7 @@ const EMERGENCY_CONTACTS = [
   {
     number: '113',
     name: 'Pemadam Kebakaran (Damkar)',
-    desc: 'Kebakaran, Penyelamatan Satwa Liar, & Bencana Runtuhan',
+    desc: 'Kebakaran, Penyelamatan Runtuhan, & Penanganan Bahaya',
     color: '#dc2626',
     bg: '#fef2f2'
   },
@@ -56,7 +56,7 @@ export function EmergencyGuideModal({ isOpen, onClose, lang = 'id' }) {
       style={{
         position: 'fixed',
         inset: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        backgroundColor: 'rgba(15, 23, 42, 0.75)',
         backdropFilter: 'blur(6px)',
         zIndex: 9999,
         display: 'flex',
@@ -70,11 +70,11 @@ export function EmergencyGuideModal({ isOpen, onClose, lang = 'id' }) {
         className="flat-card animate-fade-in"
         style={{
           width: '100%',
-          maxWidth: '620px',
-          maxHeight: '88vh',
+          maxWidth: '640px',
+          maxHeight: '90vh',
           display: 'flex',
           flexDirection: 'column',
-          backgroundColor: 'var(--bg-canvas)',
+          backgroundColor: 'var(--bg-card)',
           border: 'var(--border-thick)',
           overflow: 'hidden',
           padding: 0
@@ -82,26 +82,27 @@ export function EmergencyGuideModal({ isOpen, onClose, lang = 'id' }) {
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div style={{ padding: '1.25rem', borderBottom: 'var(--border-thick)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+        <div style={{ padding: '1.25rem 1.5rem', borderBottom: 'var(--border-thick)', backgroundColor: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <div style={{
-              width: '36px',
-              height: '36px',
+              width: '40px',
+              height: '40px',
               borderRadius: 'var(--radius-sm)',
               backgroundColor: 'var(--color-danger)',
               color: '#fff',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center'
+              justifyContent: 'center',
+              flexShrink: 0
             }}>
-              <ShieldAlert size={20} strokeWidth={2.5} />
+              <ShieldAlert size={22} strokeWidth={2.5} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
                 Tanggap Bencana & Kontak Darurat
               </h3>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0, fontWeight: '600' }}>
-                Panduan Kesiapsiagaan & Nomor Panggilan Darurat Indonesia
+              <p style={{ fontSize: '0.775rem', color: 'var(--text-muted)', margin: 0, fontWeight: '600' }}>
+                Panduan Kesiapsiagaan & Hotline Bencana Resmi Indonesia
               </p>
             </div>
           </div>
@@ -111,89 +112,115 @@ export function EmergencyGuideModal({ isOpen, onClose, lang = 'id' }) {
             className="flat-btn-secondary"
             style={{ minHeight: '32px', padding: '4px 8px' }}
           >
-            <X size={16} />
+            <X size={16} strokeWidth={2.5} />
           </button>
         </div>
 
-        {/* Tab Pills */}
-        <div style={{ display: 'flex', gap: '0.4rem', padding: '0.75rem 1.25rem', borderBottom: 'var(--border-thick)', backgroundColor: 'var(--bg-muted)', overflowX: 'auto', scrollbarWidth: 'none' }}>
+        {/* Tab Navigation with Clean Vector Icons */}
+        <div style={{ display: 'flex', gap: '0.5rem', padding: '0.75rem 1.25rem', borderBottom: 'var(--border-thick)', backgroundColor: 'var(--bg-muted)', overflowX: 'auto', scrollbarWidth: 'none' }}>
+          
           <button
             onClick={() => setActiveTab('kontak')}
             style={{
-              padding: '6px 12px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.6rem 1rem',
+              minHeight: '38px',
               borderRadius: 'var(--radius-sm)',
-              fontSize: '0.8rem',
+              fontSize: '0.825rem',
               fontWeight: '800',
               cursor: 'pointer',
               border: activeTab === 'kontak' ? '2px solid var(--color-danger)' : 'var(--border-thick)',
-              backgroundColor: activeTab === 'kontak' ? 'var(--color-danger)' : 'var(--bg-canvas)',
-              color: activeTab === 'kontak' ? '#fff' : 'var(--text-main)',
-              whiteSpace: 'nowrap'
+              backgroundColor: activeTab === 'kontak' ? 'var(--color-danger)' : 'var(--bg-card)',
+              color: activeTab === 'kontak' ? '#ffffff' : 'var(--text-main)',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.15s ease'
             }}
           >
-            ☎️ Kontak Darurat
+            <PhoneCall size={15} strokeWidth={2.5} />
+            <span>Kontak Darurat</span>
           </button>
 
           <button
             onClick={() => setActiveTab('gempa')}
             style={{
-              padding: '6px 12px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.6rem 1rem',
+              minHeight: '38px',
               borderRadius: 'var(--radius-sm)',
-              fontSize: '0.8rem',
+              fontSize: '0.825rem',
               fontWeight: '800',
               cursor: 'pointer',
               border: activeTab === 'gempa' ? '2px solid var(--color-accent)' : 'var(--border-thick)',
-              backgroundColor: activeTab === 'gempa' ? 'var(--color-accent)' : 'var(--bg-canvas)',
-              color: activeTab === 'gempa' ? '#fff' : 'var(--text-main)',
-              whiteSpace: 'nowrap'
+              backgroundColor: activeTab === 'gempa' ? 'var(--color-accent)' : 'var(--bg-card)',
+              color: activeTab === 'gempa' ? '#ffffff' : 'var(--text-main)',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.15s ease'
             }}
           >
-            🌋 Mitigasi Gempa
+            <Activity size={15} strokeWidth={2.5} />
+            <span>Mitigasi Gempa</span>
           </button>
 
           <button
             onClick={() => setActiveTab('polusi')}
             style={{
-              padding: '6px 12px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.6rem 1rem',
+              minHeight: '38px',
               borderRadius: 'var(--radius-sm)',
-              fontSize: '0.8rem',
+              fontSize: '0.825rem',
               fontWeight: '800',
               cursor: 'pointer',
               border: activeTab === 'polusi' ? '2px solid var(--color-secondary)' : 'var(--border-thick)',
-              backgroundColor: activeTab === 'polusi' ? 'var(--color-secondary)' : 'var(--bg-canvas)',
-              color: activeTab === 'polusi' ? '#fff' : 'var(--text-main)',
-              whiteSpace: 'nowrap'
+              backgroundColor: activeTab === 'polusi' ? 'var(--color-secondary)' : 'var(--bg-card)',
+              color: activeTab === 'polusi' ? '#ffffff' : 'var(--text-main)',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.15s ease'
             }}
           >
-            😷 Polusi Udara
+            <Wind size={15} strokeWidth={2.5} />
+            <span>Polusi Udara</span>
           </button>
 
           <button
             onClick={() => setActiveTab('tsunami')}
             style={{
-              padding: '6px 12px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.6rem 1rem',
+              minHeight: '38px',
               borderRadius: 'var(--radius-sm)',
-              fontSize: '0.8rem',
+              fontSize: '0.825rem',
               fontWeight: '800',
               cursor: 'pointer',
               border: activeTab === 'tsunami' ? '2px solid var(--color-primary)' : 'var(--border-thick)',
-              backgroundColor: activeTab === 'tsunami' ? 'var(--color-primary)' : 'var(--bg-canvas)',
-              color: activeTab === 'tsunami' ? '#fff' : 'var(--text-main)',
-              whiteSpace: 'nowrap'
+              backgroundColor: activeTab === 'tsunami' ? 'var(--color-primary)' : 'var(--bg-card)',
+              color: activeTab === 'tsunami' ? '#ffffff' : 'var(--text-main)',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.15s ease'
             }}
           >
-            🌊 Tsunami & UV
+            <Waves size={15} strokeWidth={2.5} />
+            <span>Tsunami & UV</span>
           </button>
+
         </div>
 
         {/* Content Body */}
-        <div style={{ flex: 1, overflowY: 'auto', padding: '1.25rem' }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '1.25rem 1.5rem', backgroundColor: 'var(--bg-card)' }}>
           
           {/* TAB 1: KONTAK DARURAT */}
           {activeTab === 'kontak' && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.65rem' }}>
-              <div style={{ padding: '0.75rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-danger-bg)', border: '1px solid var(--color-danger)', fontSize: '0.8rem', color: 'var(--color-danger)', fontWeight: '700' }}>
-                ⚠️ Panggilan 112 dapat dihubungi dari semua operator seluler bahkan tanpa pulsa dan saat SIM terkunci.
+              <div style={{ padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-danger-bg)', border: '1px solid var(--color-danger)', fontSize: '0.8rem', color: 'var(--color-danger)', fontWeight: '700' }}>
+                ⚠️ Panggilan 112 dapat dihubungi dari semua operator seluler bebas pulsa, bahkan saat ponsel terkunci.
               </div>
 
               {EMERGENCY_CONTACTS.map((c) => (
@@ -219,7 +246,7 @@ export function EmergencyGuideModal({ isOpen, onClose, lang = 'id' }) {
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontSize: '1.15rem',
+                      fontSize: '1.2rem',
                       fontWeight: '800'
                     }}>
                       {c.number}
@@ -245,7 +272,7 @@ export function EmergencyGuideModal({ isOpen, onClose, lang = 'id' }) {
                       backgroundColor: c.color
                     }}
                   >
-                    <PhoneCall size={15} /> Hubungi
+                    <PhoneCall size={14} strokeWidth={2.5} /> Hubungi
                   </a>
                 </div>
               ))}
@@ -260,30 +287,30 @@ export function EmergencyGuideModal({ isOpen, onClose, lang = 'id' }) {
                   1. Saat Guncangan Terjadi (DROP, COVER, HOLD ON)
                 </h4>
                 <ul style={{ fontSize: '0.85rem', color: 'var(--text-main)', paddingLeft: '1.25rem', lineHeight: 1.6, fontWeight: '500' }}>
-                  <li><strong>Merunduk (Drop)</strong> ke lantai sebelum guncangan menjatuhkan Anda.</li>
-                  <li><strong>Lindungi Kepala (Cover)</strong> di bawah meja yang kokoh atau lindungi kepala dengan tas/lengan.</li>
+                  <li><strong>Merunduk (Drop)</strong> ke lantai sebelum guncangan merobohkan keseimbangan Anda.</li>
+                  <li><strong>Lindungi Kepala (Cover)</strong> di bawah meja yang kokoh atau lindungi kepala dengan tas/bantal/lengan.</li>
                   <li><strong>Bertahan (Hold On)</strong> pegang kaki meja hingga guncangan benar-benar reda.</li>
-                  <li>Jauhi jendela kaca, cermin, lemari tinggi, dan lampu gantung.</li>
+                  <li>Jauhi kaca jendela, cermin, lemari tinggi, dan benda yang berisiko jatuh.</li>
                 </ul>
               </div>
 
               <div style={{ padding: '1rem', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-muted)', border: 'var(--border-thick)' }}>
                 <h4 style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--color-danger)', marginBottom: '0.5rem' }}>
-                  2. Jika di Gedung Bertingkat
+                  2. Jika Berada di Gedung Bertingkat
                 </h4>
                 <ul style={{ fontSize: '0.85rem', color: 'var(--text-main)', paddingLeft: '1.25rem', lineHeight: 1.6, fontWeight: '500' }}>
                   <li><strong>JANGAN gunakan lift / elevator</strong>. Selalu gunakan tangga darurat.</li>
-                  <li>Jangan panik berebut keluar pintu secara bersamaan untuk mencegah desak-desakan.</li>
+                  <li>Jangan panik berebut keluar pintu secara bersamaan untuk mencegah penumpukan massa.</li>
                 </ul>
               </div>
 
               <div style={{ padding: '1rem', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-muted)', border: 'var(--border-thick)' }}>
                 <h4 style={{ fontSize: '1rem', fontWeight: '800', color: 'var(--color-secondary)', marginBottom: '0.5rem' }}>
-                  3. Pasca Guncangan
+                  3. Pasca Guncangan Mereda
                 </h4>
                 <ul style={{ fontSize: '0.85rem', color: 'var(--text-main)', paddingLeft: '1.25rem', lineHeight: 1.6, fontWeight: '500' }}>
-                  <li>Matikan kompor gas dan saklar listrik utama untuk mencegah kebakaran.</li>
-                  <li>Evakuasi ke titik kumpul terbuka yang jauh dari tiang listrik dan bangunan retak.</li>
+                  <li>Segera matikan kompor gas dan saklar listrik utama untuk mencegah kebakaran.</li>
+                  <li>Evakuasi ke titik kumpul terbuka yang jauh dari tiang listrik, baliho, dan tembok retak.</li>
                   <li>Pantau pembaruan gempa susulan resmi BMKG di aplikasi Sekitarku.</li>
                 </ul>
               </div>
@@ -298,7 +325,7 @@ export function EmergencyGuideModal({ isOpen, onClose, lang = 'id' }) {
                   Saat Kualitas Udara Tidak Sehat (AQI &gt; 150)
                 </h4>
                 <ul style={{ fontSize: '0.85rem', color: 'var(--text-main)', paddingLeft: '1.25rem', lineHeight: 1.6, fontWeight: '500' }}>
-                  <li><strong>Wajib Masker Respirator</strong>: Gunakan masker standar N95, KN95, atau KF94 saat keluar ruangan. Masker kain biasa tidak mampu menyaring partikel mikro PM2.5.</li>
+                  <li><strong>Wajib Masker Respirator</strong>: Gunakan masker standar N95, KN95, atau KF94 saat keluar ruangan. Masker kain tipis tidak mampu menyaring partikel mikro PM2.5.</li>
                   <li><strong>Tutup Jendela & Ventilasi</strong>: Cegah masuknya polusi luar ruangan ke dalam kamar dan ruang keluarga.</li>
                   <li><strong>Gunakan Pembersih Udara</strong>: Nyalakan HEPA Air Purifier jika tersedia di dalam ruangan.</li>
                   <li><strong>Batasi Aktivitas Berat</strong>: Hindari jogging atau bersepeda di pinggir jalan raya utama pada jam sibuk.</li>
@@ -337,7 +364,7 @@ export function EmergencyGuideModal({ isOpen, onClose, lang = 'id' }) {
         </div>
 
         {/* Footer */}
-        <div style={{ padding: '0.75rem 1.25rem', borderTop: 'var(--border-thick)', backgroundColor: 'var(--bg-muted)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+        <div style={{ padding: '0.85rem 1.5rem', borderTop: 'var(--border-thick)', backgroundColor: 'var(--bg-muted)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>
           <span>Pedoman Resmi BNPB, BMKG & Kemenkes RI</span>
           <span>Bebas Pulsa 112</span>
         </div>
