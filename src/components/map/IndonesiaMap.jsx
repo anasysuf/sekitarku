@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
+import React, { useEffect, useState, useMemo } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { INDONESIA_CITIES } from '../../utils/cities';
@@ -52,9 +52,15 @@ function getEarthquakeColor(mag) {
   return '#eab308';
 }
 
-// Controller component to manage zoom, flyTo, and view resets
-function MapViewManager({ targetView }) {
+// Map event listener & view animator
+function MapViewManager({ targetView, onZoomChange }) {
   const map = useMap();
+
+  useMapEvents({
+    zoomend: () => {
+      if (onZoomChange) onZoomChange(map.getZoom());
+    }
+  });
 
   useEffect(() => {
     if (!targetView) return;
@@ -96,6 +102,7 @@ function CustomMapControls({ onResetNusantara, onFocusCity, cityName }) {
         <button
           onClick={() => map.zoomIn()}
           title="Zoom In (Perbesar)"
+          aria-label="Perbesar peta"
           style={{
             width: '34px',
             height: '34px',
@@ -117,6 +124,7 @@ function CustomMapControls({ onResetNusantara, onFocusCity, cityName }) {
         <button
           onClick={() => map.zoomOut()}
           title="Zoom Out (Perkecil)"
+          aria-label="Perkecil peta"
           style={{
             width: '34px',
             height: '34px',
@@ -139,6 +147,7 @@ function CustomMapControls({ onResetNusantara, onFocusCity, cityName }) {
       <button
         onClick={onFocusCity}
         title={`Fokus ke kota ${cityName || 'terpilih'}`}
+        aria-label="Fokus ke kota aktif"
         style={{
           padding: '6px 10px',
           borderRadius: 'var(--radius-sm)',
@@ -161,6 +170,7 @@ function CustomMapControls({ onResetNusantara, onFocusCity, cityName }) {
       <button
         onClick={onResetNusantara}
         title="Reset tampilan ke seluruh Nusantara"
+        aria-label="Reset tampilan Nusantara"
         style={{
           padding: '6px 10px',
           borderRadius: 'var(--radius-sm)',
@@ -191,11 +201,12 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
   const [showCities, setShowCities] = useState(true);
   const [showVolcanoes, setShowVolcanoes] = useState(true);
   const [showEarthquakes, setShowEarthquakes] = useState(true);
+  const [currentZoom, setCurrentZoom] = useState(9);
 
   // Dynamic target view state for smooth flyTo
   const [targetView, setTargetView] = useState({
     center: initialCenter,
-    zoom: 9 // detailed zoom into active city on load
+    zoom: 9
   });
 
   // Whenever currentLocation changes externally, fly directly into city zoom
@@ -232,6 +243,22 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
     });
   };
 
+  // Adaptive Level of Detail (LOD) for 500+ cities:
+  // At zoom <= 6 (country overview): render major provincial hubs & active city (prevents DOM lag)
+  // At zoom >= 7 (regional/city view): render all cities seamlessly
+  const visibleCities = useMemo(() => {
+    const activeName = currentLocation.city || currentLocation.name;
+    if (currentZoom <= 6) {
+      const hubs = INDONESIA_CITIES.slice(0, 75);
+      const activeObj = INDONESIA_CITIES.find(c => c.name === activeName);
+      if (activeObj && !hubs.some(c => c.name === activeName)) {
+        return [...hubs, activeObj];
+      }
+      return hubs;
+    }
+    return INDONESIA_CITIES;
+  }, [currentZoom, currentLocation.city, currentLocation.name]);
+
   return (
     <div className="flat-card" style={{ padding: '1.5rem', position: 'relative' }}>
       {/* Header & Layer Filters */}
@@ -252,6 +279,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
           <button
             onClick={() => setShowCities(!showCities)}
+            aria-label="Toggle layer stasiun kota"
             style={{
               padding: '4px 9px',
               borderRadius: 'var(--radius-sm)',
@@ -273,6 +301,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
 
           <button
             onClick={() => setShowEarthquakes(!showEarthquakes)}
+            aria-label="Toggle layer gempa BMKG"
             style={{
               padding: '4px 9px',
               borderRadius: 'var(--radius-sm)',
@@ -294,6 +323,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
 
           <button
             onClick={() => setShowVolcanoes(!showVolcanoes)}
+            aria-label="Toggle layer gunung api PVMBG"
             style={{
               padding: '4px 9px',
               borderRadius: 'var(--radius-sm)',
@@ -326,9 +356,10 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
           doubleClickZoom={true}
           touchZoom={true}
           zoomControl={false}
+          preferCanvas={true}
           style={{ width: '100%', height: '100%' }}
         >
-          <MapViewManager targetView={targetView} />
+          <MapViewManager targetView={targetView} onZoomChange={setCurrentZoom} />
           <CustomMapControls
             onResetNusantara={handleResetNusantara}
             onFocusCity={handleFocusCity}
@@ -353,8 +384,8 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
             pathOptions={{ color: '#059669', fillColor: '#059669', fillOpacity: 0.65, weight: 3 }}
           />
 
-          {/* City markers with crisp SVG icon */}
-          {showCities && INDONESIA_CITIES.map((city) => {
+          {/* City markers with adaptive LOD & crisp SVG icon */}
+          {showCities && visibleCities.map((city) => {
             const isSelected = city.name === (currentLocation.city || currentLocation.name);
             return (
               <Marker

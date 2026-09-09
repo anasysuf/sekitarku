@@ -1,12 +1,14 @@
-const CACHE_NAME = 'sekitarku-v4';
-const ASSETS_TO_CACHE = [
+const CACHE_NAME = 'sekitarku-v5';
+const STATIC_ASSETS = [
+  '/',
+  '/index.html',
   '/leaf.svg',
   '/manifest.webmanifest'
 ];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(STATIC_ASSETS))
   );
   self.skipWaiting();
 });
@@ -17,7 +19,7 @@ self.addEventListener('activate', (e) => {
       Promise.all(
         keys.map((k) => {
           if (k !== CACHE_NAME) {
-            console.log('[SW] Deleting old cache:', k);
+            console.log('[SW] Cleared old cache:', k);
             return caches.delete(k);
           }
         })
@@ -32,7 +34,7 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
 
-  // 1. For HTML page navigation: Network First (prevents stale hash 404s on Vercel deploys)
+  // 1. Navigation / Document: Network First, fallback to cached index.html
   if (event.request.mode === 'navigate' || event.request.destination === 'document') {
     event.respondWith(
       fetch(event.request)
@@ -52,7 +54,28 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2. For external APIs (BMKG, Open-Meteo): Network First
+  // 2. OpenStreetMap Tiles: Stale-While-Revalidate for offline navigation & speed
+  if (url.hostname.includes('tile.openstreetmap.org')) {
+    event.respondWith(
+      caches.open(CACHE_NAME).then((cache) =>
+        cache.match(event.request).then((cachedResponse) => {
+          const fetchPromise = fetch(event.request)
+            .then((networkResponse) => {
+              if (networkResponse && networkResponse.status === 200) {
+                cache.put(event.request, networkResponse.clone());
+              }
+              return networkResponse;
+            })
+            .catch(() => cachedResponse);
+
+          return cachedResponse || fetchPromise;
+        })
+      )
+    );
+    return;
+  }
+
+  // 3. Real-time External APIs (BMKG, Open-Meteo): Network First
   if (url.hostname.includes('open-meteo.com') || url.hostname.includes('data.bmkg.go.id')) {
     event.respondWith(
       fetch(event.request)
@@ -68,21 +91,17 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 3. For static assets (JS/CSS/Fonts/Images): Cache First, fallback to Network
+  // 4. Static JS/CSS/Fonts/Assets: Cache First with Network Fallback
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached;
-      return fetch(event.request)
-        .then((response) => {
-          if (response.status === 200 && response.type === 'basic') {
-            const copy = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
-          }
-          return response;
-        })
-        .catch((err) => {
-          console.warn('[SW] Fetch failed for asset:', event.request.url, err);
-        });
+      return fetch(event.request).then((response) => {
+        if (response && response.status === 200 && response.type === 'basic') {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+        }
+        return response;
+      });
     })
   );
 });
