@@ -394,7 +394,7 @@ export function App() {
       </div>
 
       {/* Footer */}
-      <Footer />
+      <Footer onOpenWidget={() => setIsWidgetOpen(true)} />
     </div>
   );
 }

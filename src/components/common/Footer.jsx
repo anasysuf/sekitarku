@@ -1,7 +1,7 @@
 import React from 'react';
-import { Code2, Globe, Coffee, Heart } from 'lucide-react';
+import { Code2, Globe, Coffee, Code } from 'lucide-react';
 
-export function Footer() {
+export function Footer({ onOpenWidget }) {
   return (
     <footer style={{ marginTop: '4rem', padding: '2.5rem 0', borderTop: 'var(--border-thick)', textAlign: 'center' }}>
       <p style={{ fontSize: '0.9rem', color: 'var(--text-main)', margin: 0, fontWeight: '700' }}>
@@ -12,7 +12,7 @@ export function Footer() {
         Sumber Data Resmi: BMKG (Badan Meteorologi, Klimatologi, dan Geofisika) & Open-Meteo.
       </p>
 
-      {/* Buy Me a Coffee / SociaBuzz Support Button */}
+      {/* Traktir Kopi & Widget Action Buttons */}
       <div style={{ marginTop: '1.25rem', display: 'flex', justifyContent: 'center' }}>
         <a
           href="https://sociabuzz.com/1rengblox/tribe"
