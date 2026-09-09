@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sekitarku-v7';
+const CACHE_NAME = 'sekitarku-cache-v8';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

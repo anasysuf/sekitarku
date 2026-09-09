@@ -8,10 +8,6 @@
           "value": "nosniff"
         },
         {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
           "key": "X-XSS-Protection",
           "value": "1; mode=block"
         },
@@ -25,7 +21,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.tile.openstreetmap.org https://data.bmkg.go.id; connect-src 'self' blob: data: https://*.tile.openstreetmap.org https://api.open-meteo.com https://air-quality-api.open-meteo.com https://data.bmkg.go.id; worker-src 'self' blob:; child-src 'self' blob:;"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.tile.openstreetmap.org https://data.bmkg.go.id https://sekitarku.vercel.app; connect-src 'self' blob: data: https://*.tile.openstreetmap.org https://api.open-meteo.com https://air-quality-api.open-meteo.com https://data.bmkg.go.id; worker-src 'self' blob:; child-src 'self' blob:; frame-ancestors *;"
         }
       ]
     },
@@ -35,6 +31,15 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=120, s-maxage=600, stale-while-revalidate=86400"
         }
       ]
     },
