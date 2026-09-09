@@ -1,50 +1,94 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Header } from './components/common/Header';
-import { Footer } from './components/common/Footer';
-import { CitySearchModal } from './components/common/CitySearchModal';
-import { ShareCardModal } from './components/common/ShareCardModal';
-import { EmergencyGuideModal } from './components/common/EmergencyGuideModal';
 import { EcoHealthCard } from './components/cards/EcoHealthCard';
 import { AqiCard } from './components/cards/AqiCard';
 import { WeatherCard } from './components/cards/WeatherCard';
 import { EarthquakeCard } from './components/cards/EarthquakeCard';
 import { UvCard } from './components/cards/UvCard';
-import { IndonesiaMap } from './components/map/IndonesiaMap';
-import { AqiChart } from './components/charts/AqiChart';
-import { WeatherForecastChart } from './components/charts/WeatherForecastChart';
-import { AlertTriangle, Download, X } from 'lucide-react';
-
+import { Footer } from './components/common/Footer';
 import { useGeolocation } from './hooks/useGeolocation';
 import { useDarkMode } from './hooks/useDarkMode';
 import { fetchWeatherData } from './services/weather';
 import { fetchAirQualityData } from './services/airQuality';
 import { fetchLatestEarthquake, fetchRecentEarthquakes } from './services/bmkg';
-import { translations } from './utils/i18n';
+import { i18n } from './utils/i18n';
+import { Download, AlertTriangle, X, Loader2 } from 'lucide-react';
+
+// Lazy load heavy components for peak initial load speed & performance
+const AqiChart = lazy(() =>
+  import('./components/charts/AqiChart').then((m) => ({ default: m.AqiChart }))
+);
+const WeatherForecastChart = lazy(() =>
+  import('./components/charts/WeatherForecastChart').then((m) => ({
+    default: m.WeatherForecastChart
+  }))
+);
+const IndonesiaMap = lazy(() =>
+  import('./components/map/IndonesiaMap').then((m) => ({ default: m.IndonesiaMap }))
+);
+const CitySearchModal = lazy(() =>
+  import('./components/common/CitySearchModal').then((m) => ({ default: m.CitySearchModal }))
+);
+const ShareCardModal = lazy(() =>
+  import('./components/common/ShareCardModal').then((m) => ({ default: m.ShareCardModal }))
+);
+const EmergencyGuideModal = lazy(() =>
+  import('./components/common/EmergencyGuideModal').then((m) => ({
+    default: m.EmergencyGuideModal
+  }))
+);
+
+// Loading Fallback Component
+function ComponentSkeleton({ height = '200px', label = 'Memuat komponen...' }) {
+  return (
+    <div
+      style={{
+        minHeight: height,
+        backgroundColor: 'var(--bg-card)',
+        border: '2px solid var(--border-color)',
+        borderRadius: 'var(--radius-lg)',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '0.5rem',
+        color: 'var(--text-muted)',
+        fontSize: '0.85rem',
+        fontWeight: '600'
+      }}
+    >
+      <Loader2 size={24} className="animate-spin" color="var(--color-primary)" />
+      <span>{label}</span>
+    </div>
+  );
+}
 
 export function App() {
-  const { location, selectCity, requestGpsLocation, loading: gpsLoading } = useGeolocation();
   const { isDark, toggleDarkMode } = useDarkMode();
-  const [lang, setLang] = useState('id');
+  const { location, selectCity, requestGpsLocation, gpsLoading } = useGeolocation();
 
   const [weatherData, setWeatherData] = useState(null);
   const [airQualityData, setAirQualityData] = useState(null);
   const [latestEarthquake, setLatestEarthquake] = useState(null);
   const [recentEarthquakes, setRecentEarthquakes] = useState([]);
-  
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
-  // Modals state
+  // Language state: 'id' or 'en'
+  const [lang, setLang] = useState('id');
+  const t = i18n[lang] || i18n.id;
+
+  // Modals
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
 
-  // PWA and Notification states
+  // PWA Prompt
   const [installPrompt, setInstallPrompt] = useState(null);
   const [showPwaBanner, setShowPwaBanner] = useState(true);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
-  const t = translations[lang] || translations.id;
+  // Notification state
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e) => {
@@ -55,12 +99,11 @@ export function App() {
 
     if ('serviceWorker' in navigator) {
       if (import.meta.env.PROD) {
-        navigator.serviceWorker.register('/sw.js').catch(err => {
+        navigator.serviceWorker.register('/sw.js').catch((err) => {
           console.log('SW error:', err);
         });
       } else {
-        // Unregister SW in development to prevent stale caches
-        navigator.serviceWorker.getRegistrations().then(registrations => {
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
           for (const reg of registrations) reg.unregister();
         });
       }
@@ -90,21 +133,21 @@ export function App() {
     const perm = await Notification.requestPermission();
     if (perm === 'granted') {
       setNotificationsEnabled(true);
-      new Notification('Sekitarku Active', {
+      new Notification('Sekitarku Aktif', {
         body: 'Notifikasi peringatan gempa & kualitas udara berhasil diaktifkan.',
         icon: '/leaf.svg'
       });
     }
   };
 
-  const loadData = async () => {
+  const loadData = async (force = false) => {
     setLoading(true);
     try {
       const [weather, aqi, quake, quakeList] = await Promise.all([
-        fetchWeatherData(location.lat, location.lon),
-        fetchAirQualityData(location.lat, location.lon),
-        fetchLatestEarthquake(),
-        fetchRecentEarthquakes()
+        fetchWeatherData(location.lat, location.lon, force),
+        fetchAirQualityData(location.lat, location.lon, force),
+        fetchLatestEarthquake(force),
+        fetchRecentEarthquakes(force)
       ]);
 
       setWeatherData(weather);
@@ -144,7 +187,7 @@ export function App() {
   };
 
   const toggleLang = () => {
-    setLang(prev => prev === 'id' ? 'en' : 'id');
+    setLang((prev) => (prev === 'id' ? 'en' : 'id'));
   };
 
   // Alerts
@@ -162,7 +205,7 @@ export function App() {
         gpsLoading={gpsLoading}
         isDark={isDark}
         onToggleDark={toggleDarkMode}
-        onRefresh={loadData}
+        onRefresh={() => loadData(true)}
         lastUpdated={lastUpdated}
         lang={lang}
         onToggleLang={toggleLang}
@@ -172,32 +215,44 @@ export function App() {
         onOpenEmergency={() => setIsEmergencyOpen(true)}
       />
 
-      {/* City Search Modal */}
-      <CitySearchModal
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        onSelectCity={selectCity}
-        currentCity={location}
-        lang={lang}
-      />
+      {/* Lazy Loaded City Search Modal */}
+      {isSearchOpen && (
+        <Suspense fallback={null}>
+          <CitySearchModal
+            isOpen={isSearchOpen}
+            onClose={() => setIsSearchOpen(false)}
+            onSelectCity={selectCity}
+            currentCity={location}
+            lang={lang}
+          />
+        </Suspense>
+      )}
 
-      {/* Share Card Modal */}
-      <ShareCardModal
-        isOpen={isShareOpen}
-        onClose={() => setIsShareOpen(false)}
-        location={location}
-        airQualityData={airQualityData}
-        weatherData={weatherData}
-        latestEarthquake={latestEarthquake}
-        lang={lang}
-      />
+      {/* Lazy Loaded Share Card Modal */}
+      {isShareOpen && (
+        <Suspense fallback={null}>
+          <ShareCardModal
+            isOpen={isShareOpen}
+            onClose={() => setIsShareOpen(false)}
+            location={location}
+            airQualityData={airQualityData}
+            weatherData={weatherData}
+            latestEarthquake={latestEarthquake}
+            lang={lang}
+          />
+        </Suspense>
+      )}
 
-      {/* Emergency Guide Modal */}
-      <EmergencyGuideModal
-        isOpen={isEmergencyOpen}
-        onClose={() => setIsEmergencyOpen(false)}
-        lang={lang}
-      />
+      {/* Lazy Loaded Emergency Guide Modal */}
+      {isEmergencyOpen && (
+        <Suspense fallback={null}>
+          <EmergencyGuideModal
+            isOpen={isEmergencyOpen}
+            onClose={() => setIsEmergencyOpen(false)}
+            lang={lang}
+          />
+        </Suspense>
+      )}
 
       {/* PWA Install Banner */}
       {installPrompt && showPwaBanner && (
@@ -212,7 +267,7 @@ export function App() {
             <button
               onClick={handleInstallPwa}
               className="flat-btn-primary"
-              style={{ minHeight: '32px', padding: '4px 12px', fontSize: '0.75rem' }}
+              style={{ minHeight: '36px', padding: '6px 14px', fontSize: '0.8rem' }}
             >
               {t.pwaInstall}
             </button>
@@ -220,7 +275,7 @@ export function App() {
               onClick={() => setShowPwaBanner(false)}
               aria-label="Tutup"
               className="flat-btn-secondary"
-              style={{ minHeight: '32px', padding: '4px 8px' }}
+              style={{ minHeight: '36px', padding: '6px 10px' }}
             >
               <X size={16} />
             </button>
@@ -271,22 +326,28 @@ export function App() {
       {/* Row 2: UV + Hourly Chart */}
       <div className="dashboard-grid-2">
         <UvCard uvIndex={weatherData?.current?.uvIndex || 0} loading={loading} />
-        <AqiChart hourlyData={airQualityData?.hourly} />
+        <Suspense fallback={<ComponentSkeleton height="240px" label="Memuat Grafik Tren AQI..." />}>
+          <AqiChart hourlyData={airQualityData?.hourly} />
+        </Suspense>
       </div>
 
       {/* Row 3: 7-Day Forecast */}
       <div style={{ marginBottom: '1.5rem' }}>
-        <WeatherForecastChart dailyData={weatherData?.daily} lang={lang} />
+        <Suspense fallback={<ComponentSkeleton height="260px" label="Memuat Prakiraan Cuaca 7 Hari..." />}>
+          <WeatherForecastChart dailyData={weatherData?.daily} lang={lang} />
+        </Suspense>
       </div>
 
       {/* Row 4: Interactive Map */}
       <div style={{ marginBottom: '1.5rem' }}>
-        <IndonesiaMap
-          currentLocation={location}
-          earthquakes={recentEarthquakes}
-          onSelectCity={selectCity}
-          lang={lang}
-        />
+        <Suspense fallback={<ComponentSkeleton height="360px" label="Memuat Peta Interaktif Indonesia..." />}>
+          <IndonesiaMap
+            currentLocation={location}
+            earthquakes={recentEarthquakes}
+            onSelectCity={selectCity}
+            lang={lang}
+          />
+        </Suspense>
       </div>
 
       {/* Footer */}

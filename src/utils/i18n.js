@@ -110,3 +110,5 @@ export const translations = {
     today: 'Today'
   }
 };
+
+export const i18n = translations;

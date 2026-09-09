@@ -344,3 +344,21 @@ button, input, select, a {
   flex-wrap: wrap;
   gap: 0.85rem;
 }
+
+
+/* Optimization: Smooth modal overscroll containment & mobile touch targets */
+.modal-overlay {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 640px) {
+  .app-container {
+    padding: 0.75rem 0.75rem 2rem 0.75rem;
+  }
+  
+  .flat-btn-primary,
+  .flat-btn-secondary {
+    min-height: 42px;
+  }
+}

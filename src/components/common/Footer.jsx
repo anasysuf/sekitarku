@@ -13,10 +13,10 @@ export function Footer() {
       </p>
 
       <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '1.25rem', fontSize: '0.85rem' }}>
-        <a href="https://github.com/anasysuf/sekitarku" target="_blank" rel="noreferrer" style={{ color: 'var(--color-primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: '700' }}>
+        <a href="https://github.com/anasysuf/sekitarku" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: '700' }}>
           <Code2 size={16} strokeWidth={2.5} /> GitHub Repository
         </a>
-        <a href="https://data.bmkg.go.id" target="_blank" rel="noreferrer" style={{ color: 'var(--color-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: '700' }}>
+        <a href="https://data.bmkg.go.id" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: '700' }}>
           <Globe size={16} strokeWidth={2.5} /> BMKG Open Data
         </a>
       </div>
