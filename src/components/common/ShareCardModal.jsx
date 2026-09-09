@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Share2, Download, MessageCircle, Copy, Check, X, Camera, Send, Sparkles } from 'lucide-react';
+import { Share2, Download, Copy, Check, X } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi';
 import { calculateEcoHealthScore } from '../../utils/healthIndex';
 import { getWeatherVisual } from '../../utils/weatherIcons';
@@ -31,171 +31,237 @@ export function ShareCardModal({
   const weatherVisual = getWeatherVisual(weatherCode, lang);
   const dateFormatted = formatFullCurrentDate(new Date(), lang);
 
-  const shareText = `🌿 Pantauan Lingkungan ${location.name} (${dateFormatted}):\n• Kualitas Udara (AQI): ${aqi} (${aqiInfo.label})\n• Cuaca: ${temp}°C, ${weatherVisual.label}\n• Skor Kesehatan Lingkungan: ${health.score}/100 (${health.category})\n• Paparan Polusi: ${health.cigs > 0 ? health.cigs + ' rokok/hari' : 'Udara Bersih'}\n\nPantau real-time di Sekitarku: ${window.location.origin}`;
+  const shareText = `🌿 Pantauan Lingkungan ${location.name} (${dateFormatted}):\n• Kualitas Udara (AQI): ${aqi} (${aqiInfo.label})\n• Cuaca: ${temp}°C, ${weatherVisual.label}\n• Skor Kesehatan Lingkungan: ${health.score}/100 (${health.category})\n${latestEarthquake ? `• Gempa Terkini: M ${latestEarthquake.magnitude} (${latestEarthquake.wilayah})\n` : ''}🌐 Cek real-time di https://sekitarku.vercel.app`;
 
-  const generateCanvasBlob = async () => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1080;
-    canvas.height = 1350;
-    const ctx = canvas.getContext('2d');
+  // Draw 9:16 high quality story infographic on HTML5 canvas
+  const generateCanvasImage = () => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 1080;
+      canvas.height = 1920;
+      const ctx = canvas.getContext('2d');
 
-    function drawCard(x, y, w, h, radius, fill, stroke) {
-      ctx.beginPath();
-      ctx.roundRect(x, y, w, h, radius);
-      if (fill) {
+      // 1. Clean Slate Background
+      ctx.fillStyle = '#F8FAFC';
+      ctx.fillRect(0, 0, 1080, 1920);
+
+      // Top Decorative Banner
+      ctx.fillStyle = '#10B981';
+      ctx.fillRect(0, 0, 1080, 24);
+
+      // Helper for clean rounded cards
+      const drawCard = (x, y, w, h, fill, border) => {
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(x, y, w, h, 28);
+        } else {
+          ctx.rect(x, y, w, h);
+        }
         ctx.fillStyle = fill;
         ctx.fill();
-      }
-      if (stroke) {
-        ctx.lineWidth = 3;
-        ctx.strokeStyle = stroke;
+        ctx.strokeStyle = border;
+        ctx.lineWidth = 4;
         ctx.stroke();
+      };
+
+      // 2. Header
+      ctx.fillStyle = '#0F172A';
+      ctx.font = '800 68px "Outfit", sans-serif';
+      ctx.fillText('Sekitarku', 80, 140);
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '700 32px "Outfit", sans-serif';
+      ctx.fillText('Laporan Lingkungan & Cuaca Real-Time', 80, 195);
+
+      // 3. Location Hero Card
+      drawCard(80, 250, 920, 260, '#FFFFFF', '#E2E8F0');
+
+      ctx.fillStyle = '#0F172A';
+      ctx.font = '800 58px "Outfit", sans-serif';
+      ctx.fillText(location.name, 120, 340);
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '600 32px "Outfit", sans-serif';
+      ctx.fillText(location.province || 'Indonesia', 120, 395);
+
+      ctx.fillStyle = '#059669';
+      ctx.font = '700 28px "Outfit", sans-serif';
+      ctx.fillText(`📅 ${dateFormatted}`, 120, 455);
+
+      // 4. Eco-Health Composite Score Card
+      drawCard(80, 550, 920, 340, '#FFFFFF', '#E2E8F0');
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '800 28px "Outfit", sans-serif';
+      ctx.fillText('SKOR KUALITAS LINGKUNGAN', 120, 620);
+
+      ctx.fillStyle = health.color || '#10B981';
+      ctx.font = '800 100px "Outfit", sans-serif';
+      ctx.fillText(`${health.score}`, 120, 740);
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '800 48px "Outfit", sans-serif';
+      ctx.fillText('/100', 250, 740);
+
+      // Score Badge
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(520, 660, 440, 90, 20);
+      else ctx.rect(520, 660, 440, 90);
+      ctx.fillStyle = health.color || '#10B981';
+      ctx.fill();
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '800 36px "Outfit", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(health.category || 'Baik', 740, 718);
+      ctx.textAlign = 'left';
+
+      ctx.fillStyle = '#334155';
+      ctx.font = '600 28px "Outfit", sans-serif';
+      ctx.fillText(`Perkiraan setara paparan ${health.cigs || '0'} batang rokok/hari.`, 120, 830);
+
+      // 5. Grid: AQI & Weather Cards
+      drawCard(80, 930, 440, 380, '#FFFFFF', '#E2E8F0');
+
+      ctx.fillStyle = aqiInfo.color || '#10B981';
+      ctx.font = '800 28px "Outfit", sans-serif';
+      ctx.fillText('KUALITAS UDARA', 120, 990);
+
+      ctx.fillStyle = aqiInfo.color || '#10B981';
+      ctx.font = '800 88px "Outfit", sans-serif';
+      ctx.fillText(`${aqi}`, 120, 1100);
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '700 32px "Outfit", sans-serif';
+      ctx.fillText('AQI US', 280, 1100);
+
+      ctx.fillStyle = '#0F172A';
+      ctx.font = '800 36px "Outfit", sans-serif';
+      ctx.fillText(aqiInfo.label, 120, 1180);
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '600 28px "Outfit", sans-serif';
+      ctx.fillText(`PM2.5: ${pm25} µg/m³`, 120, 1240);
+
+      // Weather Card
+      drawCard(560, 930, 440, 380, '#FFFFFF', '#E2E8F0');
+
+      ctx.fillStyle = '#0284C7';
+      ctx.font = '800 28px "Outfit", sans-serif';
+      ctx.fillText('CUACA & SUHU', 600, 990);
+
+      ctx.fillStyle = '#0F172A';
+      ctx.font = '800 88px "Outfit", sans-serif';
+      ctx.fillText(`${temp}°C`, 600, 1100);
+
+      ctx.fillStyle = '#0F172A';
+      ctx.font = '800 36px "Outfit", sans-serif';
+      ctx.fillText(weatherVisual.label, 600, 1180);
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '600 28px "Outfit", sans-serif';
+      ctx.fillText(`Kelembapan: ${humidity}%`, 600, 1240);
+
+      // 6. Seismic / Earthquake Card
+      if (latestEarthquake) {
+        drawCard(80, 1350, 920, 240, '#FFFFFF', '#E2E8F0');
+
+        ctx.fillStyle = '#EF4444';
+        ctx.font = '800 28px "Outfit", sans-serif';
+        ctx.fillText('GEMPA TERKINI (BMKG)', 120, 1410);
+
+        ctx.fillStyle = '#EF4444';
+        ctx.font = '800 58px "Outfit", sans-serif';
+        ctx.fillText(`M ${latestEarthquake.magnitude}`, 120, 1490);
+
+        ctx.fillStyle = '#0F172A';
+        ctx.font = '700 30px "Outfit", sans-serif';
+        ctx.fillText(latestEarthquake.wilayah || 'Indonesia', 340, 1475);
+
+        ctx.fillStyle = '#64748B';
+        ctx.font = '600 26px "Outfit", sans-serif';
+        ctx.fillText(`Kedalaman: ${latestEarthquake.depth} • ${latestEarthquake.potensi}`, 340, 1525);
+      } else {
+        drawCard(80, 1350, 920, 240, '#FFFFFF', '#E2E8F0');
+
+        ctx.fillStyle = '#10B981';
+        ctx.font = '800 28px "Outfit", sans-serif';
+        ctx.fillText('INFORMASI KESELAMATAN', 120, 1410);
+
+        ctx.fillStyle = '#0F172A';
+        ctx.font = '700 32px "Outfit", sans-serif';
+        ctx.fillText('Tidak ada peringatan bencana kritis saat ini.', 120, 1480);
+
+        ctx.fillStyle = '#64748B';
+        ctx.font = '600 26px "Outfit", sans-serif';
+        ctx.fillText('Tetap pantau pembaruan berkala dari BMKG & Sekitarku.', 120, 1530);
       }
-    }
 
-    // 1. Solid Canvas Background
-    ctx.fillStyle = '#0b1120';
-    ctx.fillRect(0, 0, 1080, 1350);
+      // 7. Footer Branding
+      ctx.fillStyle = '#0F172A';
+      ctx.font = '800 34px "Outfit", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('sekitarku.vercel.app', 540, 1720);
 
-    // 2. Top Header Brand Block
-    drawCard(60, 60, 960, 110, 20, '#1e293b', '#334155');
+      ctx.fillStyle = '#64748B';
+      ctx.font = '600 26px "Outfit", sans-serif';
+      ctx.fillText('Data Resmi BMKG & Open-Meteo • Dipantau Secara Real-Time', 540, 1770);
 
-    ctx.beginPath();
-    ctx.arc(115, 115, 26, 0, Math.PI * 2);
-    ctx.fillStyle = '#10b981';
-    ctx.fill();
+      ctx.textAlign = 'left';
 
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 38px sans-serif';
-    ctx.fillText('SEKITARKU', 165, 122);
-
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = 'bold 22px sans-serif';
-    ctx.fillText('Pantauan Lingkungan Hidup Real-Time', 165, 150);
-
-    // 3. Location & Date Block
-    drawCard(60, 195, 960, 150, 20, '#1e293b', '#334155');
-
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 44px sans-serif';
-    ctx.fillText(location.name || 'DKI Jakarta', 95, 260);
-
-    ctx.fillStyle = '#10b981';
-    ctx.font = 'bold 24px sans-serif';
-    ctx.fillText(`${location.province || 'Indonesia'} • ${dateFormatted}`, 95, 305);
-
-    // 4. Middle Grid: AQI Block (Left)
-    drawCard(60, 370, 465, 340, 20, '#1e293b', aqiInfo.color);
-
-    ctx.fillStyle = aqiInfo.color;
-    ctx.font = 'bold 24px sans-serif';
-    ctx.fillText('KUALITAS UDARA (AQI)', 95, 420);
-
-    ctx.font = 'bold 88px sans-serif';
-    ctx.fillText(String(aqi), 95, 525);
-
-    drawCard(95, 560, 395, 52, 10, aqiInfo.color, null);
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 24px sans-serif';
-    ctx.fillText(aqiInfo.label.toUpperCase(), 120, 595);
-
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = 'bold 20px sans-serif';
-    ctx.fillText(`PM2.5: ${pm25} µg/m³`, 95, 660);
-
-    // Middle Grid: Weather Block (Right)
-    drawCard(555, 370, 465, 340, 20, '#1e293b', '#3b82f6');
-
-    ctx.fillStyle = '#3b82f6';
-    ctx.font = 'bold 24px sans-serif';
-    ctx.fillText('CUACA & SUHU', 590, 420);
-
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 88px sans-serif';
-    ctx.fillText(`${temp}°C`, 590, 525);
-
-    drawCard(590, 560, 395, 52, 10, '#3b82f6', null);
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 24px sans-serif';
-    ctx.fillText(weatherVisual.label.toUpperCase(), 615, 595);
-
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = 'bold 20px sans-serif';
-    ctx.fillText(`Kelembapan: ${humidity}% • UV: ${uvIndex}`, 590, 660);
-
-    // 5. Eco-Health Score Banner
-    drawCard(60, 735, 960, 240, 20, '#1e293b', health.color);
-
-    drawCard(95, 770, 110, 110, 16, health.color, null);
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 54px sans-serif';
-    ctx.fillText(String(health.score), 125, 845);
-
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 34px sans-serif';
-    ctx.fillText(health.category, 235, 815);
-
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = 'bold 22px sans-serif';
-    ctx.fillText('Skor Kelayakan Lingkungan Terpadu (0 - 100)', 235, 855);
-
-    ctx.fillStyle = health.cigs > 1.5 ? '#ef4444' : '#10b981';
-    ctx.font = 'bold 22px sans-serif';
-    ctx.fillText(`Paparan Polusi: ${health.cigs > 0 ? health.cigs + ' rokok/hari' : 'Udara Bersih'}`, 235, 895);
-
-    // 6. Seismic Info
-    if (latestEarthquake) {
-      drawCard(60, 1000, 960, 140, 20, '#1e293b', '#f59e0b');
-
-      ctx.fillStyle = '#f59e0b';
-      ctx.font = 'bold 24px sans-serif';
-      ctx.fillText(`GEMPA TERKINI BMKG: M ${latestEarthquake.magnitude} SR (Kedalaman ${latestEarthquake.depth})`, 95, 1045);
-
-      ctx.fillStyle = '#e2e8f0';
-      ctx.font = 'bold 20px sans-serif';
-      ctx.fillText(`${latestEarthquake.wilayah}`, 95, 1080);
-
-      ctx.fillStyle = '#94a3b8';
-      ctx.font = 'bold 18px sans-serif';
-      ctx.fillText(`Waktu: ${latestEarthquake.date} ${latestEarthquake.time} • ${latestEarthquake.potensi || 'Aman tsunami'}`, 95, 1110);
-    }
-
-    // 7. Footer Watermark
-    ctx.fillStyle = '#64748b';
-    ctx.font = 'bold 22px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('Data Resmi: BMKG & Open-Meteo • sekitarku.vercel.app', 540, 1275);
-    ctx.textAlign = 'left';
-
-    return new Promise((resolve) => {
-      canvas.toBlob((blob) => resolve(blob), 'image/png');
+      canvas.toBlob((blob) => {
+        resolve(blob);
+      }, 'image/png');
     });
   };
 
-  // Direct Web Share with Image Attachment (Native OS Share Sheet -> IG Story, WhatsApp Status, etc.)
-  const handleNativeShareStory = async () => {
+  // Unified Share: Web Share API with image file -> triggers OS Share Sheet (WhatsApp Status, Instagram Story, X, etc.)
+  const handleNativeShare = async () => {
     setIsGenerating(true);
     try {
-      const blob = await generateCanvasBlob();
-      const file = new File([blob], `Sekitarku-${location.name}.png`, { type: 'image/png' });
+      const blob = await generateCanvasImage();
+      if (!blob) throw new Error('Gagal membuat gambar');
 
+      const fileName = `Sekitarku_${location.name.replace(/\s+/g, '_')}_${Date.now()}.png`;
+      const file = new File([blob], fileName, { type: 'image/png' });
+
+      // Check if navigator.canShare supports files
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
-          files: [file],
-          title: `Kondisi Lingkungan ${location.name}`,
-          text: shareText
+          title: `Pantauan Lingkungan ${location.name}`,
+          text: shareText,
+          files: [file]
         });
-      } else {
-        // Fallback: download image and trigger WhatsApp
+      } else if (navigator.share) {
+        // Fallback share text & auto-download image
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `Sekitarku-${location.name}.png`;
+        a.download = fileName;
         a.click();
         URL.revokeObjectURL(url);
+
+        await navigator.share({
+          title: `Pantauan Lingkungan ${location.name}`,
+          text: shareText,
+          url: 'https://sekitarku.vercel.app'
+        });
+      } else {
+        // Direct download + copy text
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        a.click();
+        URL.revokeObjectURL(url);
+        navigator.clipboard?.writeText(shareText);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 3000);
       }
     } catch (err) {
-      console.warn('Native share cancelled or error:', err);
+      if (err.name !== 'AbortError') {
+        console.error('Share error:', err);
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -204,13 +270,15 @@ export function ShareCardModal({
   const handleDownloadImage = async () => {
     setIsGenerating(true);
     try {
-      const blob = await generateCanvasBlob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.download = `Sekitarku-${location.name.replace(/\s+/g, '-')}-${new Date().toISOString().slice(0,10)}.png`;
-      link.href = url;
-      link.click();
-      URL.revokeObjectURL(url);
+      const blob = await generateCanvasImage();
+      if (blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Sekitarku_${location.name.replace(/\s+/g, '_')}_${Date.now()}.png`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
     } catch (err) {
       console.error('Download error:', err);
     } finally {
@@ -218,55 +286,37 @@ export function ShareCardModal({
     }
   };
 
-  const handleShareWhatsApp = () => {
-    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-    window.open(url, '_blank');
-  };
-
-  const handleShareTwitter = () => {
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
-    window.open(url, '_blank');
-  };
-
   const handleCopyText = () => {
     navigator.clipboard.writeText(shareText);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => setCopied(false), 2500);
   };
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        inset: 0,
-        backgroundColor: 'rgba(15, 23, 42, 0.75)',
-        backdropFilter: 'blur(6px)',
-        zIndex: 9999,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '1rem'
-      }}
-      onClick={onClose}
-    >
+    <div className="modal-overlay animate-fade-in" onClick={onClose}>
       <div
-        className="flat-card animate-fade-in"
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
         style={{
-          width: '100%',
-          maxWidth: '560px',
+          maxWidth: '480px',
+          width: '95%',
           maxHeight: '90vh',
           display: 'flex',
           flexDirection: 'column',
-          backgroundColor: 'var(--bg-card)',
-          border: 'var(--border-thick)',
-          overflow: 'hidden',
-          padding: 0
+          padding: 0,
+          overflow: 'hidden'
         }}
-        onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
-        <div style={{ padding: '1.25rem 1.5rem', borderBottom: 'var(--border-thick)', backgroundColor: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+        {/* Header */}
+        <div style={{
+          padding: '1.25rem 1.5rem',
+          borderBottom: 'var(--border-thick)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          backgroundColor: 'var(--bg-muted)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
             <div style={{
               width: '36px',
               height: '36px',
@@ -281,10 +331,10 @@ export function ShareCardModal({
             </div>
             <div>
               <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
-                Bagikan ke Story & Sosmed
+                Bagikan Laporan
               </h3>
               <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0, fontWeight: '600' }}>
-                Format Story HD untuk WhatsApp Status, Instagram, & Twitter
+                Kartu grafis HD untuk Story WhatsApp, Instagram & Medsos
               </p>
             </div>
           </div>
@@ -360,9 +410,9 @@ export function ShareCardModal({
           {/* Action Sharing Buttons Grid */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginTop: '1.25rem' }}>
             
-            {/* Primary Action: Direct Web Share Sheet (Instagram Story, WhatsApp Status, etc.) */}
+            {/* Unified Primary Action: Bagikan (Direct OS Sheet / Intent / File Share) */}
             <button
-              onClick={handleNativeShareStory}
+              onClick={handleNativeShare}
               disabled={isGenerating}
               className="flat-btn-primary"
               style={{
@@ -370,84 +420,52 @@ export function ShareCardModal({
                 backgroundColor: 'var(--color-primary)',
                 gap: '0.5rem',
                 minHeight: '46px',
-                fontSize: '0.9rem'
+                fontSize: '0.95rem',
+                fontWeight: '800',
+                justifyContent: 'center'
               }}
             >
-              <Camera size={19} strokeWidth={2.5} />
-              <span>{isGenerating ? 'Menyiapkan Story...' : '📲 Bagikan Gambar ke Story / Sosmed'}</span>
+              <Share2 size={18} strokeWidth={2.5} />
+              <span>{isGenerating ? 'Menyiapkan Gambar...' : 'Bagikan'}</span>
             </button>
 
-            {/* Social Channels 3-Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem' }}>
+            {/* Secondary Actions: Simpan PNG & Salin Teks */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
               
-              {/* WhatsApp */}
-              <button
-                onClick={handleShareWhatsApp}
-                className="flat-btn-secondary"
-                style={{
-                  backgroundColor: '#25D366',
-                  color: '#ffffff',
-                  borderColor: '#25D366',
-                  gap: '0.35rem',
-                  fontSize: '0.8rem',
-                  fontWeight: '700',
-                  padding: '0.6rem 0.5rem'
-                }}
-              >
-                <MessageCircle size={16} strokeWidth={2.5} />
-                <span>WhatsApp</span>
-              </button>
-
-              {/* Twitter / X */}
-              <button
-                onClick={handleShareTwitter}
-                className="flat-btn-secondary"
-                style={{
-                  backgroundColor: '#000000',
-                  color: '#ffffff',
-                  borderColor: '#000000',
-                  gap: '0.35rem',
-                  fontSize: '0.8rem',
-                  fontWeight: '700',
-                  padding: '0.6rem 0.5rem'
-                }}
-              >
-                <Send size={15} strokeWidth={2.5} />
-                <span>Twitter / X</span>
-              </button>
-
               {/* Download PNG */}
               <button
                 onClick={handleDownloadImage}
                 disabled={isGenerating}
                 className="flat-btn-secondary"
                 style={{
-                  gap: '0.35rem',
+                  gap: '0.4rem',
                   fontSize: '0.8rem',
                   fontWeight: '700',
-                  padding: '0.6rem 0.5rem'
+                  padding: '0.65rem 0.5rem',
+                  justifyContent: 'center'
                 }}
               >
-                <Download size={15} strokeWidth={2.5} />
+                <Download size={16} strokeWidth={2.5} />
                 <span>Simpan PNG</span>
               </button>
 
-            </div>
+              {/* Copy Text Button */}
+              <button
+                onClick={handleCopyText}
+                className="flat-btn-secondary"
+                style={{
+                  gap: '0.4rem',
+                  fontSize: '0.8rem',
+                  fontWeight: '700',
+                  padding: '0.65rem 0.5rem',
+                  justifyContent: 'center'
+                }}
+              >
+                {copied ? <Check size={16} color="var(--color-secondary)" strokeWidth={2.5} /> : <Copy size={16} strokeWidth={2.2} />}
+                <span>{copied ? 'Tersalin!' : 'Salin Teks'}</span>
+              </button>
 
-            {/* Copy Text Button */}
-            <button
-              onClick={handleCopyText}
-              className="flat-btn-secondary"
-              style={{
-                width: '100%',
-                gap: '0.45rem',
-                minHeight: '38px',
-                fontSize: '0.8rem'
-              }}
-            >
-              {copied ? <Check size={16} color="var(--color-secondary)" strokeWidth={2.5} /> : <Copy size={16} strokeWidth={2.2} />}
-              <span>{copied ? 'Teks Laporan Tersalin!' : 'Salin Format Teks Lengkap'}</span>
-            </button>
+            </div>
 
           </div>
 
@@ -455,7 +473,7 @@ export function ShareCardModal({
 
         {/* Footer */}
         <div style={{ padding: '0.75rem 1.5rem', borderTop: 'var(--border-thick)', backgroundColor: 'var(--bg-muted)', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textAlign: 'center' }}>
-          Mendukung WhatsApp Status, Instagram Stories, dan postingan Twitter/X
+          Mendukung WhatsApp Status, Instagram Stories, Twitter/X, & aplikasi lainnya
         </div>
       </div>
     </div>
