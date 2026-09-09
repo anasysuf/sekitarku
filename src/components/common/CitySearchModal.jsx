@@ -175,7 +175,7 @@ export function CitySearchModal({ isOpen, onClose, onSelectCity, currentCity, la
         <div style={{ flex: 1, overflowY: 'auto', padding: '0.75rem 1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-              Menampilkan {filteredCities.length} dari {INDONESIA_CITIES.length} Kota/Kabupaten
+              Menampilkan {Math.min(filteredCities.length, 100)} dari {filteredCities.length} hasil ({INDONESIA_CITIES.length} total kota & kabupaten)
             </span>
           </div>
 
@@ -188,7 +188,7 @@ export function CitySearchModal({ isOpen, onClose, onSelectCity, currentCity, la
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.4rem' }}>
-              {filteredCities.map((city) => {
+              {filteredCities.slice(0, 100).map((city) => {
                 const isSelected = currentCity.name.replace(' (GPS)', '') === city.name;
                 return (
                   <div
