@@ -6,6 +6,7 @@ import { INDONESIA_VOLCANOES, VOLCANO_STATUS_LEVELS } from '../../utils/volcanoe
 import { getEarthquakeColor } from '../../utils/aqi';
 import { translations } from '../../utils/i18n';
 
+// Fix default leaflet icons
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -23,10 +24,15 @@ function MapController({ center }) {
   return null;
 }
 
-export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, lang = 'id' }) {
+export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDark = false, lang = 'id' }) {
   const t = translations[lang] || translations.id;
   const center = [currentLocation.lat || -2.5489, currentLocation.lon || 118.0149];
   const [showVolcanoes, setShowVolcanoes] = useState(true);
+
+  // Fast, high-reliability CartoDB tile URLs with Dark/Light theme adaptation
+  const tileUrl = isDark
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
 
   return (
     <div className="flat-card" style={{ padding: '1.5rem' }}>
@@ -66,12 +72,20 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, lang 
       </div>
 
       <div className="map-wrapper">
-        <MapContainer center={center} zoom={5} scrollWheelZoom={false} style={{ width: '100%', height: '100%' }}>
+        <MapContainer
+          key={isDark ? 'dark-map' : 'light-map'}
+          center={center}
+          zoom={5}
+          scrollWheelZoom={false}
+          style={{ width: '100%', height: '100%' }}
+        >
           <MapController center={center} />
           
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>'
+            url={tileUrl}
+            subdomains="abcd"
+            maxZoom={19}
           />
 
           {/* Current selected city ring */}
