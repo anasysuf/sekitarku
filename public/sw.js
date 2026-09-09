@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sekitarku-v2';
+const CACHE_NAME = 'sekitarku-v3';
 const ASSETS_TO_CACHE = [
   '/leaf.svg',
   '/manifest.webmanifest'
