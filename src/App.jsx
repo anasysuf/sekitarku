@@ -79,7 +79,7 @@ export function App() {
     const perm = await Notification.requestPermission();
     if (perm === 'granted') {
       setNotificationsEnabled(true);
-      new Notification('Lingkunganku Active', {
+      new Notification('Sekitarku Active', {
         body: 'Notifikasi peringatan gempa & kualitas udara berhasil diaktifkan.',
         icon: '/leaf.svg'
       });
@@ -174,7 +174,7 @@ export function App() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <Download size={18} color="#10b981" />
             <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-primary)' }}>
-              Pasang aplikasi Lingkunganku di layar utama HP Anda untuk akses instan & offline.
+              Pasang aplikasi Sekitarku di layar utama HP Anda untuk akses instan & offline.
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>

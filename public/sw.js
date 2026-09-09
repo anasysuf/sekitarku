@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lingkunganku-v1';
+const CACHE_NAME = 'sekitarku-v1';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

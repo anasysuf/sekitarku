@@ -1,4 +1,4 @@
-# Lingkunganku
+# Sekitarku
 
 > **Sistem Monitoring Kesehatan Lingkungan Real-Time Indonesia**  
 > Dashboard modern, responsif, dan open-source untuk memantau Kualitas Udara (AQI), Cuaca, Indeks UV, dan Gempa Bumi BMKG secara langsung.
@@ -35,7 +35,7 @@
 
 ```bash
 # 1. Masuk ke direktori
-cd C:/laragon/www/lingkunganku
+cd C:/laragon/www/sekitarku
 
 # 2. Install dependensi (jika baru di-clone)
 npm install

@@ -1,6 +1,6 @@
 {
-  "name": "Lingkunganku - Pantauan Lingkungan Indonesia",
-  "short_name": "Lingkunganku",
+  "name": "Sekitarku - Pantauan Lingkungan Indonesia",
+  "short_name": "Sekitarku",
   "description": "Dashboard Real-time Kualitas Udara (AQI), Cuaca BMKG, Indeks UV & Gempa Bumi Indonesia",
   "start_url": "/",
   "display": "standalone",

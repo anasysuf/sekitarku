@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 export function useDarkMode() {
   const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem('lingkunganku-theme');
+    const saved = localStorage.getItem('sekitarku-theme');
     if (saved) return saved === 'dark';
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
@@ -11,10 +11,10 @@ export function useDarkMode() {
     const root = document.documentElement;
     if (isDark) {
       root.removeAttribute('data-theme');
-      localStorage.setItem('lingkunganku-theme', 'dark');
+      localStorage.setItem('sekitarku-theme', 'dark');
     } else {
       root.setAttribute('data-theme', 'light');
-      localStorage.setItem('lingkunganku-theme', 'light');
+      localStorage.setItem('sekitarku-theme', 'light');
     }
   }, [isDark]);
 

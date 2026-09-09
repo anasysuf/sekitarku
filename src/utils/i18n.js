@@ -1,6 +1,6 @@
 export const translations = {
   id: {
-    appTitle: 'Lingkunganku',
+    appTitle: 'Sekitarku',
     appSubtitle: 'Pantauan Lingkungan & Kualitas Hidup',
     liveBadge: 'LIVE',
     selectCity: 'Pilih Kota',
@@ -50,7 +50,7 @@ export const translations = {
     today: 'Hari Ini'
   },
   en: {
-    appTitle: 'Lingkunganku',
+    appTitle: 'Sekitarku',
     appSubtitle: 'Environmental & Living Health Monitor',
     liveBadge: 'LIVE',
     selectCity: 'Select City',
