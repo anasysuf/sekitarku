@@ -50,9 +50,16 @@ export function App() {
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(err => {
-        console.log('SW registration skipped in dev:', err);
-      });
+      if (import.meta.env.PROD) {
+        navigator.serviceWorker.register('/sw.js').catch(err => {
+          console.log('SW error:', err);
+        });
+      } else {
+        // Unregister SW in development to prevent stale caches
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          for (const reg of registrations) reg.unregister();
+        });
+      }
     }
 
     if ('Notification' in window && Notification.permission === 'granted') {

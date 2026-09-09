@@ -20,9 +20,9 @@ export function WeatherForecastChart({ dailyData, lang = 'id' }) {
         {dailyData.time.slice(0, 7).map((dateStr, idx) => {
           const d = new Date(dateStr);
           const dayName = idx === 0 ? t.today : days[d.getDay()];
-          const maxTemp = Math.round(dailyData.temperature_2m_max[idx]);
-          const minTemp = Math.round(dailyData.temperature_2m_min[idx]);
-          const code = dailyData.weather_code[idx];
+          const maxTemp = Math.round(dailyData.temperature_2m_max?.[idx] ?? 0);
+          const minTemp = Math.round(dailyData.temperature_2m_min?.[idx] ?? 0);
+          const code = dailyData.weather_code?.[idx] ?? 0;
           const weather = formatWeatherCode(code);
 
           return (
