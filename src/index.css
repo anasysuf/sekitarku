@@ -346,11 +346,7 @@ button, input, select, a {
 }
 
 
-/* Optimization: Smooth modal overscroll containment & mobile touch targets */
-.modal-overlay {
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-}
+
 
 @media (max-width: 640px) {
   .app-container {
@@ -360,5 +356,58 @@ button, input, select, a {
   .flat-btn-primary,
   .flat-btn-secondary {
     min-height: 42px;
+  }
+}
+
+/* ==========================================
+   MODAL POPUP SYSTEM (Standard Centered Dialog)
+   ========================================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  animation: modalFadeIn 150ms ease-out;
+}
+
+.modal-content {
+  background-color: var(--bg-card);
+  border: var(--border-thick);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 100000;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  animation: modalScaleIn 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
 }
