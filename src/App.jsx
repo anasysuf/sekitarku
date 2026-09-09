@@ -5,6 +5,7 @@ import { AqiCard } from './components/cards/AqiCard';
 import { WeatherCard } from './components/cards/WeatherCard';
 import { EarthquakeCard } from './components/cards/EarthquakeCard';
 import { UvCard } from './components/cards/UvCard';
+import { VolcanoCard } from './components/cards/VolcanoCard';
 import { Footer } from './components/common/Footer';
 import { useGeolocation } from './hooks/useGeolocation';
 import { useDarkMode } from './hooks/useDarkMode';
@@ -37,6 +38,11 @@ const EmergencyGuideModal = lazy(() =>
     default: m.EmergencyGuideModal
   }))
 );
+const VolcanoListModal = lazy(() =>
+  import('./components/common/VolcanoListModal').then((m) => ({
+    default: m.VolcanoListModal
+  }))
+);
 
 // Loading Fallback Component
 function ComponentSkeleton({ height = '200px', label = 'Memuat komponen...' }) {
@@ -45,19 +51,19 @@ function ComponentSkeleton({ height = '200px', label = 'Memuat komponen...' }) {
       style={{
         minHeight: height,
         backgroundColor: 'var(--bg-card)',
-        border: '2px solid var(--border-color)',
-        borderRadius: 'var(--radius-lg)',
+        border: '2px solid var(--border-color, #e5e7eb)',
+        borderRadius: 'var(--radius-lg, 12px)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         gap: '0.5rem',
-        color: 'var(--text-muted)',
+        color: 'var(--text-muted, #6b7280)',
         fontSize: '0.85rem',
         fontWeight: '600'
       }}
     >
-      <Loader2 size={24} className="animate-spin" color="var(--color-primary)" />
+      <Loader2 size={24} className="animate-spin" color="var(--color-primary, #3b82f6)" />
       <span>{label}</span>
     </div>
   );
@@ -82,6 +88,7 @@ export function App() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
+  const [isVolcanoOpen, setIsVolcanoOpen] = useState(false);
 
   // PWA Prompt
   const [installPrompt, setInstallPrompt] = useState(null);
@@ -103,6 +110,7 @@ export function App() {
           console.log('SW error:', err);
         });
       } else {
+        // Unregister SW in development to prevent stale caches
         navigator.serviceWorker.getRegistrations().then((registrations) => {
           for (const reg of registrations) reg.unregister();
         });
@@ -134,7 +142,7 @@ export function App() {
     if (perm === 'granted') {
       setNotificationsEnabled(true);
       new Notification('Sekitarku Aktif', {
-        body: 'Notifikasi peringatan gempa & kualitas udara berhasil diaktifkan.',
+        body: 'Notifikasi peringatan gempa, gunung api & kualitas udara berhasil diaktifkan.',
         icon: '/leaf.svg'
       });
     }
@@ -254,6 +262,18 @@ export function App() {
         </Suspense>
       )}
 
+      {/* Lazy Loaded Volcano List Modal */}
+      {isVolcanoOpen && (
+        <Suspense fallback={null}>
+          <VolcanoListModal
+            isOpen={isVolcanoOpen}
+            onClose={() => setIsVolcanoOpen(false)}
+            userLocation={location}
+            lang={lang}
+          />
+        </Suspense>
+      )}
+
       {/* PWA Install Banner */}
       {installPrompt && showPwaBanner && (
         <div className="pwa-banner animate-fade-in">
@@ -322,6 +342,13 @@ export function App() {
           lang={lang}
         />
       </div>
+
+      {/* Volcano Proximity & Monitoring Card (PVMBG / MAGMA Indonesia) */}
+      <VolcanoCard
+        location={location}
+        onOpenModal={() => setIsVolcanoOpen(true)}
+        lang={lang}
+      />
 
       {/* Row 2: UV + Hourly Chart */}
       <div className="dashboard-grid-2">
