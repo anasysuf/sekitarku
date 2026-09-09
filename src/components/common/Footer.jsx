@@ -1,5 +1,5 @@
 import React from 'react';
-import { Code2, Globe } from 'lucide-react';
+import { Code2, Globe, Coffee, Heart } from 'lucide-react';
 
 export function Footer() {
   return (
@@ -12,11 +12,48 @@ export function Footer() {
         Sumber Data Resmi: BMKG (Badan Meteorologi, Klimatologi, dan Geofisika) & Open-Meteo.
       </p>
 
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '1.25rem', fontSize: '0.85rem' }}>
-        <a href="https://github.com/anasysuf/sekitarku" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: '700' }}>
+      {/* Buy Me a Coffee / SociaBuzz Support Button */}
+      <div style={{ marginTop: '1.25rem', display: 'flex', justifyContent: 'center' }}>
+        <a
+          href="https://sociabuzz.com/1rengblox/tribe"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            padding: '0.55rem 1.15rem',
+            backgroundColor: 'rgba(245, 158, 11, 0.12)',
+            color: '#d97706',
+            border: '1px solid rgba(245, 158, 11, 0.35)',
+            borderRadius: 'var(--radius-md)',
+            fontSize: '0.85rem',
+            fontWeight: '800',
+            textDecoration: 'none',
+            transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+            boxShadow: '0 2px 8px rgba(245, 158, 11, 0.08)'
+          }}
+        >
+          <Coffee size={17} strokeWidth={2.5} />
+          <span>Traktir Kopi</span>
+        </a>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '1.25rem', fontSize: '0.85rem', flexWrap: 'wrap' }}>
+        <a
+          href="https://github.com/anasysuf/sekitarku"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: 'var(--color-primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: '700' }}
+        >
           <Code2 size={16} strokeWidth={2.5} /> GitHub Repository
         </a>
-        <a href="https://data.bmkg.go.id" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--color-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: '700' }}>
+        <a
+          href="https://data.bmkg.go.id"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: 'var(--color-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: '700' }}
+        >
           <Globe size={16} strokeWidth={2.5} /> BMKG Open Data
         </a>
       </div>
