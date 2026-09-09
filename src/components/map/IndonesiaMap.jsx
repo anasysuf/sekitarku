@@ -85,11 +85,15 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
           <MapController center={center} />
           
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a>'
-            url={tileUrl}
-            subdomains="abcd"
-            maxZoom={19}
-          />
+          key={isDark ? 'esri-dark' : 'esri-light'}
+          attribution='&copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>, HERE, Garmin, METI/NASA, USGS'
+          url={
+            isDark
+              ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
+              : 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'
+          }
+          maxZoom={16}
+        />
 
           {/* Current selected city ring */}
           <Circle
