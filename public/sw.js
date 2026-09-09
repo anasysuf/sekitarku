@@ -1,7 +1,5 @@
-const CACHE_NAME = 'sekitarku-v1';
+const CACHE_NAME = 'sekitarku-v2';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
   '/leaf.svg',
   '/manifest.webmanifest'
 ];
@@ -18,7 +16,10 @@ self.addEventListener('activate', (e) => {
     caches.keys().then((keys) =>
       Promise.all(
         keys.map((k) => {
-          if (k !== CACHE_NAME) return caches.delete(k);
+          if (k !== CACHE_NAME) {
+            console.log('[SW] Deleting old cache:', k);
+            return caches.delete(k);
+          }
         })
       )
     )
@@ -26,18 +27,62 @@ self.addEventListener('activate', (e) => {
   self.clients.claim();
 });
 
-self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
-  
-  // Stale-while-revalidate for assets, network first for APIs
-  if (e.request.url.includes('api.open-meteo.com') || e.request.url.includes('data.bmkg.go.id')) {
-    e.respondWith(
-      fetch(e.request).catch(() => caches.match(e.request))
+self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+
+  const url = new URL(event.request.url);
+
+  // 1. For HTML page navigation: Network First (prevents stale hash 404s on Vercel deploys)
+  if (event.request.mode === 'navigate' || event.request.destination === 'document') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response.status === 200) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return response;
+        })
+        .catch(async () => {
+          const cached = await caches.match(event.request);
+          if (cached) return cached;
+          return caches.match('/index.html');
+        })
     );
     return;
   }
 
-  e.respondWith(
-    caches.match(e.request).then((cached) => cached || fetch(e.request))
+  // 2. For external APIs (BMKG, Open-Meteo): Network First
+  if (url.hostname.includes('open-meteo.com') || url.hostname.includes('data.bmkg.go.id')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response.status === 200) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // 3. For static assets (JS/CSS/Fonts/Images): Cache First, fallback to Network
+  event.respondWith(
+    caches.match(event.request).then((cached) => {
+      if (cached) return cached;
+      return fetch(event.request)
+        .then((response) => {
+          if (response.status === 200 && response.type === 'basic') {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return response;
+        })
+        .catch((err) => {
+          console.warn('[SW] Fetch failed for asset:', event.request.url, err);
+        });
+    })
   );
 });
