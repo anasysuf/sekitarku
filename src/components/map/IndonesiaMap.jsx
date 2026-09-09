@@ -7,12 +7,43 @@ import { INDONESIA_VOLCANOES, VOLCANO_STATUS_LEVELS } from '../../utils/volcanoe
 import { translations } from '../../utils/i18n';
 import { MapPin, Compass, ZoomIn, ZoomOut } from 'lucide-react';
 
-// Fix Leaflet default icon path issues
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+// Inline SVG data URIs - 100% offline, 0 network requests, never broken image
+const cityPinSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 30" width="24" height="30">
+  <defs>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 18 8 18s8-12.75 8-18c0-4.42-3.58-8-8-8z" fill="#059669" stroke="#ffffff" stroke-width="1.5" filter="url(#sh)"/>
+  <circle cx="12" cy="10" r="3" fill="#ffffff"/>
+</svg>
+`)}`;
+
+const activeCityPinSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 34" width="26" height="34">
+  <defs>
+    <filter id="sh-act" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#059669" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+  <path d="M13 2C7.5 2 3 6.5 3 12c0 6.5 10 20 10 20s10-13.5 10-20c0-5.5-4.5-10-10-10z" fill="#10b981" stroke="#ffffff" stroke-width="2" filter="url(#sh-act)"/>
+  <circle cx="13" cy="12" r="4" fill="#ffffff"/>
+</svg>
+`)}`;
+
+const cityIcon = L.icon({
+  iconUrl: cityPinSvg,
+  iconSize: [20, 25],
+  iconAnchor: [10, 25],
+  popupAnchor: [0, -22]
+});
+
+const activeCityIcon = L.icon({
+  iconUrl: activeCityPinSvg,
+  iconSize: [26, 34],
+  iconAnchor: [13, 34],
+  popupAnchor: [0, -30]
 });
 
 function getEarthquakeColor(mag) {
@@ -299,7 +330,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
           scrollWheelZoom={true}
           doubleClickZoom={true}
           touchZoom={true}
-          zoomControl={false} // Sleek custom controls provided
+          zoomControl={false}
           style={{ width: '100%', height: '100%' }}
         >
           <MapViewManager targetView={targetView} />
@@ -328,40 +359,44 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
             pathOptions={{ color: '#059669', fillColor: '#059669', fillOpacity: 0.65, weight: 3 }}
           />
 
-          {/* City markers */}
-          {showCities && INDONESIA_CITIES.map((city) => (
-            <Marker
-              key={city.name}
-              position={[city.lat, city.lon]}
-              eventHandlers={{
-                click: () => handleCityMarkerClick(city)
-              }}
-            >
-              <Popup>
-                <div style={{ padding: '6px', textAlign: 'center', fontFamily: 'Outfit, sans-serif' }}>
-                  <strong style={{ fontSize: '0.95rem', color: '#111827', display: 'block' }}>{city.name}</strong>
-                  <p style={{ margin: '3px 0 0 0', fontSize: '0.75rem', color: '#6b7280' }}>Provinsi: {city.province}</p>
-                  <p style={{ margin: '2px 0 6px 0', fontSize: '0.7rem', color: '#9ca3af' }}>Koordinat: {city.lat.toFixed(2)}, {city.lon.toFixed(2)}</p>
-                  <button
-                    onClick={() => handleCityMarkerClick(city)}
-                    style={{
-                      padding: '6px 12px',
-                      borderRadius: '4px',
-                      backgroundColor: '#10b981',
-                      color: '#fff',
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontSize: '0.75rem',
-                      fontWeight: '800',
-                      width: '100%'
-                    }}
-                  >
-                    🔍 Zoom & Pantau Kota Ini
-                  </button>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
+          {/* City markers with crisp SVG icon */}
+          {showCities && INDONESIA_CITIES.map((city) => {
+            const isSelected = city.name === (currentLocation.city || currentLocation.name);
+            return (
+              <Marker
+                key={city.name}
+                position={[city.lat, city.lon]}
+                icon={isSelected ? activeCityIcon : cityIcon}
+                eventHandlers={{
+                  click: () => handleCityMarkerClick(city)
+                }}
+              >
+                <Popup>
+                  <div style={{ padding: '6px', textAlign: 'center', fontFamily: 'Outfit, sans-serif' }}>
+                    <strong style={{ fontSize: '0.95rem', color: '#111827', display: 'block' }}>{city.name}</strong>
+                    <p style={{ margin: '3px 0 0 0', fontSize: '0.75rem', color: '#6b7280' }}>Provinsi: {city.province}</p>
+                    <p style={{ margin: '2px 0 6px 0', fontSize: '0.7rem', color: '#9ca3af' }}>Koordinat: {city.lat.toFixed(2)}, {city.lon.toFixed(2)}</p>
+                    <button
+                      onClick={() => handleCityMarkerClick(city)}
+                      style={{
+                        padding: '6px 12px',
+                        borderRadius: '4px',
+                        backgroundColor: '#10b981',
+                        color: '#fff',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '0.75rem',
+                        fontWeight: '800',
+                        width: '100%'
+                      }}
+                    >
+                      🔍 Zoom & Pantau Kota Ini
+                    </button>
+                  </div>
+                </Popup>
+              </Marker>
+            );
+          })}
 
           {/* Volcano markers */}
           {showVolcanoes && INDONESIA_VOLCANOES.map((v) => {
