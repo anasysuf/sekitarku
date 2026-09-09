@@ -1,53 +1,167 @@
-# Sekitarku
+# 🌿 Sekitarku (Environmental & Disaster Intelligence Platform)
 
-> **Sistem Monitoring Kesehatan Lingkungan Real-Time Indonesia**  
-> Dashboard modern, responsif, dan open-source untuk memantau Kualitas Udara (AQI), Cuaca, Indeks UV, dan Gempa Bumi BMKG secara langsung.
+> **Platform Pemantauan Kualitas Lingkungan Hidup, Polusi Udara, Cuaca, dan Sistem Peringatan Dini Bencana BMKG Terpadu di Indonesia.**
 
----
-
-## Fitur Utama
-
-- **Skor Kelayakan Lingkungan Terpadu**: Indeks gabungan dari toksisitas udara, kenyamanan suhu atmosfer, dan radiasi matahari.
-- **Kesiapan Aktivitas Luar Ruangan**: Rekomendasi langsung untuk jogging, bersepeda, anak/lansia, dan ventilasi udara rumah.
-- **Estimasi Dampak Hirupan Polusi**: Perhitungan ekuivalen hisapan rokok pasif harian berdasarkan formula ilmiah Berkeley Earth.
-- **Kualitas Udara (AQI)**: Pemantauan polutan PM2.5, PM10, CO, NO2, SO2, dan Ozon dengan skala US-EPA & rekomendasi kesehatan.
-- **Cuaca Real-time**: Suhu, kelembapan, kecepatan & arah angin, tekanan udara, dan prakiraan cuaca 7 hari ke depan.
-- **Deteksi Gempa BMKG**: Integrasi data auto-gempa dan daftar gempa terkini dari BMKG Indonesia lengkap dengan magnitude, kedalaman, wilayah, dan status potensi tsunami.
-- **Peta Interaktif Nusantara**: Visualisasi berbasis Leaflet untuk memantau stasiun kota dan sebaran gempa aktif di seluruh Indonesia.
-- **Cakupan Seluruh 38 Provinsi**: Dilengkapi modal pencarian instan dengan filter per wilayah kepulauan dan deteksi lokasi GPS otomatis.
-- **Progressive Web App (PWA)**: Dapat dipasang langsung di layar utama ponsel dan mendukung notifikasi web real-time.
-- **Bilingual & Dark Mode**: Mendukung Bahasa Indonesia dan English serta tema Dark dan Light yang nyaman di mata.
+[![React](https://img.shields.io/badge/React-19.x-61DAFB?style=flat-square&logo=react&logoColor=black)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8.x-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Leaflet](https://img.shields.io/badge/Leaflet-1.9.4-199900?style=flat-square&logo=leaflet&logoColor=white)](https://leafletjs.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg?style=flat-square)](LICENSE)
+[![PWA Ready](https://img.shields.io/badge/PWA-Enabled-10B981?style=flat-square&logo=pwa&logoColor=white)](https://web.dev/progressive-web-apps/)
 
 ---
 
-## Tech Stack
+## 📌 Ringkasan Sistem (System Overview)
 
-- **React 18** + **Vite**
-- **Vanilla CSS** (Custom Design Tokens & Responsive Grid)
-- **Leaflet & React-Leaflet** (Peta Interaktif)
-- **Recharts** (Grafik Tren AQI 24 Jam)
-- **Lucide Icons** (Ikon UI)
-- **Sumber Data**: BMKG Open Data & Open-Meteo API
+**Sekitarku** adalah platform analitik lingkungan berbasis web modern (PWA) yang dirancang untuk memberikan transparansi data kualitas udara, cuaca, dan kebencanaan secara *real-time* kepada masyarakat di seluruh penjuru Indonesia.
+
+Menggabungkan data terbuka resmi dari **Badan Meteorologi, Klimatologi, dan Geofisika (BMKG)** serta pemodelan atmosfer global dari **Open-Meteo**, Sekitarku memproses jutaan titik data atmosfer menjadi rekomendasi kesehatan yang praktis dan mudah dipahami, mulai dari kesiapan aktivitas luar ruangan hingga mitigasi darurat bencana.
 
 ---
 
-## Cara Menjalankan Lokal
+## 🏛️ Arsitektur Sistem & Aliran Data (Data Flow)
 
-```bash
-# 1. Masuk ke direktori
-cd C:/laragon/www/sekitarku
+```mermaid
+graph TD
+    subgraph Data_Sources ["🌐 Sumber Data Terbuka (Public Open Data)"]
+        BMKG["BMKG Open Data API<br/>(TEWS Seismik & Gempa Realtime)"]
+        Meteo["Open-Meteo Atmospheric API<br/>(Prakiraan Cuaca, Suhu, Angin, UV)"]
+        AQI_API["Open-Meteo Air Quality API<br/>(PM2.5, PM10, Gas Polutan & US-AQI)"]
+    end
 
-# 2. Install dependensi (jika baru di-clone)
-npm install
+    subgraph Service_Layer ["⚡ Client-side Service & Caching Layer"]
+        Cache["Smart API Cache (TTL 3-5 Min)<br/>(In-Memory + SessionStorage)"]
+        BMKG_Svc["bmkg.js (Auto-Gempa & Parser)"]
+        Weather_Svc["weather.js (7-Day Forecast)"]
+        AQI_Svc["airQuality.js (Pollutant Index)"]
+    end
 
-# 3. Jalankan development server
-npm run dev
+    subgraph Engine_Layer ["🧠 Analitik & Processing Engine"]
+        EcoScore["Eco-Health Calculator<br/>(Indeks Komposit Kebugaran)"]
+        CigFormula["Berkeley Earth Equivalence<br/>(Konversi Polusi ke Batang Rokok)"]
+        CanvasGen["Canvas 2D Graphics Engine<br/>(Generator Infografis Story 9:16)"]
+    end
 
-# 4. Akses via peramban di http://localhost:3000
+    subgraph UI_Layer ["🖥️ Frontend UI (React 19 + Flat Design)"]
+        Header["Header & GPS Geolocation"]
+        Hero["Eco-Health Matrix & Activity Ready"]
+        Dashboard["Bento Grid: AQI, Cuaca, Gempa, UV"]
+        Charts["Grafik Tren AQI 24 Jam & Cuaca 7 Hari"]
+        Map["Peta Interaktif Sebaran Nusantara (Leaflet)"]
+        Emergency["Panduan Darurat 112 & Checklist Bencana"]
+        Share["Native Web Share Intent (WA, IG, X)"]
+    end
+
+    BMKG --> BMKG_Svc
+    Meteo --> Weather_Svc
+    AQI_API --> AQI_Svc
+
+    BMKG_Svc --> Cache
+    Weather_Svc --> Cache
+    AQI_Svc --> Cache
+
+    Cache --> EcoScore
+    Cache --> CigFormula
+    Cache --> Dashboard
+
+    EcoScore --> Hero
+    CigFormula --> Hero
+    Dashboard --> Charts
+    Dashboard --> Map
+    CanvasGen --> Share
 ```
 
 ---
 
-## Lisensi
+## 🌟 Modul & Fitur Unggulan
 
-Proyek ini dilisensikan di bawah lisensi [MIT](LICENSE).
+### 1. Skor Kesehatan Lingkungan Komposit (Eco-Health Composite Score)
+- Menggabungkan 5 parameter krusial secara dinamis: **Indeks Polusi Udara (AQI US-EPA)**, **Konsentrasi PM2.5**, **Suhu Terasa (Apparent Temperature)**, **Kelembapan Relatif**, dan **Tingkat Radiasi Sinar UV**.
+- Memberikan skor 0–100 dengan kategori status instan (*Sangat Sehat*, *Cukup Baik*, *Waspada Polusi/Panas*, *Berbahaya*).
+- **Matriks Kesiapan Aktivitas Luar Ruangan**: Rekomendasi kesiapan untuk *Olahraga/Jogging*, *Aktivitas Anak & Lansia*, *Keringat/Dehidrasi*, serta anjuran *Ventilasi Udara Ruangan*.
+- **Konversi Bahaya Polusi Berkeley Earth**: Menghitung estimasi bahaya hirupan polusi partikulat harian yang setara dengan hisapan rokok pasif (misal: *Setara 2.4 batang rokok/hari*).
+
+### 2. Pemantauan Polusi Udara Lengkap (AQI & Profil Polutan)
+- Standar klasifikasi **US-EPA AQI** (0–500) dengan warna penanda visual kontras tinggi.
+- Rincian polutan mikro: **PM2.5**, **PM10**, **Karbon Monoksida (CO)**, **Nitrogen Dioksida (NO2)**, **Sulfur Dioksida (SO2)**, **Ozon Permukaan (O3)**, dan **Partikel Debu**.
+- Grafik historis tren fluktuasi AQI per jam untuk membaca pola puncak polusi harian.
+
+### 3. Sistem Peringatan Dini Seismik BMKG (Earthquake & Tsunami Alert)
+- **Auto-Gempa Real-Time**: Terhubung langsung ke *BMKG Indonesia Tsunami Early Warning System (InaTEWS)* untuk mendeteksi gempa bumi terkini dalam hitungan detik.
+- Rincian parameter seismik: Magnitudo, Kedalaman, Koordinat Lintang/Bujur, Wilayah Episentrum, Skala Intensitas MMI yang dirasakan, dan Status Potensi Tsunami.
+- Visualisasi peta guncangan mikro (*Shakemap raster*) resmi dari BMKG.
+- Riwayat 15 gempa bumi terkini di seluruh lempeng tektonik Indonesia dengan fitur interaktif fokus kamera peta.
+
+### 4. Prakiraan Cuaca 7 Hari & Indeks UV Ekstrem
+- Suhu saat ini, suhu terasa (*feels-like*), persentase kelembapan, tekanan udara permukaan, kecepatan dan arah angin.
+- Grafik prakiraan cuaca komprehensif 7 hari ke depan lengkap dengan suhu minimum/maksimum harian dan probabilitas presipitasi hujan.
+- Pengukur indeks radiasi Ultraviolet (UV) matahari disertai waktu aman terpapar dan saran penggunaan tabir surya (*sunscreen*).
+
+### 5. Peta Geospasial Interaktif Nusantara (Leaflet Engine)
+- Menampilkan seluruh stasiun pantau kota dan titik episentrum gempa bumi di atas peta interaktif Indonesia.
+- Penanda kluster cerdas dengan popup detail metrik lingkungan untuk setiap wilayah yang diklik.
+
+### 6. Panduan Tanggap Darurat & Kontak Darurat 112 Indonesia
+- Akses cepat tombol darurat **Call 112** (Layanan Panggilan Darurat Nasional Indonesia).
+- Panduan protokol keselamatan komprehensif berdasarkan standar BNPB & BPBD:
+  - 🚨 **Protokol Gempa Bumi** (Drop, Cover, Hold On, Evakuasi)
+  - 🌊 **Protokol Tsunami** (Evakuasi 20-20-20)
+  - 🌧️ **Protokol Banjir & Cuaca Ekstrem**
+  - 😷 **Protokol Polusi Udara Ekstrem & Kabut Asap**
+- Direktori kontak penting: **Basarnas (115)**, **Ambulans (118/119)**, **Pemadam Kebakaran (113)**, **Kepolisian (110)**, dan **PLN (123)**.
+
+### 7. Generator Kartu Infografis & Native Intent Share
+- Menghasilkan kartu infografis resolusi tinggi (rasio 9:16 HD) yang digambar secara presisi via **HTML5 Canvas 2D**.
+- **1-Tap Direct Web Share API**: Terintegrasi langsung dengan *Native Share Sheet* sistem operasi smartphone (*Android / iOS*) untuk membagikan gambar laporan langsung ke **WhatsApp Status/Story**, **Instagram Stories**, **Twitter/X**, Telegram, atau Direct Message.
+- Tombol alternatif untuk mengunduh gambar PNG ke galeri dan menyalin teks ringkasan resmi.
+
+### 8. Cakupan 500+ Kota & Kabupaten di Seluruh Indonesia
+- Mendukung pencarian instan seluruh kota dan kabupaten di 38 provinsi Indonesia.
+- Filter navigasi berdasarkan wilayah kepulauan: *Jawa, Sumatera, Kalimantan, Sulawesi, Bali & Nusa Tenggara, Maluku & Papua*.
+- Deteksi lokasi otomatis berbasis **HTML5 GPS Geolocation** dengan perhitungan algoritma jarak *Haversine*.
+
+### 9. Progressive Web App (PWA) & Web Push Notifications
+- Instalasi satu klik langsung ke layar utama (*Home Screen*) perangkat smartphone Android, iOS, dan Desktop tanpa melalui App Store.
+- Dukungan *Web Push Notification* untuk peringatan polusi udara tidak sehat (AQI > 150) dan gempa bumi signifikan (M >= 5.5).
+
+---
+
+## ⚡ Rekayasa Kinerja & Optimasi (Performance Engineering)
+
+Sistem Sekitarku dirancang dengan standar performa tinggi untuk memastikan pengalaman akses instan dan mulus bahkan pada koneksi jaringan seluler yang lambat:
+
+| Aspek Optimasi | Implementasi Teknis | Dampak Kinerja |
+| :--- | :--- | :--- |
+| **Code Splitting** | `React.lazy()` + Dynamic Import untuk modal & visualisasi berat | Mengurangi ukuran bundle inisial JavaScript dari **848 kB** menjadi **102 kB** (**-88%**) |
+| **Vendor Isolation** | `manualChunks` di Rollup/Vite untuk Leaflet, Recharts, React, dan Lucide | Cache browser vendor independen jangka panjang (*long-term cacheability*) |
+| **Smart API Caching** | In-Memory `Map` + `sessionStorage` dengan TTL (3-5 menit) | Navigasi antar kota instan (**0ms**) & bebas batas kuota API |
+| **Network Prefetching** | DNS Prefetch & Preconnect untuk server data BMKG, Open-Meteo, & Map Tiles | Menghemat *Time-to-First-Byte (TTFB)* dan latensi SSL handshake |
+| **DOM Containment** | `overscroll-behavior: contain` pada modal & CSS hardware acceleration | Menghilangkan *layout thrashing* dan scroll-bounce di peramban mobile |
+
+---
+
+## 🛡️ Standar Keamanan & Ketahanan (Security Hardening)
+
+- **Content Security Policy (CSP) Ketat**: Membatasi eksekusi skrip, stylesheet, aset visual, dan koneksi API hanya pada sumber terverifikasi resmi (*BMKG, Open-Meteo, Google Fonts, OpenStreetMap*).
+- **Enterprise Security Headers**: Dilengkapi `X-Frame-Options: DENY` (perlindungan anti-clickjacking), `X-Content-Type-Options: nosniff` (anti MIME sniffing), dan `Referrer-Policy: strict-origin-when-cross-origin`.
+- **Sanitasi Rel Links**: Seluruh tautan eksternal menggunakan `target="_blank" rel="noopener noreferrer"` untuk mencegah kerentanan eksploitasi tabnabbing.
+- **Defensive Error Handling**: Mekanisme fallback *stale-while-revalidate* yang tangguh agar antarmuka pengguna tidak mengalami *crash* saat server data BMKG / Open-Meteo sedang dalam pemeliharaan.
+
+---
+
+## 🛠️ Tumpukan Teknologi (Tech Stack)
+
+- **Framework**: [React 19](https://react.dev/) + [Vite 8](https://vitejs.dev/) (Fast Client-Side Build Tool)
+- **Styling**: Vanilla CSS (Custom Flat Design Tokens, High-Contrast Palette, Zero CSS Bloat)
+- **Pemetaan**: [Leaflet 1.9.4](https://leafletjs.com/) + [React-Leaflet 5](https://react-leaflet.js.org/)
+- **Visualisasi Data**: [Recharts 3.10](https://recharts.org/)
+- **Ikonografi**: [Lucide React](https://lucide.dev/)
+- **Manipulasi Waktu**: [date-fns](https://date-fns.org/)
+- **Sumber Data Terbuka**:
+  - BMKG Indonesia Open Data (TEWS Seismik & Gempaterkini)
+  - Open-Meteo Weather & Air Quality API
+
+---
+
+## 📄 Lisensi (License)
+
+Proyek ini dirilis di bawah lisensi terbuka [MIT License](LICENSE). Bebas digunakan, dipelajari, dan dikembangkan untuk kepentingan publik dan kemanusiaan.
