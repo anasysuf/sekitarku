@@ -1,21 +1,26 @@
 import React, { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
+import { MapContainer, Marker, Popup, Circle, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import '@maplibre/maplibre-gl-leaflet';
 import { INDONESIA_CITIES } from '../../utils/cities';
 import { INDONESIA_VOLCANOES, VOLCANO_STATUS_LEVELS } from '../../utils/volcanoes';
-import { getEarthquakeColor } from '../../utils/aqi';
 import { translations } from '../../utils/i18n';
 
-// Official CARTO Basemaps API Key
-const CARTO_API_KEY = import.meta.env.VITE_CARTO_API_KEY || 'cb1_33y9_1_f8ef25450161f96a4a3aa386';
-
-// Fix default leaflet icons
+// Fix Leaflet default icon path issues
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
   iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png'
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
+
+function getEarthquakeColor(mag) {
+  if (mag >= 7.0) return '#dc2626';
+  if (mag >= 5.0) return '#f97316';
+  return '#eab308';
+}
 
 function MapController({ center }) {
   const map = useMap();
@@ -27,15 +32,37 @@ function MapController({ center }) {
   return null;
 }
 
+// OpenFreeMap vector tile layer using MapLibre GL
+function OpenFreeMapLayer({ isDark }) {
+  const map = useMap();
+
+  useEffect(() => {
+    const styleUrl = isDark
+      ? 'https://tiles.openfreemap.org/styles/dark'
+      : 'https://tiles.openfreemap.org/styles/positron';
+
+    const glLayer = L.maplibreGL({
+      style: styleUrl,
+      attribution:
+        '&copy; <a href="https://openfreemap.org" target="_blank" rel="noopener noreferrer">OpenFreeMap</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a>'
+    });
+
+    glLayer.addTo(map);
+
+    return () => {
+      if (map && map.hasLayer && map.hasLayer(glLayer)) {
+        map.removeLayer(glLayer);
+      }
+    };
+  }, [isDark, map]);
+
+  return null;
+}
+
 export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDark = false, lang = 'id' }) {
   const t = translations[lang] || translations.id;
   const center = [currentLocation.lat || -2.5489, currentLocation.lon || 118.0149];
   const [showVolcanoes, setShowVolcanoes] = useState(true);
-
-  // Official CARTO Basemaps URL with API key
-  const tileUrl = isDark
-    ? `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?api_key=${CARTO_API_KEY}`
-    : `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?api_key=${CARTO_API_KEY}`;
 
   return (
     <div className="flat-card" style={{ padding: '1.5rem' }}>
@@ -76,7 +103,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
 
       <div className="map-wrapper">
         <MapContainer
-          key={`map-${isDark ? 'dark' : 'light'}-${CARTO_API_KEY.slice(-6)}`}
+          key={'map-' + (isDark ? 'dark' : 'light')}
           center={center}
           zoom={5}
           scrollWheelZoom={false}
@@ -84,16 +111,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
         >
           <MapController center={center} />
           
-          <TileLayer
-          key={isDark ? 'esri-dark' : 'esri-light'}
-          attribution='&copy; <a href="https://www.esri.com/" target="_blank" rel="noopener noreferrer">Esri</a>, HERE, Garmin, METI/NASA, USGS'
-          url={
-            isDark
-              ? 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}'
-              : 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}'
-          }
-          maxZoom={16}
-        />
+          <OpenFreeMapLayer isDark={isDark} />
 
           {/* Current selected city ring */}
           <Circle
