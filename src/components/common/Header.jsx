@@ -138,10 +138,20 @@ export function Header({
           <button
             onClick={onToggleDark}
             aria-label={t.themeToggle}
-            title={t.themeToggle}
+            title={isDark ? "Beralih ke Mode Terang" : "Beralih ke Mode Gelap"}
             className="flat-btn-secondary"
           >
-            {isDark ? <Sun size={17} color="var(--color-accent)" strokeWidth={2.2} /> : <Moon size={17} color="var(--color-primary)" strokeWidth={2.2} />}
+            {isDark ? (
+              <>
+                <Sun size={16} color="var(--color-accent)" strokeWidth={2.5} />
+                <span>Terang</span>
+              </>
+            ) : (
+              <>
+                <Moon size={16} color="var(--color-primary)" strokeWidth={2.5} />
+                <span>Gelap</span>
+              </>
+            )}
           </button>
 
         </div>

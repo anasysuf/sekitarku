@@ -2,19 +2,28 @@ import { useState, useEffect } from 'react';
 
 export function useDarkMode() {
   const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem('sekitarku-theme');
-    if (saved) return saved === 'dark';
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    try {
+      const saved = localStorage.getItem('sekitarku-theme');
+      if (saved !== null) {
+        return saved === 'dark';
+      }
+    } catch (e) {}
+    // Default explicitly to Light Mode
+    return false;
   });
 
   useEffect(() => {
     const root = document.documentElement;
     if (isDark) {
-      root.removeAttribute('data-theme');
-      localStorage.setItem('sekitarku-theme', 'dark');
+      root.setAttribute('data-theme', 'dark');
+      try {
+        localStorage.setItem('sekitarku-theme', 'dark');
+      } catch (e) {}
     } else {
-      root.setAttribute('data-theme', 'light');
-      localStorage.setItem('sekitarku-theme', 'light');
+      root.removeAttribute('data-theme');
+      try {
+        localStorage.setItem('sekitarku-theme', 'light');
+      } catch (e) {}
     }
   }, [isDark]);
 
