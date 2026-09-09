@@ -1,53 +1,60 @@
 :root {
-  /* Minimal Botanical & Slate Palette */
-  --bg-primary: #0d1117;
-  --bg-secondary: #161b22;
-  --bg-surface: #161b22;
-  --bg-surface-subtle: #0f141c;
-  --border-color: #30363d;
-  --border-subtle: #21262d;
+  /* Ultra-clean Slate & Botanical Palette */
+  --bg-primary: #0b0f14;
+  --bg-secondary: #12171f;
+  --bg-surface: #12171f;
+  --bg-surface-subtle: #181f2a;
+  --bg-surface-hover: #1c2432;
   
-  --text-primary: #f0f6fc;
-  --text-secondary: #8b949e;
-  --text-muted: #6e7681;
-  
-  --accent-brand: #2ea043;
-  --accent-brand-bg: rgba(46, 160, 67, 0.1);
-  --accent-blue: #58a6ff;
-  --accent-amber: #d29922;
-  --accent-rose: #f85149;
+  --border-color: #202734;
+  --border-subtle: #171d27;
+  --border-focus: #3b82f6;
 
-  /* Natural Scales */
-  --aqi-good: #2ea043;
-  --aqi-moderate: #d29922;
-  --aqi-unhealthy-sensitive: #db6d28;
-  --aqi-unhealthy: #f85149;
-  --aqi-very-unhealthy: #bc8cff;
-  --aqi-hazardous: #8b1827;
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+
+  /* Botanical Accents */
+  --accent-brand: #10b981;
+  --accent-brand-bg: rgba(16, 185, 129, 0.12);
+  --accent-blue: #3b82f6;
+  --accent-amber: #f59e0b;
+  --accent-rose: #ef4444;
+
+  /* AQI Severity Scales */
+  --aqi-good: #10b981;
+  --aqi-moderate: #f59e0b;
+  --aqi-unhealthy-sensitive: #f97316;
+  --aqi-unhealthy: #ef4444;
+  --aqi-very-unhealthy: #a855f7;
+  --aqi-hazardous: #881337;
 
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 [data-theme="light"] {
-  --bg-primary: #f8f9fa;
+  --bg-primary: #f8fafc;
   --bg-secondary: #ffffff;
   --bg-surface: #ffffff;
-  --bg-surface-subtle: #f1f3f5;
-  --border-color: #e1e4e8;
-  --border-subtle: #eaecef;
-  
-  --text-primary: #1a1f24;
-  --text-secondary: #586069;
-  --text-muted: #8c959f;
-  
-  --accent-brand: #1a7f37;
-  --accent-brand-bg: rgba(26, 127, 55, 0.08);
-  --accent-blue: #0969da;
-  --accent-amber: #9a6700;
-  --accent-rose: #cf222e;
+  --bg-surface-subtle: #f1f5f9;
+  --bg-surface-hover: #e2e8f0;
+
+  --border-color: #e2e8f0;
+  --border-subtle: #edf2f7;
+  --border-focus: #2563eb;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+
+  --accent-brand: #059669;
+  --accent-brand-bg: rgba(5, 150, 105, 0.08);
+  --accent-blue: #2563eb;
+  --accent-amber: #d97706;
+  --accent-rose: #dc2626;
 }
 
 * {
@@ -67,8 +74,9 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
-  line-height: 1.6;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.01em;
 }
 
 :focus-visible {
@@ -82,36 +90,37 @@ button, select, input, a {
   font-family: inherit;
 }
 
-/* Grounded Spacious Card */
+/* Grounded Clean Card */
 .glass-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   transition: var(--transition);
   width: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .glass-card:hover {
-  border-color: var(--text-muted);
+  border-color: var(--border-focus);
 }
 
-/* App Container with Generous Breathing Room */
+/* App Container */
 .app-container {
   width: 100%;
-  max-width: 1240px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1.5rem 1rem 3rem 1rem;
+  padding: 1.25rem 1rem 3rem 1rem;
 }
 
 @media (min-width: 640px) {
   .app-container {
-    padding: 2rem 1.5rem 4rem 1.5rem;
+    padding: 1.75rem 1.5rem 4rem 1.5rem;
   }
 }
 
 @media (min-width: 1024px) {
   .app-container {
-    padding: 3rem 2rem 5rem 2rem;
+    padding: 2.25rem 2rem 5rem 2rem;
   }
 }
 
@@ -119,10 +128,11 @@ button, select, input, a {
 .header-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-@media (min-width: 860px) {
+@media (min-width: 840px) {
   .header-wrapper {
     flex-direction: row;
     align-items: center;
@@ -134,37 +144,37 @@ button, select, input, a {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.6rem;
+  gap: 0.5rem;
   width: 100%;
 }
 
-@media (min-width: 860px) {
+@media (min-width: 840px) {
   .header-controls {
     width: auto;
   }
 }
 
 .city-select-container {
-  flex: 1 1 220px;
+  flex: 1 1 200px;
   min-width: 0;
 }
 
-/* Buttons */
+/* Action Buttons */
 .btn-icon {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 42px;
-  min-height: 42px;
-  padding: 0 0.85rem;
+  min-width: 38px;
+  min-height: 38px;
+  padding: 0 0.75rem;
   border-radius: var(--radius-sm);
   background-color: var(--bg-surface);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
   cursor: pointer;
-  font-size: 0.825rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  gap: 0.4rem;
+  gap: 0.35rem;
   transition: var(--transition);
 }
 
@@ -179,12 +189,12 @@ button, select, input, a {
   border-color: var(--accent-brand);
 }
 
-/* Grids with Generous Gutters */
+/* Clean Dashboard Layout Grids */
 .dashboard-grid-3 {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
 }
 
 @media (min-width: 680px) {
@@ -193,7 +203,7 @@ button, select, input, a {
   }
 }
 
-@media (min-width: 1060px) {
+@media (min-width: 1024px) {
   .dashboard-grid-3 {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -202,13 +212,13 @@ button, select, input, a {
 .dashboard-grid-2 {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
 }
 
 @media (min-width: 860px) {
   .dashboard-grid-2 {
-    grid-template-columns: 1fr 1.4fr;
+    grid-template-columns: 1fr 1.35fr;
   }
 }
 
@@ -216,7 +226,7 @@ button, select, input, a {
 .pollutant-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.6rem;
+  gap: 0.5rem;
 }
 
 @media (min-width: 480px) {
@@ -225,36 +235,23 @@ button, select, input, a {
   }
 }
 
-/* Weather metrics */
-.weather-metrics-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.6rem;
-  margin-top: 1rem;
-}
-
-@media (min-width: 420px) {
-  .weather-metrics-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* 7-Day Forecast Scroll container */
+/* Forecast Scroll */
 .forecast-scroll-container {
   display: flex;
-  gap: 0.6rem;
+  gap: 0.5rem;
   overflow-x: auto;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.4rem;
   -webkit-overflow-scrolling: touch;
 }
 
 .forecast-item {
-  flex: 0 0 105px;
+  flex: 0 0 100px;
   text-align: center;
-  padding: 1rem 0.5rem;
+  padding: 0.85rem 0.4rem;
   border-radius: var(--radius-md);
   background-color: var(--bg-surface-subtle);
   border: 1px solid var(--border-color);
+  transition: var(--transition);
 }
 
 @media (min-width: 768px) {
@@ -279,47 +276,48 @@ button, select, input, a {
 
 @media (min-width: 640px) {
   .map-wrapper {
-    height: 440px;
+    height: 420px;
   }
 }
 
 .leaflet-container {
   width: 100%;
   height: 100%;
-  background-color: #161b22;
+  background-color: var(--bg-secondary);
 }
 
+/* Micro Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
+  from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.25s ease-out forwards;
+  animation: fadeIn 0.2s ease-out forwards;
 }
 
-/* Banner */
+/* Banners */
 .alert-banner {
-  background: rgba(207, 34, 46, 0.08);
-  border: 1px solid rgba(207, 34, 46, 0.25);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
   border-radius: var(--radius-md);
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.5rem;
+  padding: 0.85rem 1.15rem;
+  margin-bottom: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.85rem;
 }
 
 .pwa-banner {
   background: var(--accent-brand-bg);
   border: 1px solid var(--accent-brand);
   border-radius: var(--radius-md);
-  padding: 0.85rem 1.25rem;
-  margin-bottom: 1.5rem;
+  padding: 0.75rem 1.15rem;
+  margin-bottom: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 0.85rem;
+  gap: 0.75rem;
 }
