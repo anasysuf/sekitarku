@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sekitarku-v5';
+const CACHE_NAME = 'sekitarku-v6';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -54,23 +54,18 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2. OpenStreetMap Tiles: Stale-While-Revalidate for offline navigation & speed
+  // 2. OpenStreetMap Tiles: Network First with Cache Fallback for 100% reliable live tiles
   if (url.hostname.includes('tile.openstreetmap.org')) {
     event.respondWith(
-      caches.open(CACHE_NAME).then((cache) =>
-        cache.match(event.request).then((cachedResponse) => {
-          const fetchPromise = fetch(event.request)
-            .then((networkResponse) => {
-              if (networkResponse && networkResponse.status === 200) {
-                cache.put(event.request, networkResponse.clone());
-              }
-              return networkResponse;
-            })
-            .catch(() => cachedResponse);
-
-          return cachedResponse || fetchPromise;
+      fetch(event.request)
+        .then((response) => {
+          if (response && (response.status === 200 || response.type === 'opaque')) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return response;
         })
-      )
+        .catch(() => caches.match(event.request))
     );
     return;
   }

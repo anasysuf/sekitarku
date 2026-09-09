@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -52,9 +52,27 @@ function getEarthquakeColor(mag) {
   return '#eab308';
 }
 
-// Map event listener & view animator
+// Map event listener, dynamic resize invalidator & view animator
 function MapViewManager({ targetView, onZoomChange }) {
   const map = useMap();
+
+  // Fix: Force Leaflet to compute DOM container dimensions on mount and resize
+  useEffect(() => {
+    map.invalidateSize();
+    const t1 = setTimeout(() => map.invalidateSize(), 150);
+    const t2 = setTimeout(() => map.invalidateSize(), 500);
+
+    const resizeHandler = () => {
+      map.invalidateSize();
+    };
+    window.addEventListener('resize', resizeHandler);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      window.removeEventListener('resize', resizeHandler);
+    };
+  }, [map]);
 
   useMapEvents({
     zoomend: () => {
@@ -345,13 +363,13 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
       </div>
 
       {/* Map Container */}
-      <div className="map-wrapper" style={{ position: 'relative' }}>
+      <div className="map-wrapper" style={{ position: 'relative', width: '100%', height: '420px' }}>
         <MapContainer
-          key={'map-' + (isDark ? 'dark' : 'light')}
+          key={'map-container'}
           center={initialCenter}
           zoom={9}
           minZoom={4}
-          maxZoom={18}
+          maxZoom={19}
           scrollWheelZoom={true}
           doubleClickZoom={true}
           touchZoom={true}
@@ -369,7 +387,8 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            maxZoom={18}
+            subdomains={['a', 'b', 'c']}
+            maxZoom={19}
           />
 
           {/* Current selected city indicator rings */}
