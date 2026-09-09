@@ -13,6 +13,11 @@ export const translations = {
     notifyActive: 'Aktif',
     pwaInstall: 'Pasang Aplikasi',
     
+    // Alerts
+    alertAqiTitle: 'Peringatan Polusi Udara',
+    alertAqiDesc: 'Kualitas udara saat ini tidak sehat. Disarankan memakai masker di luar ruangan.',
+    alertQuakeTitle: 'Peringatan Gempa Terkini',
+    
     // Cards
     ecoTitle: 'Kondisi Lingkungan',
     ecoSubtitle: 'Indeks gabungan udara, suhu, dan radiasi UV',
@@ -62,6 +67,11 @@ export const translations = {
     notifyEnable: 'Alerts',
     notifyActive: 'Active',
     pwaInstall: 'Install App',
+    
+    // Alerts
+    alertAqiTitle: 'Air Quality Alert',
+    alertAqiDesc: 'Air quality is currently unhealthy. Outdoor masks are recommended.',
+    alertQuakeTitle: 'Earthquake Alert',
     
     // Cards
     ecoTitle: 'Living Environment',
