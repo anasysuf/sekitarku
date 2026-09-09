@@ -7,6 +7,8 @@ import { EarthquakeCard } from './components/cards/EarthquakeCard';
 import { UvCard } from './components/cards/UvCard';
 import { VolcanoCard } from './components/cards/VolcanoCard';
 import { Footer } from './components/common/Footer';
+import { WidgetEmbedView } from './components/embed/WidgetEmbedView';
+import { INDONESIA_CITIES } from './utils/cities';
 import { useGeolocation } from './hooks/useGeolocation';
 import { useDarkMode } from './hooks/useDarkMode';
 import { fetchWeatherData } from './services/weather';
@@ -88,6 +90,24 @@ export function App() {
   // Language state: 'id' or 'en'
   const [lang, setLang] = useState('id');
   const t = i18n[lang] || i18n.id;
+
+  // Embed mode check
+  const isEmbedMode = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('embed') === 'true';
+  const cityParam = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('city') : null;
+
+  useEffect(() => {
+    if (cityParam) {
+      const match = INDONESIA_CITIES.find(
+        (c) => c.name.toLowerCase() === cityParam.toLowerCase() ||
+               c.name.toLowerCase().includes(cityParam.toLowerCase()) ||
+               cityParam.toLowerCase().includes(c.name.toLowerCase())
+      );
+      if (match && (match.lat !== location.lat || match.lon !== location.lon)) {
+        selectCity(match);
+      }
+    }
+  }, [cityParam]);
+
 
   // Modals
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -208,6 +228,19 @@ export function App() {
   const currentAqi = airQualityData?.current?.aqi || 0;
   const isAqiAlert = currentAqi > 150;
   const isQuakeAlert = latestEarthquake && latestEarthquake.magnitude >= 5.5;
+
+  if (isEmbedMode) {
+    return (
+      <WidgetEmbedView
+        location={location}
+        weatherData={weatherData}
+        airQualityData={airQualityData}
+        loading={loading}
+        onRefresh={() => loadData(true)}
+        lang={lang}
+      />
+    );
+  }
 
   return (
     <div className="app-container">
