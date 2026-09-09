@@ -3,21 +3,21 @@ import { Code2, Globe } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer style={{ marginTop: '4rem', padding: '2rem 0', borderTop: '1px solid var(--border-color)', textAlign: 'center' }}>
-      <p style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', margin: 0 }}>
-        Dibuat untuk pemantauan kualitas lingkungan hidup di seluruh Indonesia.
+    <footer style={{ marginTop: '4rem', padding: '2.5rem 0', borderTop: 'var(--border-thick)', textAlign: 'center' }}>
+      <p style={{ fontSize: '0.9rem', color: 'var(--text-main)', margin: 0, fontWeight: '700' }}>
+        Sekitarku: Pantauan Lingkungan Hidup & Mitigasi Bencana Real-time
       </p>
 
-      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-        Sumber Data: BMKG (Badan Meteorologi, Klimatologi, dan Geofisika) & Open-Meteo API.
+      <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.4rem', fontWeight: '500' }}>
+        Sumber Data Resmi: BMKG (Badan Meteorologi, Klimatologi, dan Geofisika) & Open-Meteo.
       </p>
 
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '1.25rem', fontSize: '0.8rem' }}>
-        <a href="https://github.com" target="_blank" rel="noreferrer" style={{ color: 'var(--text-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-          <Code2 size={15} /> Open Source (MIT)
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginTop: '1.25rem', fontSize: '0.85rem' }}>
+        <a href="https://github.com/anasysuf/sekitarku" target="_blank" rel="noreferrer" style={{ color: 'var(--color-primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: '700' }}>
+          <Code2 size={16} strokeWidth={2.5} /> GitHub Repository
         </a>
-        <a href="https://data.bmkg.go.id" target="_blank" rel="noreferrer" style={{ color: 'var(--text-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-          <Globe size={15} /> BMKG Open Data
+        <a href="https://data.bmkg.go.id" target="_blank" rel="noreferrer" style={{ color: 'var(--color-secondary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem', fontWeight: '700' }}>
+          <Globe size={16} strokeWidth={2.5} /> BMKG Open Data
         </a>
       </div>
     </footer>

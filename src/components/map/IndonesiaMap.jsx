@@ -5,7 +5,6 @@ import { INDONESIA_CITIES } from '../../utils/cities';
 import { getEarthquakeColor } from '../../utils/aqi';
 import { translations } from '../../utils/i18n';
 
-// Fix leaflet default icon issue in react
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -28,18 +27,18 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, lang 
   const center = [currentLocation.lat || -2.5489, currentLocation.lon || 118.0149];
 
   return (
-    <div className="glass-card animate-fade-in" style={{ padding: '1.5rem' }}>
+    <div className="flat-card" style={{ padding: '1.5rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
         <div>
-          <h3 style={{ fontSize: '1rem', fontWeight: '700', margin: 0 }}>{t.mapTitle}</h3>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>{t.mapSubtitle}</p>
+          <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>{t.mapTitle}</h3>
+          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, fontWeight: '500' }}>{t.mapSubtitle}</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', fontSize: '0.75rem' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--text-secondary)' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '2px', backgroundColor: 'var(--accent-blue)' }}></span> Kota
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', fontSize: '0.75rem', fontWeight: '700' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--text-main)' }}>
+            <span style={{ width: '10px', height: '10px', borderRadius: '2px', backgroundColor: 'var(--color-primary)' }}></span> Kota
           </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--text-secondary)' }}>
-            <span style={{ width: '8px', height: '8px', borderRadius: '2px', backgroundColor: 'var(--accent-rose)' }}></span> Gempa BMKG
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--text-main)' }}>
+            <span style={{ width: '10px', height: '10px', borderRadius: '2px', backgroundColor: 'var(--color-danger)' }}></span> Gempa BMKG
           </span>
         </div>
       </div>
@@ -57,11 +56,11 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, lang 
           <Circle
             center={[currentLocation.lat, currentLocation.lon]}
             radius={35000}
-            pathOptions={{ color: '#2ea043', fillColor: '#2ea043', fillOpacity: 0.25 }}
+            pathOptions={{ color: '#10b981', fillColor: '#10b981', fillOpacity: 0.35 }}
           />
 
-          {/* City markers */}
-          {INDONESIA_CITIES.map(city => (
+          {/* City markers (Major/all) */}
+          {INDONESIA_CITIES.slice(0, 120).map(city => (
             <Marker
               key={city.name}
               position={[city.lat, city.lon]}
@@ -70,20 +69,21 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, lang 
               }}
             >
               <Popup>
-                <div style={{ padding: '4px', textAlign: 'center' }}>
-                  <strong style={{ fontSize: '0.85rem' }}>{city.name}</strong>
-                  <p style={{ margin: '3px 0 0 0', fontSize: '0.75rem', color: '#666' }}>{city.province}</p>
+                <div style={{ padding: '4px', textAlign: 'center', fontFamily: 'Outfit, sans-serif' }}>
+                  <strong style={{ fontSize: '0.9rem', color: '#111827' }}>{city.name}</strong>
+                  <p style={{ margin: '3px 0 0 0', fontSize: '0.75rem', color: '#6b7280' }}>{city.province}</p>
                   <button
                     onClick={() => onSelectCity(city)}
                     style={{
                       marginTop: '6px',
-                      padding: '4px 8px',
+                      padding: '5px 10px',
                       borderRadius: '4px',
-                      backgroundColor: '#2ea043',
+                      backgroundColor: '#10b981',
                       color: '#fff',
                       border: 'none',
                       cursor: 'pointer',
-                      fontSize: '0.75rem'
+                      fontSize: '0.75rem',
+                      fontWeight: '700'
                     }}
                   >
                     Pilih Kota
@@ -103,15 +103,15 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, lang 
                 key={q.id || idx}
                 center={[q.lat, q.lon]}
                 radius={(q.magnitude || 4) * 15000}
-                pathOptions={{ color: color, fillColor: color, fillOpacity: 0.35 }}
+                pathOptions={{ color: color, fillColor: color, fillOpacity: 0.45 }}
               >
                 <Popup>
-                  <div style={{ padding: '4px' }}>
-                    <span style={{ fontWeight: '700', color: color, fontSize: '0.85rem' }}>
+                  <div style={{ padding: '4px', fontFamily: 'Outfit, sans-serif' }}>
+                    <span style={{ fontWeight: '800', color: color, fontSize: '0.9rem' }}>
                       Gempa M {q.magnitude}
                     </span>
-                    <p style={{ margin: '3px 0 0 0', fontSize: '0.75rem' }}>{q.wilayah}</p>
-                    <p style={{ margin: '2px 0 0 0', fontSize: '0.7rem', color: '#666' }}>{q.date} {q.time} • Kedalaman {q.depth}</p>
+                    <p style={{ margin: '3px 0 0 0', fontSize: '0.75rem', color: '#111827', fontWeight: '600' }}>{q.wilayah}</p>
+                    <p style={{ margin: '2px 0 0 0', fontSize: '0.7rem', color: '#6b7280' }}>{q.date} {q.time} • Kedalaman {q.depth}</p>
                   </div>
                 </Popup>
               </Circle>

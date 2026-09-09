@@ -11,9 +11,9 @@ export function WeatherForecastChart({ dailyData, lang = 'id' }) {
   const days = lang === 'en' ? daysEn : daysId;
 
   return (
-    <div className="glass-card animate-fade-in" style={{ padding: '1.5rem' }}>
+    <div className="flat-card" style={{ padding: '1.5rem' }}>
       <div style={{ marginBottom: '1.25rem' }}>
-        <h3 style={{ fontSize: '1rem', fontWeight: '700', margin: 0 }}>{t.forecast7Title}</h3>
+        <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>{t.forecast7Title}</h3>
       </div>
 
       <div className="forecast-scroll-container">
@@ -30,20 +30,20 @@ export function WeatherForecastChart({ dailyData, lang = 'id' }) {
               key={dateStr}
               className="forecast-item"
               style={{
-                backgroundColor: idx === 0 ? 'var(--accent-brand-bg)' : 'var(--bg-primary)',
-                borderColor: idx === 0 ? 'var(--accent-brand)' : 'var(--border-color)'
+                backgroundColor: idx === 0 ? 'var(--color-primary-bg)' : 'var(--bg-muted)',
+                borderColor: idx === 0 ? 'var(--color-primary)' : 'var(--border-flat)'
               }}
             >
-              <div style={{ fontSize: '0.8rem', fontWeight: idx === 0 ? '700' : '600', color: idx === 0 ? 'var(--accent-brand)' : 'var(--text-secondary)' }}>
+              <div style={{ fontSize: '0.85rem', fontWeight: '800', color: idx === 0 ? 'var(--color-primary)' : 'var(--text-muted)' }}>
                 {dayName}
               </div>
-              <div style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-primary)', margin: '0.5rem 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div style={{ fontSize: '0.775rem', fontWeight: '700', color: 'var(--text-main)', margin: '0.5rem 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {weather.label}
               </div>
-              <div style={{ fontSize: '1.05rem', fontWeight: '800', color: 'var(--text-primary)' }}>
+              <div style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--text-main)' }}>
                 {maxTemp}°
               </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>
                 {minTemp}°
               </div>
             </div>
