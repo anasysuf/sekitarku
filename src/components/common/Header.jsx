@@ -1,5 +1,6 @@
 import React from 'react';
-import { Sun, Moon, MapPin, RefreshCw, Compass, Bell, BellRing, Globe, Search } from 'lucide-react';
+import { Sun, Moon, MapPin, RefreshCw, Compass, Bell, BellRing, Globe, Search, Calendar, Clock } from 'lucide-react';
+import { formatFullCurrentDate } from '../../utils/format';
 import { translations } from '../../utils/i18n';
 
 export function Header({
@@ -58,6 +59,22 @@ export function Header({
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, fontWeight: '500' }}>
               {t.appSubtitle}
             </p>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              marginTop: '0.35rem',
+              padding: '2px 8px',
+              borderRadius: 'var(--radius-sm)',
+              backgroundColor: 'var(--bg-muted)',
+              border: 'var(--border-thick)',
+              fontSize: '0.75rem',
+              fontWeight: '700',
+              color: 'var(--text-main)'
+            }}>
+              <Calendar size={13} color="var(--color-primary)" strokeWidth={2.5} />
+              <span>{formatFullCurrentDate(lastUpdated, lang)}</span>
+            </div>
           </div>
         </div>
 

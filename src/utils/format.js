@@ -27,8 +27,41 @@ export function formatRelativeTime(dateStr) {
   }
 }
 
+export function formatFullCurrentDate(date = new Date(), lang = 'id') {
+  try {
+    const locale = lang === 'en' ? 'en-US' : 'id-ID';
+    const dayStr = new Intl.DateTimeFormat(locale, {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }).format(date);
+    const timeStr = new Intl.DateTimeFormat(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }).format(date);
+    return `${dayStr} • ${timeStr} WIB`;
+  } catch (e) {
+    return date.toLocaleString();
+  }
+}
+
+export function formatShortDate(dateStr, lang = 'id') {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    const locale = lang === 'en' ? 'en-US' : 'id-ID';
+    return new Intl.DateTimeFormat(locale, {
+      day: 'numeric',
+      month: 'short'
+    }).format(d);
+  } catch (e) {
+    return dateStr;
+  }
+}
+
 export function formatWeatherCode(code) {
-  // WMO Weather interpretation codes (WW)
   const codes = {
     0: { label: 'Cerah', icon: 'Sun' },
     1: { label: 'Cerah Berawan', icon: 'SunMedium' },
@@ -36,7 +69,7 @@ export function formatWeatherCode(code) {
     3: { label: 'Berawan Mendung', icon: 'Cloud' },
     45: { label: 'Berkabut', icon: 'CloudFog' },
     48: { label: 'Kabut Tebal', icon: 'CloudFog' },
-    51: { label: 'Gerimis Ringan', icon: 'CloudDrizzle' },
+    51: { label: 'Gerimis', icon: 'CloudDrizzle' },
     53: { label: 'Gerimis Sedang', icon: 'CloudDrizzle' },
     55: { label: 'Gerimis Lebat', icon: 'CloudDrizzle' },
     61: { label: 'Hujan Ringan', icon: 'CloudRain' },
@@ -44,7 +77,7 @@ export function formatWeatherCode(code) {
     65: { label: 'Hujan Lebat', icon: 'CloudRainWind' },
     80: { label: 'Hujan Lokal Ringan', icon: 'CloudRain' },
     81: { label: 'Hujan Lokal Sedang', icon: 'CloudRain' },
-    82: { label: 'Hujan Lokal Sangat Lebat', icon: 'CloudRainWind' },
+    82: { label: 'Hujan Lokal Lebat', icon: 'CloudRainWind' },
     95: { label: 'Badai Petir', icon: 'CloudLightning' },
     96: { label: 'Badai Petir Ringan', icon: 'CloudLightning' },
     99: { label: 'Badai Petir Kuat', icon: 'CloudLightning' }
