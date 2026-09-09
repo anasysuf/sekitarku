@@ -1,5 +1,5 @@
 import React from 'react';
-import { formatWeatherCode } from '../../utils/format';
+import { getWeatherVisual } from '../../utils/weatherIcons';
 import { translations } from '../../utils/i18n';
 
 export function WeatherForecastChart({ dailyData, lang = 'id' }) {
@@ -12,8 +12,13 @@ export function WeatherForecastChart({ dailyData, lang = 'id' }) {
 
   return (
     <div className="flat-card" style={{ padding: '1.5rem' }}>
-      <div style={{ marginBottom: '1.25rem' }}>
-        <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>{t.forecast7Title}</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+        <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>
+          {t.forecast7Title}
+        </h3>
+        <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)' }}>
+          Open-Meteo High-Resolution
+        </span>
       </div>
 
       <div className="forecast-scroll-container">
@@ -23,7 +28,8 @@ export function WeatherForecastChart({ dailyData, lang = 'id' }) {
           const maxTemp = Math.round(dailyData.temperature_2m_max?.[idx] ?? 0);
           const minTemp = Math.round(dailyData.temperature_2m_min?.[idx] ?? 0);
           const code = dailyData.weather_code?.[idx] ?? 0;
-          const weather = formatWeatherCode(code);
+          const visual = getWeatherVisual(code, lang);
+          const IconComp = visual.icon;
 
           return (
             <div
@@ -31,20 +37,65 @@ export function WeatherForecastChart({ dailyData, lang = 'id' }) {
               className="forecast-item"
               style={{
                 backgroundColor: idx === 0 ? 'var(--color-primary-bg)' : 'var(--bg-muted)',
-                borderColor: idx === 0 ? 'var(--color-primary)' : 'var(--border-flat)'
+                borderColor: idx === 0 ? 'var(--color-primary)' : 'var(--border-flat)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                minHeight: '170px'
               }}
             >
-              <div style={{ fontSize: '0.85rem', fontWeight: '800', color: idx === 0 ? 'var(--color-primary)' : 'var(--text-muted)' }}>
+              {/* Day Header */}
+              <div style={{
+                fontSize: '0.85rem',
+                fontWeight: '800',
+                color: idx === 0 ? 'var(--color-primary)' : 'var(--text-main)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em'
+              }}>
                 {dayName}
               </div>
-              <div style={{ fontSize: '0.775rem', fontWeight: '700', color: 'var(--text-main)', margin: '0.5rem 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                {weather.label}
+
+              {/* Weather Icon Badge */}
+              <div
+                style={{
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: 'var(--radius-full)',
+                  backgroundColor: visual.bg,
+                  border: `1px solid ${visual.color}35`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0.5rem 0'
+                }}
+              >
+                <IconComp size={24} color={visual.color} strokeWidth={2.5} />
               </div>
-              <div style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--text-main)' }}>
-                {maxTemp}°
+
+              {/* Weather Condition Label */}
+              <div style={{
+                fontSize: '0.75rem',
+                fontWeight: '700',
+                color: 'var(--text-main)',
+                textAlign: 'center',
+                lineHeight: 1.2,
+                minHeight: '28px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {visual.label}
               </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>
-                {minTemp}°
+
+              {/* Temperature Range */}
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.35rem', marginTop: '0.35rem' }}>
+                <span style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)', lineHeight: 1 }}>
+                  {maxTemp}°
+                </span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '600' }}>
+                  {minTemp}°
+                </span>
               </div>
             </div>
           );
