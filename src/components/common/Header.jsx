@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Moon, MapPin, RefreshCw, Compass, Bell, BellRing, Globe, Search, Calendar, Clock } from 'lucide-react';
+import { Sun, Moon, MapPin, RefreshCw, Compass, Bell, BellRing, Globe, Search, Calendar, Share2, ShieldAlert } from 'lucide-react';
 import { formatFullCurrentDate } from '../../utils/format';
 import { translations } from '../../utils/i18n';
 
@@ -15,7 +15,9 @@ export function Header({
   lang,
   onToggleLang,
   notificationsEnabled,
-  onRequestNotification
+  onRequestNotification,
+  onOpenShare,
+  onOpenEmergency
 }) {
   const t = translations[lang] || translations.id;
 
@@ -23,7 +25,7 @@ export function Header({
     <header>
       <div className="header-wrapper">
         
-        {/* Brand */}
+        {/* Brand & Date */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <div style={{
             width: '46px',
@@ -106,6 +108,30 @@ export function Header({
               <Search size={13} />
               <span>{t.searchCity}</span>
             </div>
+          </button>
+
+          {/* Share Button */}
+          <button
+            onClick={onOpenShare}
+            aria-label="Bagikan Laporan"
+            title="Bagikan Gambar & Laporan Kondisi Lingkungan"
+            className="flat-btn-secondary"
+            style={{ color: 'var(--color-primary)', borderColor: 'var(--color-primary)' }}
+          >
+            <Share2 size={16} strokeWidth={2.5} />
+            <span>Bagikan</span>
+          </button>
+
+          {/* Emergency Guide Button */}
+          <button
+            onClick={onOpenEmergency}
+            aria-label="Kontak Darurat & Tanggap Bencana"
+            title="Nomor Darurat Indonesia & Mitigasi Gempa/Polusi"
+            className="flat-btn-secondary"
+            style={{ color: 'var(--color-danger)', borderColor: 'var(--color-danger)' }}
+          >
+            <ShieldAlert size={16} strokeWidth={2.5} />
+            <span>Darurat 112</span>
           </button>
 
           {/* GPS */}

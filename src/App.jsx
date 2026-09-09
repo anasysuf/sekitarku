@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Header } from './components/common/Header';
 import { Footer } from './components/common/Footer';
 import { CitySearchModal } from './components/common/CitySearchModal';
+import { ShareCardModal } from './components/common/ShareCardModal';
+import { EmergencyGuideModal } from './components/common/EmergencyGuideModal';
 import { EcoHealthCard } from './components/cards/EcoHealthCard';
 import { AqiCard } from './components/cards/AqiCard';
 import { WeatherCard } from './components/cards/WeatherCard';
@@ -32,8 +34,10 @@ export function App() {
   const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
-  // Search Modal state
+  // Modals state
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
 
   // PWA and Notification states
   const [installPrompt, setInstallPrompt] = useState(null);
@@ -164,6 +168,8 @@ export function App() {
         onToggleLang={toggleLang}
         notificationsEnabled={notificationsEnabled}
         onRequestNotification={handleRequestNotification}
+        onOpenShare={() => setIsShareOpen(true)}
+        onOpenEmergency={() => setIsEmergencyOpen(true)}
       />
 
       {/* City Search Modal */}
@@ -175,35 +181,46 @@ export function App() {
         lang={lang}
       />
 
+      {/* Share Card Modal */}
+      <ShareCardModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        location={location}
+        airQualityData={airQualityData}
+        weatherData={weatherData}
+        latestEarthquake={latestEarthquake}
+        lang={lang}
+      />
+
+      {/* Emergency Guide Modal */}
+      <EmergencyGuideModal
+        isOpen={isEmergencyOpen}
+        onClose={() => setIsEmergencyOpen(false)}
+        lang={lang}
+      />
+
       {/* PWA Install Banner */}
       {installPrompt && showPwaBanner && (
         <div className="pwa-banner animate-fade-in">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <Download size={18} color="#10b981" />
-            <span style={{ fontSize: '0.8rem', fontWeight: '600', color: 'var(--text-primary)' }}>
+            <Download size={18} color="var(--color-primary)" />
+            <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)' }}>
               Pasang aplikasi Sekitarku di layar utama HP Anda untuk akses instan & offline.
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <button
               onClick={handleInstallPwa}
-              style={{
-                padding: '4px 12px',
-                borderRadius: '6px',
-                backgroundColor: '#10b981',
-                color: '#fff',
-                border: 'none',
-                fontSize: '0.75rem',
-                fontWeight: '700',
-                cursor: 'pointer'
-              }}
+              className="flat-btn-primary"
+              style={{ minHeight: '32px', padding: '4px 12px', fontSize: '0.75rem' }}
             >
               {t.pwaInstall}
             </button>
             <button
               onClick={() => setShowPwaBanner(false)}
               aria-label="Tutup"
-              style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+              className="flat-btn-secondary"
+              style={{ minHeight: '32px', padding: '4px 8px' }}
             >
               <X size={16} />
             </button>
@@ -215,12 +232,12 @@ export function App() {
       {(isAqiAlert || isQuakeAlert) && (
         <div className="alert-banner animate-fade-in">
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <AlertTriangle size={20} color="#ef4444" style={{ flexShrink: 0 }} />
+            <AlertTriangle size={20} color="var(--color-danger)" style={{ flexShrink: 0 }} />
             <div>
-              <strong style={{ fontSize: '0.85rem', color: '#ef4444', display: 'block' }}>
+              <strong style={{ fontSize: '0.85rem', color: 'var(--color-danger)', display: 'block' }}>
                 {isAqiAlert ? t.alertAqiTitle : t.alertQuakeTitle}
               </strong>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-primary)' }}>
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-main)', fontWeight: '600' }}>
                 {isAqiAlert
                   ? `${t.alertAqiDesc} (AQI: ${currentAqi})`
                   : `Gempa M ${latestEarthquake?.magnitude} terjadi di ${latestEarthquake?.wilayah}.`}
@@ -258,12 +275,12 @@ export function App() {
       </div>
 
       {/* Row 3: 7-Day Forecast */}
-      <div style={{ marginBottom: '1rem' }}>
+      <div style={{ marginBottom: '1.5rem' }}>
         <WeatherForecastChart dailyData={weatherData?.daily} lang={lang} />
       </div>
 
       {/* Row 4: Interactive Map */}
-      <div style={{ marginBottom: '1rem' }}>
+      <div style={{ marginBottom: '1.5rem' }}>
         <IndonesiaMap
           currentLocation={location}
           earthquakes={recentEarthquakes}
