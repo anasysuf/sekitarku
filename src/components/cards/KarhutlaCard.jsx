@@ -3,15 +3,8 @@ import { Flame, Compass, ChevronRight, AlertTriangle, ShieldCheck, Wind } from '
 import { getHazeStatus } from '../../utils/karhutla.js';
 import { translations } from '../../utils/i18n.js';
 
-export function KarhutlaCard({
-  karhutlaData,
-  airQualityData,
-  location,
-  onOpenModal,
-  loading,
-  lang = 'id'
-}) {
-  const t = translations[lang] || translations.id;
+export function KarhutlaCard({ karhutlaData, airQualityData, location, onOpenModal, loading }) {
+  const t = translations;
 
   if (loading || !karhutlaData || !karhutlaData.fdrs) {
     return (
@@ -39,34 +32,26 @@ export function KarhutlaCard({
   let statusBorder = 'var(--border-flat)';
   let statusTextColor = 'var(--text-main)';
   let statusIcon = <ShieldCheck size={16} color="var(--color-primary)" />;
-  let statusMessage = lang === 'en'
-    ? `Local vegetation in ${location.name} is SAFE and clear of wildfire smoke.`
-    : `Kondisi lahan di wilayah ${location.name} terpantau AMAN dan bebas dari kabut asap.`;
+  let statusMessage = '⚠️ Terdeteksi titik kebakaran lahan sangat dekat (' + nearest.distanceKm + ' km). Risiko asap pekat tinggi.';
 
   if (isHazeActive) {
     statusBannerBg = 'var(--color-danger-bg)';
     statusBorder = 'var(--color-danger)';
     statusTextColor = 'var(--color-danger)';
     statusIcon = <Wind size={16} color="var(--color-danger)" />;
-    statusMessage = lang === 'en'
-      ? `🚨 HAZE ADVISORY: Air is exposed to wildfire smoke from ${nearest?.regency || 'nearby hotspots'} (${nearest?.distanceKm || 0} km). Local land is safe, but please wear N95 masks for outdoor breathing!`
-      : `🚨 PERINGATAN KABUT ASAP: Udara terpapar asap kiriman dari titik api ${nearest?.regency || 'wilayah sekitar'} (${nearest?.distanceKm || 0} km). Lahan setempat aman dari api, namun gunakan masker N95 untuk pernapasan!`;
+    statusMessage = `🚨 PERINGATAN KABUT ASAP: Udara terpapar asap kiriman dari titik api ${nearest?.regency || 'wilayah sekitar'} (${nearest?.distanceKm || 0} km). Lahan setempat aman dari api, namun gunakan masker N95 untuk pernapasan!`;
   } else if (isHighRisk) {
     statusBannerBg = 'var(--color-danger-bg)';
     statusBorder = 'var(--color-danger)';
     statusTextColor = 'var(--color-danger)';
     statusIcon = <AlertTriangle size={16} color="var(--color-danger)" />;
-    statusMessage = lang === 'en'
-      ? `HIGH RISK: Vegetation in ${location.name} is dry & flammable due to high heat.`
-      : `STATUS RAWAN: Vegetasi di wilayah ${location.name} sangat kering & mudah terbakar akibat suhu panas.`;
+    statusMessage = `STATUS RAWAN: Vegetasi di wilayah ${location.name} sangat kering & mudah terbakar akibat suhu panas.`;
   } else if (isModerateRisk) {
     statusBannerBg = 'var(--color-warning-bg)';
     statusBorder = 'var(--color-warning)';
     statusTextColor = '#b45309';
     statusIcon = <AlertTriangle size={16} color="#b45309" />;
-    statusMessage = lang === 'en'
-      ? `WARNING: Grass & brush are drying out. Avoid open burning in ${location.name}.`
-      : `STATUS WASPADA: Semak & alang-alang mulai mengering. Hindari pembakaran sampah di ${location.name}.`;
+    statusMessage = `STATUS WASPADA: Semak & alang-alang mulai mengering. Hindari pembakaran sampah di ${location.name}.`;
   }
 
   return (
@@ -176,7 +161,7 @@ export function KarhutlaCard({
               <div style={{ marginTop: '0.45rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <Compass size={16} color="var(--color-primary)" />
                 <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)' }}>
-                  {lang === 'en' ? 'Distance:' : 'Jarak:'} <span style={{ color: isVeryNear ? 'var(--color-danger)' : 'var(--color-primary)' }}>{nearest.distanceKm} km</span> {lang === 'en' ? 'from' : 'dari'} {location.name}
+                  Jarak: <span style={{ color: isVeryNear ? 'var(--color-danger)' : 'var(--color-primary)' }}>{nearest.distanceKm} km</span> dari {location.name}
                 </span>
               </div>
             </div>

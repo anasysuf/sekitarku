@@ -27,60 +27,31 @@ export function formatRelativeTime(dateStr) {
   }
 }
 
-export function formatFullCurrentDate(date = new Date(), lang = 'id') {
-  try {
-    const locale = lang === 'en' ? 'en-US' : 'id-ID';
-    const dayStr = new Intl.DateTimeFormat(locale, {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    }).format(date);
-    const timeStr = new Intl.DateTimeFormat(locale, {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    }).format(date);
-    return `${dayStr} • ${timeStr} WIB`;
-  } catch (e) {
-    return date.toLocaleString();
-  }
+export function formatFullCurrentDate(date = new Date()) {
+  const d = date instanceof Date ? date : new Date(date);
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+  const dayName = days[d.getDay()];
+  const dayNum = d.getDate();
+  const monthName = months[d.getMonth()];
+  const year = d.getFullYear();
+  const hours = d.getHours().toString().padStart(2, '0');
+  const minutes = d.getMinutes().toString().padStart(2, '0');
+
+  return `${dayName}, ${dayNum} ${monthName} ${year} • ${hours}.${minutes} WIB`;
 }
 
-export function formatShortDate(dateStr, lang = 'id') {
-  if (!dateStr) return '';
+export function formatShortDate(dateStr) {
+  if (!dateStr) return '-';
   try {
-    const d = new Date(dateStr);
-    const locale = lang === 'en' ? 'en-US' : 'id-ID';
-    return new Intl.DateTimeFormat(locale, {
+    const date = new Date(dateStr);
+    return new Intl.DateTimeFormat('id-ID', {
+      weekday: 'short',
       day: 'numeric',
       month: 'short'
-    }).format(d);
+    }).format(date);
   } catch (e) {
     return dateStr;
   }
-}
-
-export function formatWeatherCode(code) {
-  const codes = {
-    0: { label: 'Cerah', icon: 'Sun' },
-    1: { label: 'Cerah Berawan', icon: 'SunMedium' },
-    2: { label: 'Sebagian Berawan', icon: 'CloudSun' },
-    3: { label: 'Berawan Mendung', icon: 'Cloud' },
-    45: { label: 'Berkabut', icon: 'CloudFog' },
-    48: { label: 'Kabut Tebal', icon: 'CloudFog' },
-    51: { label: 'Gerimis', icon: 'CloudDrizzle' },
-    53: { label: 'Gerimis Sedang', icon: 'CloudDrizzle' },
-    55: { label: 'Gerimis Lebat', icon: 'CloudDrizzle' },
-    61: { label: 'Hujan Ringan', icon: 'CloudRain' },
-    63: { label: 'Hujan Sedang', icon: 'CloudRain' },
-    65: { label: 'Hujan Lebat', icon: 'CloudRainWind' },
-    80: { label: 'Hujan Lokal Ringan', icon: 'CloudRain' },
-    81: { label: 'Hujan Lokal Sedang', icon: 'CloudRain' },
-    82: { label: 'Hujan Lokal Lebat', icon: 'CloudRainWind' },
-    95: { label: 'Badai Petir', icon: 'CloudLightning' },
-    96: { label: 'Badai Petir Ringan', icon: 'CloudLightning' },
-    99: { label: 'Badai Petir Kuat', icon: 'CloudLightning' }
-  };
-  return codes[code] || { label: 'Berawan', icon: 'Cloud' };
 }

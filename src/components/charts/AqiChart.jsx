@@ -4,9 +4,9 @@ import { Activity, Wind, TrendingUp, TrendingDown, Clock, ShieldCheck, AlertTria
 import { getAqiInfo } from '../../utils/aqi';
 import { translations } from '../../utils/i18n';
 
-export function AqiChart({ hourlyData, lang = 'id' }) {
+export function AqiChart({ hourlyData }) {
   const [metric, setMetric] = useState('aqi'); // 'aqi' | 'pm25'
-  const t = translations[lang] || translations.id;
+  const t = translations;
 
   if (!hourlyData || !hourlyData.time || !hourlyData.us_aqi) {
     return (
@@ -22,11 +22,11 @@ export function AqiChart({ hourlyData, lang = 'id' }) {
     const hour = d.getHours().toString().padStart(2, '0') + ':00';
     const aqiVal = Math.round(hourlyData.us_aqi ? hourlyData.us_aqi[index] : 0);
     const pm25Val = Math.round((hourlyData.pm2_5 ? hourlyData.pm2_5[index] : 0) * 10) / 10;
-    const aqiMeta = getAqiInfo(aqiVal, lang);
+    const aqiMeta = getAqiInfo(aqiVal);
 
     return {
       time: hour,
-      fullTime: `$${hour} ${lang === 'en' ? 'Local' : 'WIB'}`,
+      fullTime: `${hour} WIB`,
       aqi: aqiVal,
       pm25: pm25Val,
       label: aqiMeta.label,
@@ -38,7 +38,7 @@ export function AqiChart({ hourlyData, lang = 'id' }) {
   // Calculate 24-Hour Highlights
   const aqiValues = chartData.map((d) => d.aqi);
   const avgAqi = Math.round(aqiValues.reduce((a, b) => a + b, 0) / (aqiValues.length || 1));
-  const avgInfo = getAqiInfo(avgAqi, lang);
+  const avgInfo = getAqiInfo(avgAqi);
 
   let maxItem = chartData[0];
   let minItem = chartData[0];
@@ -200,7 +200,7 @@ export function AqiChart({ hourlyData, lang = 'id' }) {
               {isAqi ? maxItem.aqi : `${maxItem.pm25}`}
             </strong>
             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600' }}>
-              {lang === 'en' ? 'at' : 'pukul'} {maxItem.time}
+              pukul {maxItem.time}
             </span>
           </div>
         </div>
@@ -216,7 +216,7 @@ export function AqiChart({ hourlyData, lang = 'id' }) {
               {isAqi ? minItem.aqi : `${minItem.pm25}`}
             </strong>
             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600' }}>
-              {lang === 'en' ? 'at' : 'pukul'} {minItem.time}
+              pukul {minItem.time}
             </span>
           </div>
         </div>
@@ -278,27 +278,27 @@ export function AqiChart({ hourlyData, lang = 'id' }) {
 
       {/* AQI Reference Scale Strip */}
       <div style={{ marginTop: '0.85rem', paddingTop: '0.65rem', borderTop: 'var(--border-thick)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-        <span style={{ fontWeight: '700' }}>{lang === 'en' ? 'Index Scale:' : 'Skala Indeks:'}</span>
+        <span style={{ fontWeight: '700' }}>Skala Indeks:</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981' }} />
-            <span>{lang === 'en' ? '0-50 Good' : '0-50 Baik'}</span>
+            <span>0-50 Baik</span>
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#eab308' }} />
-            <span>{lang === 'en' ? '51-100 Moderate' : '51-100 Sedang'}</span>
+            <span>51-100 Sedang</span>
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#f97316' }} />
-            <span>{lang === 'en' ? '101-150 Sensitive' : '101-150 Sensitif'}</span>
+            <span>101-150 Sensitif</span>
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444' }} />
-            <span>{lang === 'en' ? '151-200 Unhealthy' : '151-200 Tdk Sehat'}</span>
+            <span>151-200 Tdk Sehat</span>
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#8b5cf6' }} />
-            <span>{lang === 'en' ? '200+ Hazardous' : '200+ Berbahaya'}</span>
+            <span>200+ Berbahaya</span>
           </span>
         </div>
       </div>

@@ -3,8 +3,8 @@ import { SunMedium } from 'lucide-react';
 import { getUvInfo } from '../../utils/aqi';
 import { translations } from '../../utils/i18n';
 
-export function UvCard({ uvIndex, loading, lang = 'id' }) {
-  const t = translations[lang] || translations.id;
+export function UvCard({ uvIndex, loading }) {
+  const t = translations;
 
   if (loading) {
     return (
@@ -14,7 +14,7 @@ export function UvCard({ uvIndex, loading, lang = 'id' }) {
     );
   }
 
-  const uvInfo = getUvInfo(uvIndex, lang);
+  const uvInfo = getUvInfo(uvIndex);
 
   return (
     <div className="flat-card" style={{ padding: '1.5rem' }}>

@@ -3,8 +3,8 @@ import { Wind } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi';
 import { translations } from '../../utils/i18n';
 
-export function AqiCard({ data, loading, lang = 'id' }) {
-  const t = translations[lang] || translations.id;
+export function AqiCard({ data, loading }) {
+  const t = translations;
 
   if (loading) {
     return (
@@ -16,7 +16,7 @@ export function AqiCard({ data, loading, lang = 'id' }) {
 
   const current = data?.current || {};
   const aqi = Number(current.aqi) || 0;
-  const aqiInfo = getAqiInfo(aqi, lang);
+  const aqiInfo = getAqiInfo(aqi);
 
   // Position percentage on standard 0-500 AQI scale
   const needlePercent = Math.min(100, Math.max(0, (aqi / 500) * 100));

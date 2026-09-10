@@ -37,7 +37,7 @@ export const FDRS_LEVELS = {
 /**
  * Hitung Indeks Kemudahan Kebakaran (FDRS) berdasarkan cuaca lokal BMKG/Open-Meteo
  */
-export function calculateFdrs(weatherData, lang = 'id') {
+export function calculateFdrs(weatherData) {
   if (!weatherData?.current) return FDRS_LEVELS.LOW;
 
   const current = weatherData.current;
@@ -75,16 +75,6 @@ export function calculateFdrs(weatherData, lang = 'id') {
   else if (score >= 50) level = FDRS_LEVELS.HIGH;
   else if (score >= 30) level = FDRS_LEVELS.MODERATE;
 
-  if (lang === 'en') {
-    const enLabels = {
-      'AMAN': { code: 'LOW', label: 'Low / Safe', desc: 'Moist soil & vegetation. Very low chance of wildfire ignition.' },
-      'SEDANG': { code: 'MODERATE', label: 'Moderate / Caution', desc: 'Brush and surface grass drying out. Moderate fire ignition potential.' },
-      'TINGGI': { code: 'HIGH', label: 'High / Flammable', desc: 'Dry shrubs and leaves ignite very easily. Fires spread quickly.' },
-      'EKSTREM': { code: 'EXTREME', label: 'Extreme / Critical', desc: 'Peatland and forests critically dry. Extreme wildfire danger, dense smoke potential.' }
-    };
-    const enInfo = enLabels[level.code] || enLabels.AMAN;
-    return { ...level, ...enInfo };
-  }
   return level;
 }
 

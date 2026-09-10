@@ -4,13 +4,13 @@ import { getWeatherVisual } from '../../utils/weatherIcons';
 import { formatShortDate } from '../../utils/format';
 import { translations } from '../../utils/i18n';
 
-export function WeatherForecastChart({ dailyData, lang = 'id' }) {
-  const t = translations[lang] || translations.id;
+export function WeatherForecastChart({ dailyData }) {
+  const t = translations;
   if (!dailyData || !dailyData.time) return null;
 
   const daysId = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
   const daysEn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const days = lang === 'en' ? daysEn : daysId;
+  const days = daysId;
 
   // Calculate weekly extremes
   const maxTemps = dailyData.temperature_2m_max?.slice(0, 7) || [];
@@ -64,15 +64,15 @@ export function WeatherForecastChart({ dailyData, lang = 'id' }) {
       <div className="forecast-scroll-container" style={{ gap: '0.65rem' }}>
         {dailyData.time.slice(0, 7).map((dateStr, idx) => {
           const d = new Date(dateStr);
-          const dayName = idx === 0 ? (lang === 'en' ? 'Today' : 'Hari Ini') : days[d.getDay()];
-          const formattedDate = formatShortDate(dateStr, lang);
+          const dayName = idx === 0 ? 'Hari Ini' : days[d.getDay()];
+          const formattedDate = formatShortDate(dateStr);
           const maxTemp = Math.round(dailyData.temperature_2m_max?.[idx] ?? 0);
           const minTemp = Math.round(dailyData.temperature_2m_min?.[idx] ?? 0);
           const rainProb = Math.round(dailyData.precipitation_probability_max?.[idx] ?? (dailyData.precipitation_sum?.[idx] > 0 ? 60 : 15));
           const rainSum = (dailyData.precipitation_sum?.[idx] ?? 0).toFixed(1);
           const uvMax = Math.round(dailyData.uv_index_max?.[idx] ?? 6);
           const code = dailyData.weather_code?.[idx] ?? 0;
-          const visual = getWeatherVisual(code, lang);
+          const visual = getWeatherVisual(code);
           const IconComp = visual.icon;
 
           return (

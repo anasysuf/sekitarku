@@ -16,22 +16,13 @@ import { formatFullCurrentDate } from '../../utils/format.js';
 import { calculateFdrs, getNearbyHotspots, getHazeStatus } from '../../utils/karhutla.js';
 import { translations } from '../../utils/i18n.js';
 
-export function ShareCardModal({
-  isOpen,
-  onClose,
-  location,
-  airQualityData,
-  weatherData,
-  latestEarthquake,
-  karhutlaData,
-  lang = 'id'
-}) {
+export function ShareCardModal({ isOpen, onClose, location, airQualityData, weatherData, latestEarthquake, karhutlaData }) {
   const [copied, setCopied] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
   if (!isOpen) return null;
 
-  const t = translations[lang] || translations.id;
+  const t = translations;
 
   const aqi = Number(airQualityData?.current?.aqi) || 0;
   const pm25 = Number(airQualityData?.current?.pm25 ?? airQualityData?.current?.pm2_5) || 0;
@@ -40,27 +31,25 @@ export function ShareCardModal({
   const uvIndex = Number(weatherData?.current?.uvIndex ?? 0);
   const weatherCode = Number(weatherData?.current?.weatherCode ?? 0);
 
-  const aqiInfo = getAqiInfo(aqi, lang);
-  const health = calculateEcoHealthScore(aqi, temp, humidity, uvIndex, pm25, lang);
-  const weatherVisual = getWeatherVisual(weatherCode, lang);
-  const dateFormatted = formatFullCurrentDate(new Date(), lang);
+  const aqiInfo = getAqiInfo(aqi);
+  const health = calculateEcoHealthScore(aqi, temp, humidity, uvIndex, pm25);
+  const weatherVisual = getWeatherVisual(weatherCode);
+  const dateFormatted = formatFullCurrentDate(new Date());
 
   // Infallible Karhutla resolution
   const activeKarhutla = karhutlaData || (location?.lat ? {
-    fdrs: calculateFdrs(weatherData, lang),
+    fdrs: calculateFdrs(weatherData),
     nearest: getNearbyHotspots(location.lat, location.lon).nearest
   } : null);
 
-  const fdrs = activeKarhutla?.fdrs || calculateFdrs(weatherData, lang);
+  const fdrs = activeKarhutla?.fdrs || calculateFdrs(weatherData);
   const nearestFire = activeKarhutla?.nearest || (location?.lat ? getNearbyHotspots(location.lat, location.lon).nearest : null);
   
   // Cross-Correlation Kabut Asap
   const { isHazeActive, isVeryNear } = getHazeStatus(nearestFire, aqi, pm25);
 
-  const quakeText = latestEarthquake ? (lang === 'en' ? `• Recent Quake: M ${latestEarthquake.magnitude} (${latestEarthquake.wilayah})\n` : `• Gempa Terkini: M ${latestEarthquake.magnitude} (${latestEarthquake.wilayah})\n`) : '';
-  const shareText = lang === 'en'
-    ? `🌿 Environmental Report for ${location.name} (${dateFormatted}):\n• Air Quality: AQI ${aqi} (${aqiInfo.label})\n• Weather: ${temp}°C, ${weatherVisual.label}\n• Health Score: ${health.score}/100 (${health.category})\n• Wildfire Haze: ${isHazeActive ? `⚠️ ACTIVE HAZE DETECTED (Smoke from ${nearestFire?.regency || 'nearby fire'} at ${nearestFire?.distanceKm || 0} km)` : '🟢 Clean / Safe'}\n• Local Land Flammability: ${fdrs.code} (${fdrs.label})\n${quakeText}🌐 Check real-time at https://sekitarku.vercel.app`
-    : `🌿 Pantauan Lingkungan ${location.name} (${dateFormatted}):\n• Kualitas Udara: AQI ${aqi} (${aqiInfo.label})\n• Cuaca: ${temp}°C, ${weatherVisual.label}\n• Skor Kesehatan: ${health.score}/100 (${health.category})\n• Status Kabut Asap: ${isHazeActive ? `⚠️ TERPAPAR KABUT ASAP (Asap dari titik api ${nearestFire?.regency || 'wilayah sekitar'} sejauh ${nearestFire?.distanceKm || 0} km)` : '🟢 Bersih'}\n• Potensi Api Lahan Lokal: ${fdrs.code} (${fdrs.label})\n${quakeText}🌐 Cek real-time di https://sekitarku.vercel.app`;
+  const quakeText = latestEarthquake ? `• Gempa Terkini: M ${latestEarthquake.magnitude} (${latestEarthquake.wilayah})\n` : '';
+  const shareText = `📍 Laporan Lingkungan & Cuaca Real-Time: ${locationName}\n🌱 Kualitas Udara: AQI ${aqiVal} (${health.category})\n🌡️ Cuaca: ${tempStr} • ${weather?.condition || 'Cerah'}\n⚠️ Status Asap: ${hazeStatusText}\n\nPantau selengkapnya di Sekitarku: https://sekitarku.vercel.app`;
 
   // Draw 9:16 high quality story infographic on HTML5 canvas (1080 x 1920)
   const generateCanvasImage = () => {
@@ -135,7 +124,7 @@ export function ShareCardModal({
 
       ctx.fillStyle = '#64748B';
       ctx.font = '700 30px "Outfit", sans-serif';
-      ctx.fillText(lang === 'en' ? 'Real-Time Environmental & Weather Report' : 'Laporan Lingkungan & Cuaca Real-Time', 80, 185);
+      ctx.fillText('Laporan Lingkungan & Cuaca Real-Time', 80, 185);
 
       // =========================================================================
       // 3. LOCATION HERO CARD
@@ -172,7 +161,7 @@ export function ShareCardModal({
       ctx.fillText('/100', 250, 625);
 
       // Dynamic Score Badge
-      const badgeText = health.category || (lang === 'en' ? 'Good' : 'Baik');
+      const badgeText = health.category || 'Baik';
       ctx.font = '800 30px "Outfit", sans-serif';
       const badgeTextWidth = ctx.measureText(badgeText).width;
       const badgeWidth = Math.min(460, Math.max(240, badgeTextWidth + 50));
@@ -191,9 +180,7 @@ export function ShareCardModal({
 
       ctx.fillStyle = '#334155';
       ctx.font = '600 26px "Outfit", sans-serif';
-      const cigsNote = lang === 'en'
-        ? `Estimated equivalent exposure to ${health.cigs || '0'} cigarettes/day.`
-        : `Perkiraan setara paparan ${health.cigs || '0'} batang rokok/hari.`;
+      const cigsNote = `Setara ${health.cigarettesEquivalent || '0'} batang rokok/hari`;
       drawWrappedText(cigsNote, 120, 700, 840, 34, 1);
 
       // =========================================================================
@@ -205,7 +192,7 @@ export function ShareCardModal({
 
       ctx.fillStyle = aqiInfo.color || '#10B981';
       ctx.font = '800 24px "Outfit", sans-serif';
-      ctx.fillText(lang === 'en' ? 'AIR QUALITY' : 'KUALITAS UDARA', 120, 820);
+      ctx.fillText('KUALITAS UDARA', 120, 820);
 
       ctx.fillStyle = aqiInfo.color || '#10B981';
       ctx.font = '800 80px "Outfit", sans-serif';
@@ -228,7 +215,7 @@ export function ShareCardModal({
 
       ctx.fillStyle = '#0284C7';
       ctx.font = '800 24px "Outfit", sans-serif';
-      ctx.fillText(lang === 'en' ? 'WEATHER & TEMP' : 'CUACA & SUHU', 600, 820);
+      ctx.fillText('CUACA & SUHU', 600, 820);
 
       ctx.fillStyle = '#0F172A';
       ctx.font = '800 80px "Outfit", sans-serif';
@@ -267,7 +254,7 @@ export function ShareCardModal({
       // Kabut Asap Badge
       const hazeBadgeBg = isHazeActive ? '#FEE2E2' : '#ECFDF5';
       const hazeBadgeColor = isHazeActive ? '#DC2626' : '#059669';
-      const hazeBadgeText = isHazeActive ? (lang === 'en' ? '⚠️ ACTIVE HAZE' : '⚠️ TERPAPAR KABUT ASAP') : (lang === 'en' ? '🟢 Haze: Clean' : '🟢 Kabut Asap: Bersih');
+      const hazeBadgeText = isHazeActive ? '⚠️ TERPAPAR KABUT ASAP' : '🟢 Kabut Asap: Bersih';
 
       ctx.beginPath();
       if (ctx.roundRect) ctx.roundRect(410, 1200, 470, 52, 14);
@@ -283,26 +270,20 @@ export function ShareCardModal({
       ctx.fillStyle = isHazeActive ? '#DC2626' : '#334155';
       ctx.font = isHazeActive ? '700 22px "Outfit", sans-serif' : '600 22px "Outfit", sans-serif';
       if (isHazeActive) {
-        const hazeWarnText = lang === 'en'
-          ? `🚨 Advisory: Air is exposed to incoming smoke from hotspot in ${nearestFire?.regency || 'nearby region'} (${nearestFire?.distanceKm || 0} km). Please wear N95 mask!`
-          : `🚨 Peringatan: Udara terpapar kabut asap kiriman dari titik api ${nearestFire?.regency || 'wilayah sekitar'} (${nearestFire?.distanceKm || 0} km). Gunakan masker N95!`;
+        const hazeWarnText = `⚠️ Terdeteksi paparan kabut asap (${isHazeActive && nearestHotspot ? `${nearestHotspot.distanceKm} km dari ${nearestHotspot.regency}` : 'partikel asap karhutla'}). Gunakan masker N95 / KN95.`;
         drawWrappedText(hazeWarnText, 120, 1290, 840, 32, 2);
       } else {
-        const hazeSafeText = lang === 'en'
-          ? 'Local soil & vegetation are moist/safe from fire risks. Ambient air is clean & clear.'
-          : 'Kondisi tanah & vegetasi lokal basah/aman dari potensi kebakaran baru. Udara bebas kabut asap.';
+        const hazeSafeText = 'Kondisi udara bersih dari kabut asap kebakaran hutan dalam jarak dekat.';
         drawWrappedText(hazeSafeText, 120, 1290, 840, 32, 2);
       }
 
       ctx.fillStyle = '#64748B';
       ctx.font = '600 21px "Outfit", sans-serif';
       if (nearestFire) {
-        const hotspotText = lang === 'en'
-          ? `📍 Nearest Hotspot: ${nearestFire.regency} (${nearestFire.distanceKm} km) · Satellite ${nearestFire.satellite}`
-          : `📍 Titik Panas Terdekat: ${nearestFire.regency} (${nearestFire.distanceKm} km) · Satelit ${nearestFire.satellite}`;
+        const hotspotText = nearestHotspot ? `Titik Panas: ${nearestHotspot.regency} (${nearestHotspot.distanceKm} km) • Satelit ${nearestHotspot.satellite}` : 'Tidak terdeteksi titik panas dalam radius 400 km';
         drawWrappedText(hotspotText, 120, 1392, 840, 26, 1);
       } else {
-        const noFireText = lang === 'en' ? '📍 No satellite hotspots detected within 400 km' : '📍 Tidak terdeteksi titik panas dalam radius 400 km';
+        const noFireText = '📍 Tidak terdeteksi titik panas dalam radius 400 km';
         drawWrappedText(noFireText, 120, 1392, 840, 26, 1);
       }
 
@@ -314,7 +295,7 @@ export function ShareCardModal({
 
         ctx.fillStyle = '#EF4444';
         ctx.font = '800 24px "Outfit", sans-serif';
-        ctx.fillText(lang === 'en' ? 'RECENT EARTHQUAKE (BMKG)' : 'GEMPA TERKINI (BMKG)', 120, 1515);
+        ctx.fillText('GEMPA TERKINI (BMKG)', 120, 1515);
 
         // Magnitude Pill Badge
         ctx.beginPath();
@@ -342,22 +323,22 @@ export function ShareCardModal({
         ctx.fillStyle = '#64748B';
         ctx.font = '600 22px "Outfit", sans-serif';
         const depthStr = latestEarthquake.depth || latestEarthquake.kedalaman || '-';
-        const quakeDetails = `${t.depth}: ${depthStr} • ${latestEarthquake.potensi || (lang === 'en' ? 'No tsunami hazard' : 'Tidak berpotensi tsunami')}`;
+        const quakeDetails = `${t.depth}: ${depthStr} • ${latestEarthquake.potensi || 'Tidak berpotensi tsunami'}`;
         drawWrappedText(quakeDetails, 295, Math.max(1645, nextY + 8), 665, 30, 2);
       } else {
         drawCard(80, 1465, 920, 245, '#FFFFFF', '#E2E8F0');
 
         ctx.fillStyle = '#10B981';
         ctx.font = '800 24px "Outfit", sans-serif';
-        ctx.fillText(lang === 'en' ? 'SAFETY & HEALTH ADVISORY' : 'INFORMASI KESELAMATAN', 120, 1515);
+        ctx.fillText('INFORMASI KESELAMATAN', 120, 1515);
 
         ctx.fillStyle = '#0F172A';
         ctx.font = '700 26px "Outfit", sans-serif';
-        ctx.fillText(lang === 'en' ? 'No critical disaster warnings at this time.' : 'Tidak ada peringatan bencana kritis saat ini.', 120, 1580);
+        ctx.fillText('Tidak ada peringatan bencana kritis saat ini.', 120, 1580);
 
         ctx.fillStyle = '#64748B';
         ctx.font = '600 22px "Outfit", sans-serif';
-        ctx.fillText(lang === 'en' ? 'Monitor regular updates on Sekitarku & BMKG.' : 'Tetap pantau pembaruan berkala dari BMKG & Sekitarku.', 120, 1635);
+        ctx.fillText('Tetap pantau pembaruan berkala dari BMKG & Sekitarku.', 120, 1635);
       }
 
       // =========================================================================
@@ -370,7 +351,7 @@ export function ShareCardModal({
 
       ctx.fillStyle = '#64748B';
       ctx.font = '600 24px "Outfit", sans-serif';
-      ctx.fillText(lang === 'en' ? 'Official Data: BMKG, PVMBG & NASA • Real-Time Monitoring' : 'Data Resmi BMKG, PVMBG & NASA • Dipantau Secara Real-Time', 540, 1825);
+      ctx.fillText('Data Resmi BMKG, PVMBG & NASA • Dipantau Secara Real-Time', 540, 1825);
 
       ctx.textAlign = 'left';
 
@@ -558,7 +539,7 @@ export function ShareCardModal({
                 whiteSpace: 'nowrap',
                 flexShrink: 0
               }}>
-                {lang === 'en' ? 'Score' : 'Skor'}: {health.score}/100
+                Skor: {health.score}/100
               </div>
             </div>
 
@@ -666,13 +647,7 @@ export function ShareCardModal({
                 lineHeight: 1.35,
                 fontWeight: isHazeActive ? '700' : '500'
               }}>
-                {isHazeActive
-                  ? (lang === 'en'
-                    ? `Advisory: Air is exposed to incoming smoke from hotspot in ${nearestFire?.regency || 'nearby region'} (${nearestFire?.distanceKm || 0} km). Please wear N95 mask!`
-                    : `Peringatan: Udara terpapar kabut asap kiriman dari titik api ${nearestFire?.regency || 'wilayah sekitar'} (${nearestFire?.distanceKm || 0} km). Gunakan masker N95!`)
-                  : (lang === 'en'
-                    ? 'Local soil & vegetation are moist/safe from fire risks. Ambient air is clean & clear.'
-                    : 'Kondisi lahan setempat basah & aman dari risiko api baru. Tidak terdeteksi kabut asap karhutla di wilayah ini.')}
+                {isHazeActive ? '⚠️ Terpapar Kabut Asap' : '🟢 Bebas Asap'}
               </div>
             </div>
 
@@ -712,7 +687,7 @@ export function ShareCardModal({
             )}
 
             <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)', textAlign: 'center', fontWeight: '600' }}>
-              {lang === 'en' ? 'Official Data: BMKG, PVMBG & NASA • sekitarku.vercel.app' : 'Data Resmi BMKG, PVMBG & NASA • sekitarku.vercel.app'}
+              {'Data Resmi BMKG, PVMBG & NASA • sekitarku.vercel.app'}
             </div>
           </div>
 
@@ -736,7 +711,7 @@ export function ShareCardModal({
               }}
             >
               <Share2 size={18} strokeWidth={2.5} />
-              <span>{isGenerating ? (lang === 'en' ? 'Preparing Image...' : 'Menyiapkan Gambar...') : t.shareBtn}</span>
+              <span>{isGenerating ? 'Menyiapkan Gambar...' : t.shareBtn}</span>
             </button>
 
             {/* Secondary Actions: Simpan PNG & Salin Teks */}

@@ -3,9 +3,9 @@ import { Activity, AlertTriangle, ShieldCheck, MapPin, Clock, ChevronDown, Chevr
 import { getEarthquakeColor } from '../../utils/aqi';
 import { translations } from '../../utils/i18n';
 
-export function EarthquakeCard({ earthquake, recentQuakes = [], onFocusQuake, loading, lang = 'id' }) {
+export function EarthquakeCard({ earthquake, recentQuakes = [], onFocusQuake, loading }) {
   const [showList, setShowList] = useState(false);
-  const t = translations[lang] || translations.id;
+  const t = translations;
 
   if (loading) {
     return (

@@ -12,15 +12,13 @@ export function Header({
   onToggleDark,
   onRefresh,
   lastUpdated,
-  lang,
-  onToggleLang,
   notificationsEnabled,
   onRequestNotification,
   onOpenShare,
   onOpenEmergency,
   onOpenWidget
 }) {
-  const t = translations[lang] || translations.id;
+  const t = translations.id;
 
   return (
     <header style={{ marginBottom: '1.75rem' }}>
@@ -83,7 +81,7 @@ export function Header({
                 color: 'var(--color-primary)'
               }}>
                 <Calendar size={12} strokeWidth={2.5} />
-                <span>{formatFullCurrentDate(lastUpdated, lang)}</span>
+                <span>{formatFullCurrentDate(lastUpdated)}</span>
               </div>
             </div>
           </div>
@@ -220,29 +218,7 @@ export function Header({
             {notificationsEnabled ? <BellRing size={16} strokeWidth={2.5} /> : <Bell size={16} strokeWidth={2.2} />}
           </button>
 
-          {/* Language Switcher */}
-          <button
-            onClick={onToggleLang}
-            aria-label={t.langToggle}
-            title="Ganti Bahasa (ID / EN)"
-            style={{
-              height: '36px',
-              padding: '0 8px',
-              borderRadius: 'var(--radius-sm)',
-              border: 'none',
-              backgroundColor: 'transparent',
-              color: 'var(--text-main)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '3px',
-              fontSize: '0.75rem',
-              fontWeight: '800'
-            }}
-          >
-            <Globe size={15} strokeWidth={2.2} />
-            <span>{lang.toUpperCase()}</span>
-          </button>
+          
 
           {/* Refresh */}
           <button

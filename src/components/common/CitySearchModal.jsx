@@ -15,7 +15,7 @@ const POPULAR_CITIES = [
   'Palembang'
 ];
 
-export function CitySearchModal({ isOpen, onClose, onSelectCity, currentCity, lang = 'id' }) {
+export function CitySearchModal({ isOpen, onClose, onSelectCity, currentCity }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('Semua');
   const inputRef = useRef(null);

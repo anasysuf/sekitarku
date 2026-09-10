@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Copy, Check, Globe, Code2 } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi';
 
-export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, weatherData, lang = 'id' }) {
+export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, weatherData }) {
   const [copiedType, setCopiedType] = useState(null);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
 
   const cityName = location?.name || location?.city || 'Jakarta';
   const aqiVal = airQualityData?.current?.aqi || 42;
-  const aqiInfo = getAqiInfo(aqiVal, lang);
+  const aqiInfo = getAqiInfo(aqiVal);
   const temp = Math.round(weatherData?.current?.temperature || weatherData?.current?.temperature_2m || 30);
   const weatherLabel = weatherData?.current?.weatherCodeInfo?.label || 'Cerah Berawan';
 

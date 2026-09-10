@@ -2,8 +2,8 @@ import React from 'react';
 import { Code2, Globe, Coffee, Code, Flame, Mountain } from 'lucide-react';
 import { translations } from '../../utils/i18n.js';
 
-export function Footer({ onOpenWidget, lang = 'id' }) {
-  const t = translations[lang] || translations.id;
+export function Footer({ onOpenWidget }) {
+  const t = translations;
 
   return (
     <footer style={{ marginTop: '4rem', padding: '2.5rem 0', borderTop: 'var(--border-thick)', textAlign: 'center' }}>

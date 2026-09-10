@@ -95,10 +95,8 @@ export function App() {
   const [lastUpdated, setLastUpdated] = useState(new Date());
 
   // Language state: 'id' or 'en'
-  const [lang, setLang] = useState('id');
-  const t = i18n[lang] || i18n.id;
-
-  // Embed mode check
+  const t = i18n.id;
+// Embed mode check
   const isEmbedMode = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('embed') === 'true';
   const cityParam = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('city') : null;
 
@@ -231,10 +229,6 @@ export function App() {
     }
   };
 
-  const toggleLang = () => {
-    setLang((prev) => (prev === 'id' ? 'en' : 'id'));
-  };
-
   // Alerts
   const currentAqi = airQualityData?.current?.aqi || 0;
   const isAqiAlert = currentAqi > 150;
@@ -248,7 +242,6 @@ export function App() {
         airQualityData={airQualityData}
         loading={loading}
         onRefresh={() => loadData(true)}
-        lang={lang}
       />
     );
   }
@@ -265,8 +258,6 @@ export function App() {
         onToggleDark={toggleDarkMode}
         onRefresh={() => loadData(true)}
         lastUpdated={lastUpdated}
-        lang={lang}
-        onToggleLang={toggleLang}
         notificationsEnabled={notificationsEnabled}
         onRequestNotification={handleRequestNotification}
         onOpenShare={() => setIsShareOpen(true)}
@@ -282,7 +273,6 @@ export function App() {
             onClose={() => setIsSearchOpen(false)}
             onSelectCity={selectCity}
             currentCity={location}
-            lang={lang}
           />
         </Suspense>
       )}
@@ -298,7 +288,6 @@ export function App() {
             weatherData={weatherData}
             latestEarthquake={latestEarthquake}
             karhutlaData={karhutlaData}
-            lang={lang}
           />
         </Suspense>
       )}
@@ -309,7 +298,6 @@ export function App() {
           <EmergencyGuideModal
             isOpen={isEmergencyOpen}
             onClose={() => setIsEmergencyOpen(false)}
-            lang={lang}
           />
         </Suspense>
       )}
@@ -323,7 +311,6 @@ export function App() {
             location={location}
             airQualityData={airQualityData}
             weatherData={weatherData}
-            lang={lang}
           />
         </Suspense>
       )}
@@ -336,7 +323,6 @@ export function App() {
             isOpen={isKarhutlaOpen}
             onClose={() => setIsKarhutlaOpen(false)}
             userLocation={location}
-            lang={lang}
           />
         </Suspense>
       )}
@@ -348,7 +334,6 @@ export function App() {
             isOpen={isVolcanoOpen}
             onClose={() => setIsVolcanoOpen(false)}
             userLocation={location}
-            lang={lang}
           />
         </Suspense>
       )}
@@ -406,19 +391,17 @@ export function App() {
         aqiData={airQualityData}
         weatherData={weatherData}
         loading={loading}
-        lang={lang}
       />
 
       {/* Row 1: AQI, Weather, Quake */}
       <div className="dashboard-grid-3">
-        <AqiCard data={airQualityData} loading={loading} lang={lang} />
-        <WeatherCard data={weatherData} locationName={location.name} loading={loading} lang={lang} />
+        <AqiCard data={airQualityData} loading={loading} />
+        <WeatherCard data={weatherData} locationName={location.name} loading={loading} />
         <EarthquakeCard
           earthquake={latestEarthquake}
           recentQuakes={recentEarthquakes}
           onFocusQuake={handleFocusQuake}
           loading={loading}
-          lang={lang}
         />
       </div>
 
@@ -430,28 +413,26 @@ export function App() {
         location={location}
         onOpenModal={() => setIsKarhutlaOpen(true)}
         loading={loading}
-        lang={lang}
       />
 
       {/* Volcano Proximity & Monitoring Card (PVMBG / MAGMA Indonesia) */}
       <VolcanoCard
         location={location}
         onOpenModal={() => setIsVolcanoOpen(true)}
-        lang={lang}
       />
 
       {/* Row 2: UV + Hourly Chart */}
       <div className="dashboard-grid-2">
-        <UvCard uvIndex={weatherData?.current?.uvIndex || 0} loading={loading} lang={lang} />
+        <UvCard uvIndex={weatherData?.current?.uvIndex || 0} loading={loading} />
         <Suspense fallback={<ComponentSkeleton height="240px" label="Memuat Grafik Tren AQI..." />}>
-          <AqiChart hourlyData={airQualityData?.hourly} lang={lang} />
+          <AqiChart hourlyData={airQualityData?.hourly} />
         </Suspense>
       </div>
 
       {/* Row 3: 7-Day Forecast */}
       <div style={{ marginBottom: '1.5rem' }}>
         <Suspense fallback={<ComponentSkeleton height="260px" label="Memuat Prakiraan Cuaca 7 Hari..." />}>
-          <WeatherForecastChart dailyData={weatherData?.daily} lang={lang} />
+          <WeatherForecastChart dailyData={weatherData?.daily} />
         </Suspense>
       </div>
 
@@ -463,13 +444,12 @@ export function App() {
             earthquakes={recentEarthquakes}
             hotspots={karhutlaData?.allHotspots || []}
             onSelectCity={selectCity}
-            lang={lang}
           />
         </Suspense>
       </div>
 
       {/* Footer */}
-      <Footer onOpenWidget={() => setIsWidgetOpen(true)} lang={lang} />
+      <Footer onOpenWidget={() => setIsWidgetOpen(true)} />
     </div>
   );
 }

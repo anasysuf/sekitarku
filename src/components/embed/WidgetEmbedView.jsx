@@ -2,17 +2,10 @@ import React from 'react';
 import { ExternalLink, Wind, Droplets, RefreshCw } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi';
 
-export function WidgetEmbedView({
-  location,
-  weatherData,
-  airQualityData,
-  loading,
-  onRefresh,
-  lang = 'id'
-}) {
+export function WidgetEmbedView({ location, weatherData, airQualityData, loading, onRefresh }) {
   const cityName = location?.name || 'DKI Jakarta';
   const aqiVal = airQualityData?.current?.aqi || 42;
-  const aqiInfo = getAqiInfo(aqiVal, lang);
+  const aqiInfo = getAqiInfo(aqiVal);
   const temp = Math.round(weatherData?.current?.temperature || weatherData?.current?.temperature_2m || 30);
   const weatherLabel = weatherData?.current?.weatherCodeInfo?.label || 'Cerah Berawan';
   const humidity = weatherData?.current?.relative_humidity_2m || 75;

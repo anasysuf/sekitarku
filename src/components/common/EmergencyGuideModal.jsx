@@ -46,7 +46,7 @@ const EMERGENCY_CONTACTS = [
   }
 ];
 
-export function EmergencyGuideModal({ isOpen, onClose, lang = 'id' }) {
+export function EmergencyGuideModal({ isOpen, onClose }) {
   const [activeTab, setActiveTab] = useState('kontak');
 
   if (!isOpen) return null;

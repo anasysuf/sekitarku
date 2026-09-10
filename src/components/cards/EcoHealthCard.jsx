@@ -3,8 +3,8 @@ import { HeartPulse, Bike, Footprints, Baby, Wind, ShieldCheck } from 'lucide-re
 import { calculateEcoHealthScore } from '../../utils/healthIndex';
 import { translations } from '../../utils/i18n';
 
-export function EcoHealthCard({ aqiData, weatherData, loading, lang = 'id' }) {
-  const t = translations[lang] || translations.id;
+export function EcoHealthCard({ aqiData, weatherData, loading }) {
+  const t = translations;
 
   if (loading) {
     return (
@@ -66,7 +66,7 @@ export function EcoHealthCard({ aqiData, weatherData, loading, lang = 'id' }) {
                 {t.ecoTitle}
               </span>
               <h2 style={{ fontSize: '1.35rem', fontWeight: '800', margin: '0.1rem 0', color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
-                {lang === 'en' ? health.categoryEn : health.category}
+                {health.category}
               </h2>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, fontWeight: '500' }}>
                 {t.ecoSubtitle}
@@ -131,7 +131,7 @@ export function EcoHealthCard({ aqiData, weatherData, loading, lang = 'id' }) {
               <div style={{ minWidth: 0 }}>
                 <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', fontWeight: '600' }}>Jogging</span>
                 <strong style={{ fontSize: '0.825rem', color: 'var(--text-main)', fontWeight: '800' }}>
-                  {lang === 'en' ? health.activities.jogging.statusEn : health.activities.jogging.status}
+                  {health.activities.jogging.status}
                 </strong>
               </div>
             </div>
@@ -141,9 +141,9 @@ export function EcoHealthCard({ aqiData, weatherData, loading, lang = 'id' }) {
                 <Bike size={16} strokeWidth={2.5} />
               </div>
               <div style={{ minWidth: 0 }}>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', fontWeight: '600' }}>{lang === 'en' ? 'Cycling' : 'Sepeda'}</span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', fontWeight: '600' }}>Sepeda</span>
                 <strong style={{ fontSize: '0.825rem', color: 'var(--text-main)', fontWeight: '800' }}>
-                  {lang === 'en' ? health.activities.cycling.statusEn : health.activities.cycling.status}
+                  {health.activities.cycling.status}
                 </strong>
               </div>
             </div>
@@ -153,9 +153,9 @@ export function EcoHealthCard({ aqiData, weatherData, loading, lang = 'id' }) {
                 <Baby size={16} strokeWidth={2.5} />
               </div>
               <div style={{ minWidth: 0 }}>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', fontWeight: '600' }}>{lang === 'en' ? 'Kids & Seniors' : 'Anak & Lansia'}</span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', fontWeight: '600' }}>Anak & Lansia</span>
                 <strong style={{ fontSize: '0.825rem', color: 'var(--text-main)', fontWeight: '800' }}>
-                  {lang === 'en' ? health.activities.kidsAndSeniors.statusEn : health.activities.kidsAndSeniors.status}
+                  {health.activities.kidsAndSeniors.status}
                 </strong>
               </div>
             </div>
@@ -165,9 +165,9 @@ export function EcoHealthCard({ aqiData, weatherData, loading, lang = 'id' }) {
                 <Wind size={16} strokeWidth={2.5} />
               </div>
               <div style={{ minWidth: 0 }}>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', fontWeight: '600' }}>{lang === 'en' ? 'Ventilation' : 'Ventilasi'}</span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', fontWeight: '600' }}>Ventilasi</span>
                 <strong style={{ fontSize: '0.825rem', color: 'var(--text-main)', fontWeight: '800' }}>
-                  {lang === 'en' ? health.activities.ventilation.statusEn : health.activities.ventilation.status}
+                  {health.activities.ventilation.status}
                 </strong>
               </div>
             </div>

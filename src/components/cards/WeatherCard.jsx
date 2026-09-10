@@ -3,8 +3,8 @@ import { Droplets, Wind, Gauge } from 'lucide-react';
 import { getWeatherVisual } from '../../utils/weatherIcons';
 import { translations } from '../../utils/i18n';
 
-export function WeatherCard({ data, locationName, loading, lang = 'id' }) {
-  const t = translations[lang] || translations.id;
+export function WeatherCard({ data, locationName, loading }) {
+  const t = translations;
 
   if (loading) {
     return (
@@ -15,7 +15,7 @@ export function WeatherCard({ data, locationName, loading, lang = 'id' }) {
   }
 
   const current = data?.current || {};
-  const visual = getWeatherVisual(current.weatherCode || 0, lang);
+  const visual = getWeatherVisual(current.weatherCode || 0);
   const CurrentIcon = visual.icon;
 
   return (
