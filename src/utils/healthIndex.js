@@ -2,7 +2,7 @@
  * Perhitungan Skor Kelayakan Lingkungan Terpadu (Eco-Health Score) 0 - 100
  * Berdasarkan gabungan AQI (45%), Kenyamanan Termal/Suhu (30%), dan Radiasi UV (25%)
  */
-export function calculateEcoHealthScore(aqi, temp, humidity, uvIndex, pm25) {
+export function calculateEcoHealthScore(aqi, temp, humidity, uvIndex, pm25, lang = 'id') {
   const safeAqi = Math.max(0, Number(aqi) || 0);
   const safeTemp = Number(temp) || 28;
   const safeHumidity = Number(humidity) || 70;

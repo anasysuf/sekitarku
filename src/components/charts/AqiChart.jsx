@@ -26,7 +26,7 @@ export function AqiChart({ hourlyData, lang = 'id' }) {
 
     return {
       time: hour,
-      fullTime: `${hour} WIB`,
+      fullTime: `$${hour} ${lang === 'en' ? 'Local' : 'WIB'}`,
       aqi: aqiVal,
       pm25: pm25Val,
       label: aqiMeta.label,
@@ -149,7 +149,7 @@ export function AqiChart({ hourlyData, lang = 'id' }) {
               cursor: 'pointer'
             }}
           >
-            Indeks AQI
+            {t.metricAqi || 'Indeks AQI'}
           </button>
           <button
             onClick={() => setMetric('pm25')}
@@ -178,7 +178,7 @@ export function AqiChart({ hourlyData, lang = 'id' }) {
       }}>
         {/* Average AQI */}
         <div style={{ padding: '0.55rem 0.75rem', backgroundColor: 'var(--bg-muted)', borderRadius: 'var(--radius-sm)', border: 'var(--border-thick)' }}>
-          <span style={{ fontSize: '0.675rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block' }}>Rata-rata 24 Jam</span>
+          <span style={{ fontSize: '0.675rem', fontWeight: '700', color: 'var(--text-muted)', display: 'block' }}>{t.avg24h || 'Rata-rata 24 Jam'}</span>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: '2px' }}>
             <strong style={{ fontSize: '1rem', fontWeight: '900', color: avgInfo.color }}>
               {isAqi ? avgAqi : `${(chartData.reduce((a,b)=>a+b.pm25,0)/chartData.length).toFixed(1)}`}
@@ -193,14 +193,14 @@ export function AqiChart({ hourlyData, lang = 'id' }) {
         <div style={{ padding: '0.55rem 0.75rem', backgroundColor: 'var(--bg-muted)', borderRadius: 'var(--radius-sm)', border: 'var(--border-thick)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
             <TrendingUp size={12} color="#ef4444" />
-            <span style={{ fontSize: '0.675rem', fontWeight: '700', color: 'var(--text-muted)' }}>Puncak Tertinggi</span>
+            <span style={{ fontSize: '0.675rem', fontWeight: '700', color: 'var(--text-muted)' }}>{t.peak24h || 'Puncak Tertinggi'}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: '2px' }}>
             <strong style={{ fontSize: '1rem', fontWeight: '900', color: maxItem.color }}>
               {isAqi ? maxItem.aqi : `${maxItem.pm25}`}
             </strong>
             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600' }}>
-              pukul {maxItem.time}
+              {lang === 'en' ? 'at' : 'pukul'} {maxItem.time}
             </span>
           </div>
         </div>
@@ -209,14 +209,14 @@ export function AqiChart({ hourlyData, lang = 'id' }) {
         <div style={{ padding: '0.55rem 0.75rem', backgroundColor: 'var(--bg-muted)', borderRadius: 'var(--radius-sm)', border: 'var(--border-thick)' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
             <TrendingDown size={12} color="#10b981" />
-            <span style={{ fontSize: '0.675rem', fontWeight: '700', color: 'var(--text-muted)' }}>Terendah / Terbersih</span>
+            <span style={{ fontSize: '0.675rem', fontWeight: '700', color: 'var(--text-muted)' }}>{t.clean24h || 'Terendah / Terbersih'}</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginTop: '2px' }}>
             <strong style={{ fontSize: '1rem', fontWeight: '900', color: minItem.color }}>
               {isAqi ? minItem.aqi : `${minItem.pm25}`}
             </strong>
             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600' }}>
-              pukul {minItem.time}
+              {lang === 'en' ? 'at' : 'pukul'} {minItem.time}
             </span>
           </div>
         </div>
@@ -278,27 +278,27 @@ export function AqiChart({ hourlyData, lang = 'id' }) {
 
       {/* AQI Reference Scale Strip */}
       <div style={{ marginTop: '0.85rem', paddingTop: '0.65rem', borderTop: 'var(--border-thick)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-        <span style={{ fontWeight: '700' }}>Skala Indeks:</span>
+        <span style={{ fontWeight: '700' }}>{lang === 'en' ? 'Index Scale:' : 'Skala Indeks:'}</span>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981' }} />
-            <span>0-50 Baik</span>
+            <span>{lang === 'en' ? '0-50 Good' : '0-50 Baik'}</span>
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#eab308' }} />
-            <span>51-100 Sedang</span>
+            <span>{lang === 'en' ? '51-100 Moderate' : '51-100 Sedang'}</span>
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#f97316' }} />
-            <span>101-150 Sensitif</span>
+            <span>{lang === 'en' ? '101-150 Sensitive' : '101-150 Sensitif'}</span>
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ef4444' }} />
-            <span>151-200 Tdk Sehat</span>
+            <span>{lang === 'en' ? '151-200 Unhealthy' : '151-200 Tdk Sehat'}</span>
           </span>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#8b5cf6' }} />
-            <span>200+ Berbahaya</span>
+            <span>{lang === 'en' ? '200+ Hazardous' : '200+ Berbahaya'}</span>
           </span>
         </div>
       </div>

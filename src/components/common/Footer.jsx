@@ -1,15 +1,18 @@
 import React from 'react';
 import { Code2, Globe, Coffee, Code, Flame, Mountain } from 'lucide-react';
+import { translations } from '../../utils/i18n.js';
 
-export function Footer({ onOpenWidget }) {
+export function Footer({ onOpenWidget, lang = 'id' }) {
+  const t = translations[lang] || translations.id;
+
   return (
     <footer style={{ marginTop: '4rem', padding: '2.5rem 0', borderTop: 'var(--border-thick)', textAlign: 'center' }}>
       <p style={{ fontSize: '0.9rem', color: 'var(--text-main)', margin: 0, fontWeight: '700' }}>
-        Sekitarku: Pantauan Lingkungan Hidup & Mitigasi Bencana Real-time
+        {t.footerTitle}
       </p>
 
       <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.4rem', fontWeight: '500', maxWidth: '720px', margin: '0.4rem auto 0 auto', lineHeight: 1.6 }}>
-        Sumber Data Resmi: <strong>BMKG</strong> (Meteorologi, Klimatologi & Geofisika), <strong>PVMBG / Magma Indonesia</strong> (Aktivitas Gunung Api), <strong>NASA FIRMS</strong> (Satelit Titik Panas Karhutla), dan <strong>Open-Meteo / Copernicus</strong> (Kualitas Udara ISPU & AQI).
+        {t.footerSources}
       </p>
 
       {/* Traktir Kopi Support Button */}
@@ -35,11 +38,11 @@ export function Footer({ onOpenWidget }) {
           }}
         >
           <Coffee size={17} strokeWidth={2.5} />
-          <span>Traktir Kopi</span>
+          <span>{t.treatCoffee}</span>
         </a>
       </div>
 
-      {/* Footer Navigation Links with Credit Badges */}
+      {/* Footer Navigation Links */}
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1.25rem', marginTop: '1.25rem', fontSize: '0.8rem', flexWrap: 'wrap' }}>
         <a
           href="https://github.com/anasysuf/sekitarku"
@@ -47,7 +50,7 @@ export function Footer({ onOpenWidget }) {
           rel="noopener noreferrer"
           style={{ color: 'var(--color-primary)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: '700' }}
         >
-          <Code2 size={15} strokeWidth={2.5} /> GitHub Repository
+          <Code2 size={15} strokeWidth={2.5} /> {t.repoLink}
         </a>
 
         {onOpenWidget && (
@@ -66,7 +69,7 @@ export function Footer({ onOpenWidget }) {
               padding: 0
             }}
           >
-            <Code size={15} strokeWidth={2.5} /> Pasang Widget
+            <Code size={15} strokeWidth={2.5} /> {t.embedWidget}
           </button>
         )}
 

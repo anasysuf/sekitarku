@@ -442,9 +442,9 @@ export function App() {
 
       {/* Row 2: UV + Hourly Chart */}
       <div className="dashboard-grid-2">
-        <UvCard uvIndex={weatherData?.current?.uvIndex || 0} loading={loading} />
+        <UvCard uvIndex={weatherData?.current?.uvIndex || 0} loading={loading} lang={lang} />
         <Suspense fallback={<ComponentSkeleton height="240px" label="Memuat Grafik Tren AQI..." />}>
-          <AqiChart hourlyData={airQualityData?.hourly} />
+          <AqiChart hourlyData={airQualityData?.hourly} lang={lang} />
         </Suspense>
       </div>
 
@@ -469,7 +469,7 @@ export function App() {
       </div>
 
       {/* Footer */}
-      <Footer onOpenWidget={() => setIsWidgetOpen(true)} />
+      <Footer onOpenWidget={() => setIsWidgetOpen(true)} lang={lang} />
     </div>
   );
 }

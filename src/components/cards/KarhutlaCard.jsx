@@ -1,6 +1,7 @@
 import React from 'react';
 import { Flame, Compass, ChevronRight, AlertTriangle, ShieldCheck, Wind } from 'lucide-react';
-import { getHazeStatus } from '../../utils/karhutla';
+import { getHazeStatus } from '../../utils/karhutla.js';
+import { translations } from '../../utils/i18n.js';
 
 export function KarhutlaCard({
   karhutlaData,
@@ -10,6 +11,8 @@ export function KarhutlaCard({
   loading,
   lang = 'id'
 }) {
+  const t = translations[lang] || translations.id;
+
   if (loading || !karhutlaData || !karhutlaData.fdrs) {
     return (
       <div className="flat-card animate-pulse" style={{ padding: '1.5rem', marginBottom: '1.5rem', minHeight: '180px' }}>
@@ -26,36 +29,44 @@ export function KarhutlaCard({
   const aqi = airQualityData?.current?.aqi || 0;
   const pm25 = airQualityData?.current?.pm25 || airQualityData?.current?.pm2_5 || 0;
 
-  // Evaluasi Status Kabut Asap Terkini (Standard Terpadu)
+  // Evaluasi Status Kabut Asap Terkini
   const { isHazeActive, isVeryNear } = getHazeStatus(nearest, aqi, pm25);
 
-  const isHighRisk = fdrs.code === 'TINGGI' || fdrs.code === 'EKSTREM';
-  const isModerateRisk = fdrs.code === 'SEDANG';
+  const isHighRisk = fdrs.code === 'TINGGI' || fdrs.code === 'EKSTREM' || fdrs.code === 'HIGH' || fdrs.code === 'EXTREME';
+  const isModerateRisk = fdrs.code === 'SEDANG' || fdrs.code === 'MODERATE';
 
   let statusBannerBg = 'var(--bg-subtle)';
   let statusBorder = 'var(--border-flat)';
   let statusTextColor = 'var(--text-main)';
   let statusIcon = <ShieldCheck size={16} color="var(--color-primary)" />;
-  let statusMessage = `Kondisi lahan di wilayah ${location.name} terpantau AMAN dan bebas dari kabut asap.`;
+  let statusMessage = lang === 'en'
+    ? `Local vegetation in ${location.name} is SAFE and clear of wildfire smoke.`
+    : `Kondisi lahan di wilayah ${location.name} terpantau AMAN dan bebas dari kabut asap.`;
 
   if (isHazeActive) {
     statusBannerBg = 'var(--color-danger-bg)';
     statusBorder = 'var(--color-danger)';
     statusTextColor = 'var(--color-danger)';
     statusIcon = <Wind size={16} color="var(--color-danger)" />;
-    statusMessage = `🚨 PERINGATAN KABUT ASAP: Udara terpapar asap kiriman dari titik api ${nearest?.regency || 'wilayah sekitar'} (${nearest?.distanceKm || 0} km). Lahan setempat aman dari api, namun gunakan masker N95 untuk pernapasan!`;
+    statusMessage = lang === 'en'
+      ? `🚨 HAZE ADVISORY: Air is exposed to wildfire smoke from ${nearest?.regency || 'nearby hotspots'} (${nearest?.distanceKm || 0} km). Local land is safe, but please wear N95 masks for outdoor breathing!`
+      : `🚨 PERINGATAN KABUT ASAP: Udara terpapar asap kiriman dari titik api ${nearest?.regency || 'wilayah sekitar'} (${nearest?.distanceKm || 0} km). Lahan setempat aman dari api, namun gunakan masker N95 untuk pernapasan!`;
   } else if (isHighRisk) {
     statusBannerBg = 'var(--color-danger-bg)';
     statusBorder = 'var(--color-danger)';
     statusTextColor = 'var(--color-danger)';
     statusIcon = <AlertTriangle size={16} color="var(--color-danger)" />;
-    statusMessage = `STATUS RAWAN: Vegetasi di wilayah ${location.name} sangat kering & mudah terbakar akibat suhu panas / rendah hujan.`;
+    statusMessage = lang === 'en'
+      ? `HIGH RISK: Vegetation in ${location.name} is dry & flammable due to high heat.`
+      : `STATUS RAWAN: Vegetasi di wilayah ${location.name} sangat kering & mudah terbakar akibat suhu panas.`;
   } else if (isModerateRisk) {
     statusBannerBg = 'var(--color-warning-bg)';
     statusBorder = 'var(--color-warning)';
     statusTextColor = '#b45309';
     statusIcon = <AlertTriangle size={16} color="#b45309" />;
-    statusMessage = `STATUS WASPADA: Semak & alang-alang mulai mengering. Hindari pembakaran sampah sembarangan di ${location.name}.`;
+    statusMessage = lang === 'en'
+      ? `WARNING: Grass & brush are drying out. Avoid open burning in ${location.name}.`
+      : `STATUS WASPADA: Semak & alang-alang mulai mengering. Hindari pembakaran sampah di ${location.name}.`;
   }
 
   return (
@@ -78,10 +89,10 @@ export function KarhutlaCard({
           </div>
           <div>
             <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>
-              Indeks Kebakaran Hutan & Status Kabut Asap
+              {t.karhutlaTitle}
             </h3>
             <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: '600' }}>
-              Data FDRS BMKG · Satelit NASA FIRMS · Deteksi Asap Lintas Wilayah
+              {t.karhutlaSubtitle}
             </span>
           </div>
         </div>
@@ -102,7 +113,7 @@ export function KarhutlaCard({
               gap: '4px'
             }}>
               <Wind size={12} strokeWidth={2.5} />
-              <span>⚠️ Terpapar Kabut Asap</span>
+              <span>{t.hazeActiveBadge}</span>
             </span>
           ) : (
             <span style={{
@@ -117,7 +128,7 @@ export function KarhutlaCard({
               alignItems: 'center',
               gap: '4px'
             }}>
-              <span>🟢 Asap: Bersih</span>
+              <span>{t.hazeCleanBadge}</span>
             </span>
           )}
 
@@ -133,7 +144,7 @@ export function KarhutlaCard({
             color: '#ffffff'
           }}>
             <Flame size={13} strokeWidth={2.5} />
-            <span>Lahan Lokal: {fdrs.code}</span>
+            <span>{t.landLocalBadge}: {fdrs.code}</span>
           </div>
         </div>
       </div>
@@ -152,7 +163,7 @@ export function KarhutlaCard({
         {/* Left: Nearest Hotspot */}
         <div>
           <span style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            Titik Panas Satelit Terdekat
+            {t.nearestHotspotLabel}
           </span>
           {nearest ? (
             <div style={{ marginTop: '0.25rem' }}>
@@ -165,27 +176,27 @@ export function KarhutlaCard({
               <div style={{ marginTop: '0.45rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <Compass size={16} color="var(--color-primary)" />
                 <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)' }}>
-                  Jarak: <span style={{ color: isVeryNear ? 'var(--color-danger)' : 'var(--color-primary)' }}>{nearest.distanceKm} km</span> dari {location.name}
+                  {lang === 'en' ? 'Distance:' : 'Jarak:'} <span style={{ color: isVeryNear ? 'var(--color-danger)' : 'var(--color-primary)' }}>{nearest.distanceKm} km</span> {lang === 'en' ? 'from' : 'dari'} {location.name}
                 </span>
               </div>
             </div>
           ) : (
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: '0.35rem 0 0 0', fontWeight: '600' }}>
-              Tidak ada titik panas dalam radius 400 km.
+              {t.noHotspotsNearby}
             </p>
           )}
         </div>
 
-        {/* Right: FDRS Condition & Plain Language Explanation */}
+        {/* Right: FDRS Condition */}
         <div>
           <span style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            Kondisi Lahan & Vegetasi ({location.name})
+            {t.landConditionTitle} ({location.name})
           </span>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-main)', margin: '0.25rem 0 0 0', fontWeight: '600', lineHeight: 1.4 }}>
             {fdrs.desc}
           </p>
           <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '500', display: 'block', marginTop: '0.35rem' }}>
-            *💡 Penjelasan: Status "Lahan Aman" berarti rumput/tanah lokal sedang basah & tidak mudah menyala, tetapi udara tetap bisa terpapar asap dari titik api di wilayah sekitar.
+            {t.fdrsExplExplanation}
           </span>
         </div>
       </div>
@@ -221,7 +232,7 @@ export function KarhutlaCard({
             whiteSpace: 'nowrap'
           }}
         >
-          <span>Semua Titik Api ({totalInIndo} Titik)</span>
+          <span>{t.allHotspotsBtn} ({totalInIndo})</span>
           <ChevronRight size={14} />
         </button>
       </div>

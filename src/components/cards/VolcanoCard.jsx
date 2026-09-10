@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { Flame, Mountain, ShieldAlert, AlertTriangle, ChevronRight, Compass } from 'lucide-react';
-import { getNearbyVolcanoes } from '../../services/volcano';
+import React from 'react';
+import { Flame, Compass, ChevronRight, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { getNearbyVolcanoes } from '../../services/volcano.js';
+import { translations } from '../../utils/i18n.js';
 
 export function VolcanoCard({ location, onOpenModal, onFocusVolcano, lang = 'id' }) {
+  const t = translations[lang] || translations.id;
   const { nearest, alertCount } = getNearbyVolcanoes(location?.lat, location?.lon);
 
   if (!nearest) return null;
@@ -30,10 +32,10 @@ export function VolcanoCard({ location, onOpenModal, onFocusVolcano, lang = 'id'
           </div>
           <div>
             <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>
-              Aktivitas Gunung Api Terdekat
+              {t.volcanoTitle}
             </h3>
             <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: '600' }}>
-              Data Resmi PVMBG · MAGMA ESDM
+              {t.volcanoSubtitle}
             </span>
           </div>
         </div>
@@ -47,77 +49,64 @@ export function VolcanoCard({ location, onOpenModal, onFocusVolcano, lang = 'id'
           backgroundColor: nearest.status.color,
           color: '#ffffff'
         }}>
-          {nearest.status.code} ({nearest.status.name})
+          {nearest.status.code} ({lang === 'en' ? nearest.status.nameEn : nearest.status.name})
         </span>
       </div>
 
-      {/* Main Info */}
+      {/* Main Info Box */}
       <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-        gap: '1rem',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         backgroundColor: 'var(--bg-muted)',
         padding: '1rem 1.15rem',
         borderRadius: 'var(--radius-md)',
         border: 'var(--border-thick)',
-        margin: '0.75rem 0'
+        margin: '0.75rem 0',
+        flexWrap: 'wrap',
+        gap: '0.75rem'
       }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-            <strong style={{ fontSize: '1.25rem', fontWeight: '800', color: 'var(--text-main)' }}>
-              {nearest.name}
-            </strong>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '700' }}>
-              {nearest.elevation} mdpl
-            </span>
-          </div>
-          <span style={{ fontSize: '0.775rem', color: 'var(--text-muted)', display: 'block', fontWeight: '600', marginTop: '0.15rem' }}>
-            {nearest.province} ({nearest.type})
+          <strong style={{ fontSize: '1.2rem', fontWeight: '800', color: 'var(--text-main)', display: 'block' }}>
+            {nearest.name}
+          </strong>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '600' }}>
+            {nearest.regency}, {nearest.province} · {nearest.elevation}
           </span>
-
-          <div style={{ marginTop: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <Compass size={16} color="var(--color-primary)" />
-            <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)' }}>
-              Jarak: <span style={{ color: 'var(--color-primary)' }}>{nearest.distanceKm} km</span> dari {location.name}
-            </span>
-          </div>
         </div>
 
-        <div>
-          <span style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            Rekomendasi & Zona Bahaya
-          </span>
-          <p style={{ fontSize: '0.8rem', color: 'var(--text-main)', margin: '0.25rem 0 0 0', fontWeight: '600', lineHeight: 1.4 }}>
-            {nearest.note || nearest.status.recommendation}
-          </p>
-          <span style={{ fontSize: '0.725rem', color: isHighAlert ? 'var(--color-danger)' : 'var(--text-muted)', fontWeight: '700', display: 'block', marginTop: '0.35rem' }}>
-            Radius steril PVMBG: {nearest.dangerRadiusKm} km dari kawah
-          </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Compass size={18} color="var(--color-primary)" />
+          <div>
+            <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', fontWeight: '700', textTransform: 'uppercase' }}>
+              {t.volcanoDistance}
+            </span>
+            <span style={{ fontSize: '1.1rem', fontWeight: '800', color: isNear ? 'var(--color-danger)' : 'var(--color-primary)' }}>
+              {nearest.distanceKm} km
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Safety Evaluation Status */}
+      {/* Advisory Banner */}
       <div style={{
-        padding: '0.65rem 0.95rem',
-        backgroundColor: nearest.isInsideDangerZone ? 'var(--color-danger-bg)' : 'var(--bg-subtle)',
-        border: `1.5px solid ${nearest.isInsideDangerZone ? 'var(--color-danger)' : 'var(--border-flat)'}`,
+        padding: '0.75rem 1rem',
+        backgroundColor: isHighAlert ? 'var(--color-danger-bg)' : 'var(--bg-subtle)',
+        border: isHighAlert ? '1.5px solid var(--color-danger)' : 'var(--border-flat)',
         borderRadius: 'var(--radius-sm)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         fontSize: '0.775rem',
         fontWeight: '600',
-        color: nearest.isInsideDangerZone ? 'var(--color-danger)' : 'var(--text-main)',
+        color: isHighAlert ? 'var(--color-danger)' : 'var(--text-main)',
         flexWrap: 'wrap',
-        gap: '0.5rem'
+        gap: '0.65rem'
       }}>
-        <span>
-          {nearest.isInsideDangerZone
-            ? '🚨 PERINGATAN: Posisi Anda berada di dalam zona bahaya radius kawah. Segera ikuti instruksi evakuasi BPBD!'
-            : isNear
-            ? `⚠️ Lokasi Anda berjarak ${nearest.distanceKm} km dari ${nearest.name}. Waspadai potensi hujan abu jika terjadi erupsi.`
-            : `✅ Lokasi Anda berada di luar radius bahaya langsung (${nearest.distanceKm} km dari ${nearest.name}).`}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 300px' }}>
+          {isHighAlert ? <AlertTriangle size={16} /> : <ShieldCheck size={16} color="var(--color-primary)" />}
+          <span>{isHighAlert ? t.volcanoAlertMsg : t.volcanoNormalMsg}</span>
+        </div>
 
         <button
           onClick={onOpenModal}
@@ -126,10 +115,11 @@ export function VolcanoCard({ location, onOpenModal, onFocusVolcano, lang = 'id'
             padding: '4px 10px',
             minHeight: '30px',
             fontSize: '0.725rem',
-            gap: '0.3rem'
+            gap: '0.3rem',
+            whiteSpace: 'nowrap'
           }}
         >
-          <span>Semua Gunung ({alertCount} Siaga/Awas)</span>
+          <span>{t.volcanoAllBtn}</span>
           <ChevronRight size={14} />
         </button>
       </div>

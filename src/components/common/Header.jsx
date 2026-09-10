@@ -105,7 +105,7 @@ export function Header({
             }}
           >
             <Share2 size={16} strokeWidth={2.5} />
-            <span>Bagikan</span>
+            <span>{t.share || 'Bagikan'}</span>
           </button>
 
           <button
@@ -122,7 +122,7 @@ export function Header({
             }}
           >
             <ShieldAlert size={16} strokeWidth={2.5} />
-            <span>Darurat 112</span>
+            <span>{t.emergency || 'Darurat 112'}</span>
           </button>
         </div>
 
@@ -288,12 +288,12 @@ export function Header({
             {isDark ? (
               <>
                 <Sun size={15} strokeWidth={2.5} />
-                <span>Terang</span>
+                <span>{t.lightMode || 'Terang'}</span>
               </>
             ) : (
               <>
                 <Moon size={15} strokeWidth={2.5} />
-                <span>Gelap</span>
+                <span>{t.darkMode || 'Gelap'}</span>
               </>
             )}
           </button>

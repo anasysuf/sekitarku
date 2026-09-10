@@ -37,7 +37,7 @@ export const FDRS_LEVELS = {
 /**
  * Hitung Indeks Kemudahan Kebakaran (FDRS) berdasarkan cuaca lokal BMKG/Open-Meteo
  */
-export function calculateFdrs(weatherData) {
+export function calculateFdrs(weatherData, lang = 'id') {
   if (!weatherData?.current) return FDRS_LEVELS.LOW;
 
   const current = weatherData.current;
@@ -70,10 +70,22 @@ export function calculateFdrs(weatherData) {
   if (precip > 5) score -= 45;
   else if (precip > 1) score -= 25;
 
-  if (score >= 70) return FDRS_LEVELS.EXTREME;
-  if (score >= 50) return FDRS_LEVELS.HIGH;
-  if (score >= 30) return FDRS_LEVELS.MODERATE;
-  return FDRS_LEVELS.LOW;
+  let level = FDRS_LEVELS.LOW;
+  if (score >= 70) level = FDRS_LEVELS.EXTREME;
+  else if (score >= 50) level = FDRS_LEVELS.HIGH;
+  else if (score >= 30) level = FDRS_LEVELS.MODERATE;
+
+  if (lang === 'en') {
+    const enLabels = {
+      'AMAN': { code: 'LOW', label: 'Low / Safe', desc: 'Moist soil & vegetation. Very low chance of wildfire ignition.' },
+      'SEDANG': { code: 'MODERATE', label: 'Moderate / Caution', desc: 'Brush and surface grass drying out. Moderate fire ignition potential.' },
+      'TINGGI': { code: 'HIGH', label: 'High / Flammable', desc: 'Dry shrubs and leaves ignite very easily. Fires spread quickly.' },
+      'EKSTREM': { code: 'EXTREME', label: 'Extreme / Critical', desc: 'Peatland and forests critically dry. Extreme wildfire danger, dense smoke potential.' }
+    };
+    const enInfo = enLabels[level.code] || enLabels.AMAN;
+    return { ...level, ...enInfo };
+  }
+  return level;
 }
 
 /**
