@@ -75,10 +75,10 @@ export function VolcanoListModal({ isOpen, onClose, userLocation, onSelectVolcan
             </div>
             <div>
               <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>
-                Pemantauan Gunung Api Indonesia
+                {lang === 'en' ? 'Active Volcano Monitoring in Indonesia' : 'Pemantauan Gunung Api Indonesia'}
               </h3>
               <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', margin: 0, fontWeight: '600' }}>
-                Status Aktivitas Vulkanik Resmi PVMBG / MAGMA ESDM
+                {lang === 'en' ? 'Official Volcanic Activity Status from PVMBG / MAGMA ESDM' : 'Status Aktivitas Vulkanik Resmi PVMBG / MAGMA ESDM'}
               </p>
             </div>
           </div>
@@ -104,7 +104,7 @@ export function VolcanoListModal({ isOpen, onClose, userLocation, onSelectVolcan
             <Search size={16} color="var(--text-muted)" style={{ position: 'absolute', left: '12px' }} />
             <input
               type="text"
-              placeholder="Cari nama gunung api atau provinsi..."
+              placeholder={lang === 'en' ? 'Search volcano name or province...' : 'Cari nama gunung api atau provinsi...'}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -197,7 +197,7 @@ export function VolcanoListModal({ isOpen, onClose, userLocation, onSelectVolcan
                     fontWeight: '600'
                   }}>
                     <span>📍 Jarak: <strong style={{ color: 'var(--color-primary)' }}>{v.distanceKm} km</strong> dari posisi Anda</span>
-                    <span>Radius bahaya: {v.dangerRadiusKm} km</span>
+                    <span>{lang === 'en' ? `Danger radius: ${v.dangerRadiusKm} km` : `Radius bahaya: ${v.dangerRadiusKm} km`}</span>
                   </div>
                 </div>
               ))

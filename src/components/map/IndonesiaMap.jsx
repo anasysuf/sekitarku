@@ -293,7 +293,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLIT
             
           </div>
           <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', margin: '2px 0 0 0', fontWeight: '500' }}>
-            Peta sebaran lingkungan real-time: Kualitas Udara, Seismik Gempa, Erupsi PVMBG & Karhutla Satelit
+            {t.mapSubtitle || (lang === 'en' ? 'Real-time environmental map: Air Quality, Seismic Events, Volcano Eruptions & Satellite Hotspots' : 'Peta sebaran lingkungan real-time: Kualitas Udara, Seismik Gempa, Erupsi PVMBG & Karhutla Satelit')}
           </p>
         </div>
 
@@ -319,7 +319,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLIT
             }}
           >
             <MapPin size={13} strokeWidth={2.2} />
-            <span>Kota ({visibleCities.length})</span>
+            <span>{lang === 'en' ? 'Cities' : 'Kota'} ({visibleCities.length})</span>
           </button>
 
           <button
@@ -342,7 +342,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLIT
             }}
           >
             <Activity size={13} strokeWidth={2.2} />
-            <span>Gempa ({earthquakes ? earthquakes.length : 0})</span>
+            <span>{lang === 'en' ? 'Quakes' : 'Gempa'} ({earthquakes ? earthquakes.length : 0})</span>
           </button>
 
           <button
@@ -365,7 +365,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLIT
             }}
           >
             <Mountain size={13} strokeWidth={2.2} />
-            <span>Gunung Api ({INDONESIA_VOLCANOES.length})</span>
+            <span>{lang === 'en' ? 'Volcanoes' : 'Gunung Api'} ({INDONESIA_VOLCANOES.length})</span>
           </button>
 
           <button
@@ -388,7 +388,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLIT
             }}
           >
             <Flame size={13} strokeWidth={2.2} />
-            <span>Titik Panas ({hotspots ? hotspots.length : 0})</span>
+            <span>{lang === 'en' ? 'Hotspots' : 'Titik Panas'} ({hotspots ? hotspots.length : 0})</span>
           </button>
         </div>
       </div>
@@ -535,7 +535,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLIT
                           width: '100%'
                         }}
                       >
-                        Fokus ke Titik Ini
+                        {lang === 'en' ? 'Focus on this Location' : 'Fokus ke Titik Ini'}
                       </button>
                     </div>
                   </Popup>
@@ -581,7 +581,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLIT
                       Elevasi: {v.elevation} mdpl · {v.province}
                     </p>
                     <p style={{ margin: '2px 0 0 0', fontSize: '0.7rem', color: '#6b7280' }}>
-                      Radius Bahaya PVMBG: {v.dangerRadiusKm} km
+                      {lang === 'en' ? `PVMBG Danger Radius: ${v.dangerRadiusKm} km` : `Radius Bahaya PVMBG: ${v.dangerRadiusKm} km`}
                     </p>
                   </div>
                 </Popup>
@@ -604,10 +604,10 @@ export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLIT
                 <Popup>
                   <div style={{ padding: '4px', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
                     <span style={{ fontWeight: '800', color: color, fontSize: '0.95rem', display: 'block' }}>
-                      Gempa M {q.magnitude}
+                      {lang === 'en' ? 'Quake' : 'Gempa'} M {q.magnitude}
                     </span>
                     <p style={{ margin: '3px 0 0 0', fontSize: '0.775rem', color: '#111827', fontWeight: '600' }}>{q.wilayah}</p>
-                    <p style={{ margin: '2px 0 0 0', fontSize: '0.7rem', color: '#6b7280' }}>{q.date} {q.time} • Kedalaman {q.depth}</p>
+                    <p style={{ margin: '2px 0 0 0', fontSize: '0.7rem', color: '#6b7280' }}>{q.date} {q.time} • {lang === 'en' ? 'Depth' : 'Kedalaman'} {q.depth}</p>
                     {q.potensi && (
                       <span style={{ display: 'inline-block', marginTop: '4px', fontSize: '0.7rem', padding: '2px 5px', borderRadius: '3px', backgroundColor: '#fef2f2', color: '#b91c1c', fontWeight: '700' }}>
                         {q.potensi}

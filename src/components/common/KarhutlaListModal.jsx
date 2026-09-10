@@ -88,7 +88,7 @@ export function KarhutlaListModal({ isOpen, onClose, userLocation, onSelectHotsp
             </div>
             <div>
               <h3 style={{ fontSize: '1.1rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>
-                Daftar Titik Panas & Pantauan Karhutla
+                {lang === 'en' ? 'Wildfire & Satellite Hotspots List' : 'Daftar Titik Panas & Pantauan Karhutla'}
               </h3>
               <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: '600' }}>
                 Observasi Satelit VIIRS SNPP, NOAA-20 & MODIS (Near Real-Time)
@@ -119,7 +119,7 @@ export function KarhutlaListModal({ isOpen, onClose, userLocation, onSelectHotsp
             <Search size={15} color="var(--text-muted)" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
             <input
               type="text"
-              placeholder="Cari kabupaten, provinsi, atau tipe lahan (cth: Bengkalis, Gambut)..."
+              placeholder={lang === 'en' ? 'Search regency, province, or vegetation type...' : 'Cari kabupaten, provinsi, atau tipe lahan (cth: Bengkalis, Gambut)...'}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -256,7 +256,7 @@ export function KarhutlaListModal({ isOpen, onClose, userLocation, onSelectHotsp
           fontSize: '0.725rem',
           color: 'var(--text-muted)'
         }}>
-          <span>Sumber: NASA FIRMS (VIIRS/MODIS) & FDRS BMKG</span>
+          <span>{lang === 'en' ? 'Source: NASA FIRMS (VIIRS/MODIS) & BMKG FDRS' : 'Sumber: NASA FIRMS (VIIRS/MODIS) & FDRS BMKG'}</span>
           <button
             onClick={onClose}
             className="flat-btn-secondary"

@@ -141,7 +141,7 @@ export function EcoHealthCard({ aqiData, weatherData, loading, lang = 'id' }) {
                 <Bike size={16} strokeWidth={2.5} />
               </div>
               <div style={{ minWidth: 0 }}>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', fontWeight: '600' }}>Sepeda</span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', fontWeight: '600' }}>{lang === 'en' ? 'Cycling' : 'Sepeda'}</span>
                 <strong style={{ fontSize: '0.825rem', color: 'var(--text-main)', fontWeight: '800' }}>
                   {lang === 'en' ? health.activities.cycling.statusEn : health.activities.cycling.status}
                 </strong>
@@ -153,7 +153,7 @@ export function EcoHealthCard({ aqiData, weatherData, loading, lang = 'id' }) {
                 <Baby size={16} strokeWidth={2.5} />
               </div>
               <div style={{ minWidth: 0 }}>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', fontWeight: '600' }}>Anak & Lansia</span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', fontWeight: '600' }}>{lang === 'en' ? 'Kids & Seniors' : 'Anak & Lansia'}</span>
                 <strong style={{ fontSize: '0.825rem', color: 'var(--text-main)', fontWeight: '800' }}>
                   {lang === 'en' ? health.activities.kidsAndSeniors.statusEn : health.activities.kidsAndSeniors.status}
                 </strong>
@@ -165,7 +165,7 @@ export function EcoHealthCard({ aqiData, weatherData, loading, lang = 'id' }) {
                 <Wind size={16} strokeWidth={2.5} />
               </div>
               <div style={{ minWidth: 0 }}>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', fontWeight: '600' }}>Ventilasi</span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', fontWeight: '600' }}>{lang === 'en' ? 'Ventilation' : 'Ventilasi'}</span>
                 <strong style={{ fontSize: '0.825rem', color: 'var(--text-main)', fontWeight: '800' }}>
                   {lang === 'en' ? health.activities.ventilation.statusEn : health.activities.ventilation.status}
                 </strong>
