@@ -11,11 +11,12 @@ import { fetchKarhutlaData } from './services/karhutla';
 import { Footer } from './components/common/Footer';
 import { WidgetEmbedView } from './components/embed/WidgetEmbedView';
 import { INDONESIA_CITIES } from './utils/cities';
+import { apiCache } from './utils/apiCache';
 import { useGeolocation } from './hooks/useGeolocation';
 import { useDarkMode } from './hooks/useDarkMode';
-import { fetchWeatherData } from './services/weather';
-import { fetchAirQualityData } from './services/airQuality';
-import { fetchLatestEarthquake, fetchRecentEarthquakes } from './services/bmkg';
+import { fetchWeatherData, getDefaultWeather } from './services/weather';
+import { fetchAirQualityData, getDefaultAqi } from './services/airQuality';
+import { fetchLatestEarthquake, fetchRecentEarthquakes, getDefaultEarthquake } from './services/bmkg';
 import { i18n } from './utils/i18n';
 import { Download, AlertTriangle, X, Loader2 } from 'lucide-react';
 
@@ -120,7 +121,7 @@ export function App() {
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
   const [isVolcanoOpen, setIsVolcanoOpen] = useState(false);
   const [isKarhutlaOpen, setIsKarhutlaOpen] = useState(false);
-  const [karhutlaData, setKarhutlaData] = useState(null);
+  const [karhutlaData, setKarhutlaData] = useState(() => fetchKarhutlaData(-6.2088, 106.8456, getDefaultWeather(-6.2088, 106.8456), false));
   const [isWidgetOpen, setIsWidgetOpen] = useState(false);
 
   // PWA Prompt

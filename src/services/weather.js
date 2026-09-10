@@ -1,6 +1,6 @@
 import { apiCache } from '../utils/apiCache.js';
 
-function getDefaultWeather(lat = -6.2, lon = 106.8) {
+export function getDefaultWeather(lat = -6.2, lon = 106.8) {
   const now = new Date();
   const hours = Array.from({ length: 24 }, (_, i) => `${now.toISOString().split('T')[0]}T${String(i).padStart(2, '0')}:00`);
   const days = Array.from({ length: 7 }, (_, i) => {

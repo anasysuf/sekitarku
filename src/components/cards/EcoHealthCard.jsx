@@ -6,13 +6,7 @@ import { translations } from '../../utils/i18n';
 export function EcoHealthCard({ aqiData, weatherData, loading }) {
   const t = translations;
 
-  if (loading) {
-    return (
-      <div className="flat-card" style={{ padding: '2rem', minHeight: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: '600' }}>Memuat kondisi lingkungan hidup...</p>
-      </div>
-    );
-  }
+  
 
   const aqi = aqiData?.current?.aqi || 0;
   const pm25 = aqiData?.current?.pm25 || 0;

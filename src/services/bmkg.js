@@ -1,6 +1,6 @@
 import { apiCache } from '../utils/apiCache.js';
 
-function getDefaultEarthquake() {
+export function getDefaultEarthquake() {
   return {
     date: '10 Sep 2026',
     time: '22:00:00 WIB',

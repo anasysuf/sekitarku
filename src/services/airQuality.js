@@ -1,6 +1,6 @@
 import { apiCache } from '../utils/apiCache.js';
 
-function getDefaultAqi() {
+export function getDefaultAqi() {
   const now = new Date();
   const hours = Array.from({ length: 24 }, (_, i) => `${now.toISOString().split('T')[0]}T${String(i).padStart(2, '0')}:00`);
 

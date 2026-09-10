@@ -6,13 +6,7 @@ import { translations } from '../../utils/i18n';
 export function UvCard({ uvIndex, loading }) {
   const t = translations;
 
-  if (loading) {
-    return (
-      <div className="flat-card" style={{ padding: '1.5rem', minHeight: '140px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: '600' }}>Memuat radiasi UV...</p>
-      </div>
-    );
-  }
+  
 
   const uvInfo = getUvInfo(uvIndex);
 

@@ -6,13 +6,7 @@ import { translations } from '../../utils/i18n';
 export function WeatherCard({ data, locationName, loading }) {
   const t = translations;
 
-  if (loading) {
-    return (
-      <div className="flat-card" style={{ padding: '1.5rem', minHeight: '260px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: '600' }}>Memuat data cuaca...</p>
-      </div>
-    );
-  }
+  
 
   const current = data?.current || {};
   const visual = getWeatherVisual(current.weatherCode || 0);
