@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect, useDeferredValue } from 'react';
 import { Search, X, MapPin, ChevronRight, Compass, Flame } from 'lucide-react';
 import { INDONESIA_CITIES, REGIONS } from '../../utils/cities';
 
@@ -54,7 +54,7 @@ export function CitySearchModal({ isOpen, onClose, onSelectCity, currentCity }) 
          city.region.toLowerCase().includes(q))
       );
     });
-  }, [searchTerm, selectedRegion]);
+  }, [deferredSearch, selectedRegion]);
 
   if (!isOpen) return null;
 
