@@ -53,7 +53,8 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
 
   const hazeStatusText = isHazeActive ? '⚠️ Terpapar Asap Karhutla' : '🟢 Bebas Asap';
   const quakeText = latestEarthquake ? `• Gempa Terkini: M ${latestEarthquake.magnitude} (${latestEarthquake.wilayah})\n` : '';
-  const shareText = `📍 Laporan Lingkungan & Cuaca Real-Time: ${locationName}\n🌱 Kualitas Udara: AQI ${aqi} (${health.category})\n🌡️ Cuaca: ${temp}°C • ${weatherVisual.label || 'Cerah'}\n⚠️ Status Asap: ${hazeStatusText}\n${quakeText}\nPantau selengkapnya di Sekitarku: https://sekitarku.vercel.app`;
+  const cigsCount = health.cigs ?? health.cigarettesEquivalent ?? 0;
+  const shareText = `📍 Laporan Lingkungan & Cuaca Real-Time: ${locationName}\n🌱 Kualitas Udara: AQI ${aqi} (${health.category})\n🚬 Paparan Rokok: ${cigsCount} btg/hari\n🌡️ Cuaca: ${temp}°C • ${weatherVisual.label || 'Cerah'}\n⚠️ Status Asap: ${hazeStatusText}\n${quakeText}\nPantau selengkapnya di Sekitarku: https://sekitarku.vercel.app`;
 
   // Draw 9:16 high quality story infographic on HTML5 canvas (1080 x 1920)
   const generateCanvasImage = () => {
@@ -184,7 +185,8 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
 
       ctx.fillStyle = '#334155';
       ctx.font = '600 26px "Outfit", sans-serif';
-      const cigsNote = `Setara ${health.cigarettesEquivalent || '0'} batang rokok/hari`;
+      const cigsVal = health.cigs ?? health.cigarettesEquivalent ?? 0;
+      const cigsNote = `🚬 Setara ${cigsVal} batang rokok/hari (Paparan PM2.5)`;
       drawWrappedText(cigsNote, 120, 700, 840, 34, 1);
 
       // =========================================================================
@@ -542,6 +544,9 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
                   <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-muted)' }}>
                     /100
                   </span>
+                </div>
+                <div style={{ fontSize: '0.75rem', fontWeight: '700', color: health.cigs > 1.5 ? '#dc2626' : 'var(--text-muted)', marginTop: '3px' }}>
+                  🚬 Setara {health.cigs ?? 0} batang rokok/hari
                 </div>
               </div>
               <span style={{

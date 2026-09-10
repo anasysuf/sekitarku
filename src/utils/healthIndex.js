@@ -96,6 +96,7 @@ export function calculateEcoHealthScore(aqi, temp, humidity, uvIndex, pm25) {
     color,
     bg,
     cigs: cigsEquivalent,
+    cigarettesEquivalent: cigsEquivalent,
     activities,
     thermalScore,
     aqiScore,
