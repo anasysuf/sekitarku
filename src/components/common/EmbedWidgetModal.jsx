@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { X, Copy, Check, Code } from 'lucide-react';
+import { X, Copy, Check, Code, Smartphone, Globe, ExternalLink, Sparkles, Download, CheckCircle2 } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi';
 
 export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, weatherData, lang = 'id' }) {
+  const [activeTab, setActiveTab] = useState('android'); // 'android' | 'web'
   const [copiedType, setCopiedType] = useState(null);
 
   useEffect(() => {
@@ -21,15 +22,17 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
   const aqiInfo = getAqiInfo(aqiVal, lang);
   const temp = Math.round(weatherData?.current?.temperature || weatherData?.current?.temperature_2m || 30);
   const weatherLabel = weatherData?.current?.weatherCodeInfo?.label || 'Cerah Berawan';
+  const humidity = weatherData?.current?.relative_humidity_2m || 75;
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://sekitarku.vercel.app';
   
-  // Embed Iframe URL
+  // Android Widget endpoints
+  const widgetJsonUrl = `${baseUrl}/api/widget?city=${encodeURIComponent(cityName)}&lat=${location?.lat || -6.2}&lon=${location?.lon || 106.8}`;
+  const badgeUrl = `${baseUrl}/api/badge?city=${encodeURIComponent(cityName)}&aqi=${aqiVal}&status=${encodeURIComponent(aqiInfo.label)}&temp=${temp}`;
+
+  // Web Iframe & Markdown
   const iframeUrl = `${baseUrl}/?embed=true&city=${encodeURIComponent(cityName)}`;
   const iframeCode = `<iframe src="${iframeUrl}" width="340" height="190" frameborder="0" style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.1);" title="Sekitarku Live Widget - ${cityName}"></iframe>`;
-
-  // Dynamic SVG Badge URL
-  const badgeUrl = `${baseUrl}/api/badge?city=${encodeURIComponent(cityName)}&aqi=${aqiVal}&status=${encodeURIComponent(aqiInfo.label)}&temp=${temp}`;
   const markdownBadge = `[![Sekitarku AQI & Cuaca ${cityName}](${badgeUrl})](${baseUrl})`;
 
   const handleCopy = (text, type) => {
@@ -44,8 +47,8 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
         className="modal-content animate-scale-up"
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: '560px',
-          width: '94%',
+          maxWidth: '580px',
+          width: '95%',
           padding: '1.5rem',
           maxHeight: '90vh',
           overflowY: 'auto',
@@ -60,14 +63,14 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: 'var(--border-thick)', paddingBottom: '0.75rem' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
             <div style={{ padding: '7px', backgroundColor: 'var(--color-primary-bg)', color: 'var(--color-primary)', borderRadius: 'var(--radius-sm)' }}>
-              <Code size={19} strokeWidth={2.5} />
+              <Smartphone size={19} strokeWidth={2.5} />
             </div>
             <div>
               <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: '800', color: 'var(--text-main)' }}>
-                Pasang Widget di Web & Blog
+                Pasang Widget Sekitarku
               </h3>
               <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Kualitas udara & cuaca real-time untuk website Anda
+                Pantau kualitas udara & cuaca langsung di Layar Utama HP Android atau Website Anda
               </p>
             </div>
           </div>
@@ -76,127 +79,262 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
           </button>
         </div>
 
-        {/* Live Preview Box */}
-        <div style={{ padding: '1rem', backgroundColor: 'var(--bg-muted)', borderRadius: 'var(--radius-md)', border: 'var(--border-thick)' }}>
-          <span style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted)', display: 'block', marginBottom: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-            Pratinjau Widget Live ({cityName})
-          </span>
-
-          {/* Mini Interactive Card Preview */}
-          <div
+        {/* Tab Switcher */}
+        <div style={{ display: 'flex', gap: '0.4rem', backgroundColor: 'var(--bg-muted)', padding: '4px', borderRadius: 'var(--radius-sm)' }}>
+          <button
+            onClick={() => setActiveTab('android')}
             style={{
-              padding: '0.85rem 1rem',
-              backgroundColor: 'var(--bg-card)',
-              borderRadius: 'var(--radius-md)',
-              border: 'var(--border-thick)',
-              boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
+              flex: 1,
+              padding: '7px 12px',
+              borderRadius: 'var(--radius-sm)',
+              border: activeTab === 'android' ? '1px solid var(--color-primary)' : 'none',
+              backgroundColor: activeTab === 'android' ? 'var(--bg-card)' : 'transparent',
+              color: activeTab === 'android' ? 'var(--color-primary)' : 'var(--text-muted)',
+              fontSize: '0.8rem',
+              fontWeight: '800',
+              cursor: 'pointer',
               display: 'flex',
-              flexDirection: 'column',
-              gap: '0.6rem'
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px'
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '1rem' }}>🌿</span>
-                <strong style={{ fontSize: '0.875rem', color: 'var(--text-main)' }}>Sekitarku • {cityName}</strong>
-              </div>
-              <span style={{ fontSize: '0.7rem', padding: '2px 7px', borderRadius: '4px', backgroundColor: aqiInfo.bg, color: aqiInfo.color, fontWeight: '800' }}>
-                AQI {aqiVal} ({aqiInfo.label})
-              </span>
-            </div>
+            <Smartphone size={15} />
+            <span>Widget Layar Utama Android</span>
+          </button>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--bg-muted)', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-sm)' }}>
-              <div>
-                <span style={{ fontSize: '1.15rem', fontWeight: '900', color: 'var(--text-main)' }}>{temp}°C</span>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '6px' }}>{weatherLabel}</span>
-              </div>
-              <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)', fontWeight: '600' }}>
-                Sumber: BMKG
-              </span>
-            </div>
-          </div>
-
-          {/* SVG Badge Preview */}
-          <div style={{ marginTop: '0.75rem', textAlign: 'center' }}>
-            <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.35rem', fontWeight: '600' }}>
-              Pratinjau Markdown / SVG Badge:
-            </span>
-            <div style={{ display: 'inline-flex', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(0,0,0,0.1)' }}>
-              <div style={{ backgroundColor: '#059669', color: '#fff', padding: '3px 7px', fontSize: '0.675rem', fontWeight: '800' }}>🌿 Sekitarku</div>
-              <div style={{ backgroundColor: '#1e293b', color: '#fff', padding: '3px 7px', fontSize: '0.675rem' }}>{cityName} ({temp}°C)</div>
-              <div style={{ backgroundColor: aqiInfo.color, color: '#fff', padding: '3px 7px', fontSize: '0.675rem', fontWeight: '800' }}>AQI {aqiVal} • {aqiInfo.label}</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Code Snippet 1: Iframe */}
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-            <label style={{ fontSize: '0.775rem', fontWeight: '700', color: 'var(--text-main)' }}>
-              1. HTML Iframe (Untuk WordPress, Web & Blog)
-            </label>
-            <button
-              onClick={() => handleCopy(iframeCode, 'iframe')}
-              className="flat-btn-secondary"
-              style={{ padding: '3px 8px', fontSize: '0.7rem', gap: '4px' }}
-            >
-              {copiedType === 'iframe' ? <Check size={12} color="var(--color-primary)" /> : <Copy size={12} />}
-              <span>{copiedType === 'iframe' ? 'Tersalin!' : 'Salin Kode'}</span>
-            </button>
-          </div>
-          <textarea
-            readOnly
-            value={iframeCode}
-            rows={2}
+          <button
+            onClick={() => setActiveTab('web')}
             style={{
-              width: '100%',
-              padding: '0.5rem',
-              fontSize: '0.725rem',
-              fontFamily: 'monospace',
-              backgroundColor: 'var(--bg-muted)',
-              border: 'var(--border-flat)',
+              flex: 1,
+              padding: '7px 12px',
               borderRadius: 'var(--radius-sm)',
-              color: 'var(--text-main)',
-              resize: 'none',
-              lineHeight: 1.4
+              border: activeTab === 'web' ? '1px solid var(--color-primary)' : 'none',
+              backgroundColor: activeTab === 'web' ? 'var(--bg-card)' : 'transparent',
+              color: activeTab === 'web' ? 'var(--color-primary)' : 'var(--text-muted)',
+              fontSize: '0.8rem',
+              fontWeight: '800',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px'
             }}
-          />
+          >
+            <Globe size={15} />
+            <span>Web & Blog (Iframe)</span>
+          </button>
         </div>
 
-        {/* Code Snippet 2: Markdown */}
-        <div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-            <label style={{ fontSize: '0.775rem', fontWeight: '700', color: 'var(--text-main)' }}>
-              2. Markdown Badge (Untuk GitHub README / Notion)
-            </label>
-            <button
-              onClick={() => handleCopy(markdownBadge, 'markdown')}
-              className="flat-btn-secondary"
-              style={{ padding: '3px 8px', fontSize: '0.7rem', gap: '4px' }}
-            >
-              {copiedType === 'markdown' ? <Check size={12} color="var(--color-primary)" /> : <Copy size={12} />}
-              <span>{copiedType === 'markdown' ? 'Tersalin!' : 'Salin Markdown'}</span>
-            </button>
+        {/* TAB 1: ANDROID WIDGET */}
+        {activeTab === 'android' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            
+            {/* Android Home Screen Widget Mockup Preview */}
+            <div style={{ padding: '1rem', backgroundColor: 'var(--bg-muted)', borderRadius: 'var(--radius-md)', border: 'var(--border-thick)' }}>
+              <span style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted)', display: 'block', marginBottom: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Pratinjau Widget Android di HP ({cityName})
+              </span>
+
+              <div
+                style={{
+                  maxWidth: '360px',
+                  margin: '0 auto',
+                  padding: '1rem 1.15rem',
+                  backgroundColor: 'var(--bg-card)',
+                  borderRadius: '16px',
+                  border: '1.5px solid var(--border-flat)',
+                  boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.65rem'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', boxShadow: '0 0 6px #10b981' }} />
+                    <strong style={{ fontSize: '0.85rem', color: 'var(--text-main)' }}>Sekitarku • {cityName}</strong>
+                  </div>
+                  <span style={{ fontSize: '0.675rem', padding: '2px 7px', borderRadius: '4px', backgroundColor: aqiInfo.bg, color: aqiInfo.color, fontWeight: '800' }}>
+                    AQI {aqiVal} · {aqiInfo.label}
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+                    <span style={{ fontSize: '1.65rem', fontWeight: '900', color: 'var(--text-main)', lineHeight: 1 }}>{temp}°C</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>{weatherLabel}</span>
+                  </div>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600' }}>
+                    Lembap: {humidity}%
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Cara 1: PWA Home Screen (Termudah & Otomatis) */}
+            <div style={{ padding: '0.85rem 1rem', backgroundColor: 'var(--bg-card)', borderRadius: 'var(--radius-md)', border: 'var(--border-thick)' }}>
+              <strong style={{ fontSize: '0.825rem', color: 'var(--text-main)', display: 'block', marginBottom: '0.4rem' }}>
+                Metode 1: Pasang via Chrome / Edge di HP Android (Otomatis)
+              </strong>
+              <ol style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
+                <li>Buka website <strong>sekitarku.vercel.app</strong> di browser Chrome HP Android Anda.</li>
+                <li>Klik menu titik tiga <strong>(⋮)</strong> di pojok kanan atas browser.</li>
+                <li>Pilih <strong>"Tambahkan ke Layar Utama"</strong> atau <strong>"Install Aplikasi"</strong>.</li>
+                <li>Kembali ke layar utama HP, tekan & tahan ruang kosong, lalu pilih menu <strong>Widget &rarr; Sekitarku</strong>.</li>
+              </ol>
+            </div>
+
+            {/* Cara 2: Custom Live API JSON / HTTP Widget */}
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                <label style={{ fontSize: '0.775rem', fontWeight: '700', color: 'var(--text-main)' }}>
+                  Metode 2: Endpoint API JSON Live (Untuk KWGT / HTTP Request Widget Android)
+                </label>
+                <button
+                  onClick={() => handleCopy(widgetJsonUrl, 'json')}
+                  className="flat-btn-secondary"
+                  style={{ padding: '3px 8px', fontSize: '0.7rem', gap: '4px' }}
+                >
+                  {copiedType === 'json' ? <Check size={12} color="var(--color-primary)" /> : <Copy size={12} />}
+                  <span>{copiedType === 'json' ? 'Tersalin!' : 'Salin URL JSON'}</span>
+                </button>
+              </div>
+              <input
+                readOnly
+                value={widgetJsonUrl}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  fontSize: '0.725rem',
+                  fontFamily: 'monospace',
+                  backgroundColor: 'var(--bg-muted)',
+                  border: 'var(--border-flat)',
+                  borderRadius: 'var(--radius-sm)',
+                  color: 'var(--text-main)'
+                }}
+              />
+            </div>
+
           </div>
-          <input
-            readOnly
-            value={markdownBadge}
-            style={{
-              width: '100%',
-              padding: '0.5rem',
-              fontSize: '0.725rem',
-              fontFamily: 'monospace',
-              backgroundColor: 'var(--bg-muted)',
-              border: 'var(--border-flat)',
-              borderRadius: 'var(--radius-sm)',
-              color: 'var(--text-main)'
-            }}
-          />
-        </div>
+        )}
+
+        {/* TAB 2: WEB & BLOG IFRAME */}
+        {activeTab === 'web' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            
+            {/* Live Preview Box */}
+            <div style={{ padding: '1rem', backgroundColor: 'var(--bg-muted)', borderRadius: 'var(--radius-md)', border: 'var(--border-thick)' }}>
+              <span style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted)', display: 'block', marginBottom: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                Pratinjau Widget Live ({cityName})
+              </span>
+
+              {/* Mini Card Preview */}
+              <div
+                style={{
+                  padding: '0.85rem 1rem',
+                  backgroundColor: 'var(--bg-card)',
+                  borderRadius: 'var(--radius-md)',
+                  border: 'var(--border-thick)',
+                  boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.6rem'
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', boxShadow: '0 0 6px #10b981' }} />
+                    <strong style={{ fontSize: '0.875rem', color: 'var(--text-main)' }}>Sekitarku • {cityName}</strong>
+                  </div>
+                  <span style={{ fontSize: '0.7rem', padding: '2px 7px', borderRadius: '4px', backgroundColor: aqiInfo.bg, color: aqiInfo.color, fontWeight: '800' }}>
+                    AQI {aqiVal} ({aqiInfo.label})
+                  </span>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--bg-muted)', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-sm)' }}>
+                  <div>
+                    <span style={{ fontSize: '1.15rem', fontWeight: '900', color: 'var(--text-main)' }}>{temp}°C</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '6px' }}>{weatherLabel}</span>
+                  </div>
+                  <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)', fontWeight: '600' }}>
+                    Sumber: BMKG
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Code Snippet 1: Iframe */}
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                <label style={{ fontSize: '0.775rem', fontWeight: '700', color: 'var(--text-main)' }}>
+                  1. HTML Iframe (Untuk WordPress, Web & Blog)
+                </label>
+                <button
+                  onClick={() => handleCopy(iframeCode, 'iframe')}
+                  className="flat-btn-secondary"
+                  style={{ padding: '3px 8px', fontSize: '0.7rem', gap: '4px' }}
+                >
+                  {copiedType === 'iframe' ? <Check size={12} color="var(--color-primary)" /> : <Copy size={12} />}
+                  <span>{copiedType === 'iframe' ? 'Tersalin!' : 'Salin Kode'}</span>
+                </button>
+              </div>
+              <textarea
+                readOnly
+                value={iframeCode}
+                rows={2}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  fontSize: '0.725rem',
+                  fontFamily: 'monospace',
+                  backgroundColor: 'var(--bg-muted)',
+                  border: 'var(--border-flat)',
+                  borderRadius: 'var(--radius-sm)',
+                  color: 'var(--text-main)',
+                  resize: 'none',
+                  lineHeight: 1.4
+                }}
+              />
+            </div>
+
+            {/* Code Snippet 2: Markdown */}
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                <label style={{ fontSize: '0.775rem', fontWeight: '700', color: 'var(--text-main)' }}>
+                  2. Markdown Badge (Untuk GitHub README / Notion)
+                </label>
+                <button
+                  onClick={() => handleCopy(markdownBadge, 'markdown')}
+                  className="flat-btn-secondary"
+                  style={{ padding: '3px 8px', fontSize: '0.7rem', gap: '4px' }}
+                >
+                  {copiedType === 'markdown' ? <Check size={12} color="var(--color-primary)" /> : <Copy size={12} />}
+                  <span>{copiedType === 'markdown' ? 'Tersalin!' : 'Salin Markdown'}</span>
+                </button>
+              </div>
+              <input
+                readOnly
+                value={markdownBadge}
+                style={{
+                  width: '100%',
+                  padding: '0.5rem',
+                  fontSize: '0.725rem',
+                  fontFamily: 'monospace',
+                  backgroundColor: 'var(--bg-muted)',
+                  border: 'var(--border-flat)',
+                  borderRadius: 'var(--radius-sm)',
+                  color: 'var(--text-main)'
+                }}
+              />
+            </div>
+
+          </div>
+        )}
 
         {/* Footer info */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.5rem', borderTop: 'var(--border-thick)', fontSize: '0.725rem', color: 'var(--text-muted)' }}>
-          <span>100% Gratis & Real-Time Open Data</span>
+          <span>100% Gratis & Real-Time Open Data BMKG</span>
           <button onClick={onClose} className="flat-btn-primary" style={{ padding: '5px 14px', fontSize: '0.775rem' }}>
             Selesai
           </button>

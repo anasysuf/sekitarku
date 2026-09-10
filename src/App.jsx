@@ -6,6 +6,8 @@ import { WeatherCard } from './components/cards/WeatherCard';
 import { EarthquakeCard } from './components/cards/EarthquakeCard';
 import { UvCard } from './components/cards/UvCard';
 import { VolcanoCard } from './components/cards/VolcanoCard';
+import { KarhutlaCard } from './components/cards/KarhutlaCard';
+import { fetchKarhutlaData } from './services/karhutla';
 import { Footer } from './components/common/Footer';
 import { WidgetEmbedView } from './components/embed/WidgetEmbedView';
 import { INDONESIA_CITIES } from './utils/cities';
@@ -38,6 +40,11 @@ const ShareCardModal = lazy(() =>
 const EmergencyGuideModal = lazy(() =>
   import('./components/common/EmergencyGuideModal').then((m) => ({
     default: m.EmergencyGuideModal
+  }))
+);
+const KarhutlaListModal = lazy(() =>
+  import('./components/common/KarhutlaListModal').then((m) => ({
+    default: m.KarhutlaListModal
   }))
 );
 const VolcanoListModal = lazy(() =>
@@ -114,6 +121,8 @@ export function App() {
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
   const [isVolcanoOpen, setIsVolcanoOpen] = useState(false);
+  const [isKarhutlaOpen, setIsKarhutlaOpen] = useState(false);
+  const [karhutlaData, setKarhutlaData] = useState(null);
   const [isWidgetOpen, setIsWidgetOpen] = useState(false);
 
   // PWA Prompt
@@ -188,6 +197,8 @@ export function App() {
       setAirQualityData(aqi);
       setLatestEarthquake(quake);
       setRecentEarthquakes(quakeList);
+      const karhutla = fetchKarhutlaData(location.lat, location.lon, weather, force);
+      setKarhutlaData(karhutla);
       setLastUpdated(new Date());
 
       if (notificationsEnabled && 'Notification' in window && Notification.permission === 'granted') {
@@ -316,6 +327,19 @@ export function App() {
         </Suspense>
       )}
 
+      
+      {/* Lazy Loaded Karhutla Hotspot Modal */}
+      {isKarhutlaOpen && (
+        <Suspense fallback={null}>
+          <KarhutlaListModal
+            isOpen={isKarhutlaOpen}
+            onClose={() => setIsKarhutlaOpen(false)}
+            userLocation={location}
+            lang={lang}
+          />
+        </Suspense>
+      )}
+
       {/* Lazy Loaded Volcano List Modal */}
       {isVolcanoOpen && (
         <Suspense fallback={null}>
@@ -397,6 +421,16 @@ export function App() {
         />
       </div>
 
+      
+      {/* Karhutla & Fire Danger Rating Card (BMKG FDRS & NASA FIRMS) */}
+      <KarhutlaCard
+        karhutlaData={karhutlaData}
+        location={location}
+        onOpenModal={() => setIsKarhutlaOpen(true)}
+        loading={loading}
+        lang={lang}
+      />
+
       {/* Volcano Proximity & Monitoring Card (PVMBG / MAGMA Indonesia) */}
       <VolcanoCard
         location={location}
@@ -425,6 +459,8 @@ export function App() {
           <IndonesiaMap
             currentLocation={location}
             earthquakes={recentEarthquakes}
+            hotspots={karhutlaData?.allHotspots || []}
+            fdrs={karhutlaData?.fdrs || null}
             onSelectCity={selectCity}
             lang={lang}
           />

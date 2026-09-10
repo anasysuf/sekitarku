@@ -13,5 +13,17 @@
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
+  ],
+  "widgets": [
+    {
+      "name": "Sekitarku AQI & Cuaca",
+      "short_name": "Sekitarku",
+      "description": "Pantau kualitas udara & cuaca BMKG real-time di layar utama HP Anda",
+      "tag": "sekitarku-widget",
+      "template": "widget-template",
+      "ms_ac_template": "/widget.json",
+      "data": "/api/widget",
+      "type": "application/json"
+    }
   ]
 }

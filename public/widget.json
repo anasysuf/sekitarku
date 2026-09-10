@@ -1,0 +1,68 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.4",
+  "body": [
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "auto",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "🌿 Sekitarku",
+              "weight": "Bolder",
+              "size": "Medium",
+              "color": "Good"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "${city}",
+              "horizontalAlignment": "Right",
+              "weight": "Bolder",
+              "size": "Medium"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "ColumnSet",
+      "columns": [
+        {
+          "type": "Column",
+          "width": "auto",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "${tempLabel}",
+              "size": "ExtraLarge",
+              "weight": "Bolder"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": "stretch",
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "AQI ${aqi} (${aqiStatus})",
+              "horizontalAlignment": "Right",
+              "weight": "Bolder",
+              "color": "Accent"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

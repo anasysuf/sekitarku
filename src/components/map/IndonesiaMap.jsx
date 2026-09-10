@@ -1,11 +1,12 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { INDONESIA_CITIES } from '../../utils/cities';
 import { INDONESIA_VOLCANOES, VOLCANO_STATUS_LEVELS } from '../../utils/volcanoes';
+import { SATELLITE_HOTSPOTS } from '../../utils/karhutla';
 import { translations } from '../../utils/i18n';
-import { MapPin, Compass, ZoomIn, ZoomOut } from 'lucide-react';
+import { MapPin, Compass, ZoomIn, ZoomOut, Flame, Mountain, Activity, Satellite, Thermometer, Zap, ShieldAlert } from 'lucide-react';
 
 // Inline SVG data URIs - 100% offline, 0 network requests, never broken image
 const cityPinSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
@@ -32,6 +33,18 @@ const activeCityPinSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
 </svg>
 `)}`;
 
+const flamePinSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 30" width="24" height="30">
+  <defs>
+    <filter id="sh-flame" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" flood-color="#ef4444" flood-opacity="0.5"/>
+    </filter>
+  </defs>
+  <path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 18 8 18s8-12.75 8-18c0-4.42-3.58-8-8-8z" fill="#dc2626" stroke="#ffffff" stroke-width="1.5" filter="url(#sh-flame)"/>
+  <path d="M12 8c-1.2 1.8-0.8 3 0 4.5 0.5-1.2 0.8-1.8 0-4.5z" fill="#fef08a"/>
+</svg>
+`)}`;
+
 const cityIcon = L.icon({
   iconUrl: cityPinSvg,
   iconSize: [20, 25],
@@ -46,17 +59,22 @@ const activeCityIcon = L.icon({
   popupAnchor: [0, -30]
 });
 
+const flameIcon = L.icon({
+  iconUrl: flamePinSvg,
+  iconSize: [22, 28],
+  iconAnchor: [11, 28],
+  popupAnchor: [0, -25]
+});
+
 function getEarthquakeColor(mag) {
   if (mag >= 7.0) return '#dc2626';
   if (mag >= 5.0) return '#f97316';
   return '#eab308';
 }
 
-// Map event listener, dynamic resize invalidator & view animator
 function MapViewManager({ targetView, onZoomChange }) {
   const map = useMap();
 
-  // Fix: Force Leaflet to compute DOM container dimensions on mount and resize
   useEffect(() => {
     map.invalidateSize();
     const t1 = setTimeout(() => map.invalidateSize(), 150);
@@ -91,7 +109,6 @@ function MapViewManager({ targetView, onZoomChange }) {
   return null;
 }
 
-// Custom on-map floating navigation controls
 function CustomMapControls({ onResetNusantara, onFocusCity, cityName }) {
   const map = useMap();
 
@@ -107,23 +124,14 @@ function CustomMapControls({ onResetNusantara, onFocusCity, cityName }) {
         gap: '6px'
       }}
     >
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          borderRadius: 'var(--radius-sm)',
-          overflow: 'hidden',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          border: '1px solid var(--border-flat)'
-        }}
-      >
+      <div style={{ display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-sm)', overflow: 'hidden', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', border: '1px solid var(--border-flat)' }}>
         <button
           onClick={() => map.zoomIn()}
           title="Zoom In (Perbesar)"
           aria-label="Perbesar peta"
           style={{
-            width: '34px',
-            height: '34px',
+            width: '36px',
+            height: '36px',
             backgroundColor: 'var(--bg-card)',
             color: 'var(--text-main)',
             border: 'none',
@@ -144,8 +152,8 @@ function CustomMapControls({ onResetNusantara, onFocusCity, cityName }) {
           title="Zoom Out (Perkecil)"
           aria-label="Perkecil peta"
           style={{
-            width: '34px',
-            height: '34px',
+            width: '36px',
+            height: '36px',
             backgroundColor: 'var(--bg-card)',
             color: 'var(--text-main)',
             border: 'none',
@@ -168,6 +176,7 @@ function CustomMapControls({ onResetNusantara, onFocusCity, cityName }) {
         aria-label="Fokus ke kota aktif"
         style={{
           padding: '6px 10px',
+          minHeight: '36px',
           borderRadius: 'var(--radius-sm)',
           backgroundColor: 'var(--bg-card)',
           color: 'var(--color-primary)',
@@ -191,6 +200,7 @@ function CustomMapControls({ onResetNusantara, onFocusCity, cityName }) {
         aria-label="Reset tampilan Nusantara"
         style={{
           padding: '6px 10px',
+          minHeight: '36px',
           borderRadius: 'var(--radius-sm)',
           backgroundColor: 'var(--bg-card)',
           color: 'var(--text-main)',
@@ -211,61 +221,57 @@ function CustomMapControls({ onResetNusantara, onFocusCity, cityName }) {
   );
 }
 
-export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDark = false, lang = 'id' }) {
+export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLITE_HOTSPOTS, fdrs = null, onSelectCity, isDark = false, lang = 'id' }) {
   const t = translations[lang] || translations.id;
-  const initialCenter = [currentLocation.lat || -2.5489, currentLocation.lon || 118.0149];
+  const initialCenter = useMemo(() => [currentLocation?.lat || -2.5489, currentLocation?.lon || 118.0149], [currentLocation?.lat, currentLocation?.lon]);
   
   // Layer toggles
   const [showCities, setShowCities] = useState(true);
   const [showVolcanoes, setShowVolcanoes] = useState(true);
+  const [showHotspots, setShowHotspots] = useState(true);
   const [showEarthquakes, setShowEarthquakes] = useState(true);
   const [currentZoom, setCurrentZoom] = useState(9);
 
-  // Dynamic target view state for smooth flyTo
   const [targetView, setTargetView] = useState({
     center: initialCenter,
     zoom: 9
   });
 
-  // Whenever currentLocation changes externally, fly directly into city zoom
   useEffect(() => {
-    if (currentLocation.lat && currentLocation.lon) {
+    if (currentLocation?.lat && currentLocation?.lon) {
       setTargetView({
         center: [currentLocation.lat, currentLocation.lon],
         zoom: 10
       });
     }
-  }, [currentLocation.lat, currentLocation.lon]);
+  }, [currentLocation?.lat, currentLocation?.lon]);
 
-  const handleResetNusantara = () => {
+  const handleResetNusantara = useCallback(() => {
     setTargetView({
       center: [-2.5489, 118.0149],
       zoom: 5
     });
-  };
+  }, []);
 
-  const handleFocusCity = () => {
-    if (currentLocation.lat && currentLocation.lon) {
+  const handleFocusCity = useCallback(() => {
+    if (currentLocation?.lat && currentLocation?.lon) {
       setTargetView({
         center: [currentLocation.lat, currentLocation.lon],
         zoom: 11
       });
     }
-  };
+  }, [currentLocation?.lat, currentLocation?.lon]);
 
-  const handleCityMarkerClick = (city) => {
+  const handleCityMarkerClick = useCallback((city) => {
     onSelectCity(city);
     setTargetView({
       center: [city.lat, city.lon],
       zoom: 11
     });
-  };
+  }, [onSelectCity]);
 
-  // Adaptive Level of Detail (LOD) for 500+ cities:
-  // At zoom <= 6 (country overview): render major provincial hubs & active city (prevents DOM lag)
-  // At zoom >= 7 (regional/city view): render all cities seamlessly
   const visibleCities = useMemo(() => {
-    const activeName = currentLocation.city || currentLocation.name;
+    const activeName = currentLocation?.city || currentLocation?.name;
     if (currentZoom <= 6) {
       const hubs = INDONESIA_CITIES.slice(0, 75);
       const activeObj = INDONESIA_CITIES.find(c => c.name === activeName);
@@ -275,33 +281,48 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
       return hubs;
     }
     return INDONESIA_CITIES;
-  }, [currentZoom, currentLocation.city, currentLocation.name]);
+  }, [currentZoom, currentLocation?.city, currentLocation?.name]);
 
   return (
     <div className="flat-card" style={{ padding: '1.5rem', position: 'relative' }}>
       {/* Header & Layer Filters */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.75rem' }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
             <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>{t.mapTitle}</h3>
-            <span style={{ fontSize: '0.7rem', padding: '2px 6px', borderRadius: '4px', backgroundColor: 'var(--bg-muted)', color: 'var(--text-muted)', fontWeight: '700' }}>
-              Scroll & Pinch Zoom Aktif
-            </span>
+            {fdrs && (
+              <span style={{
+                fontSize: '0.7rem',
+                padding: '3px 9px',
+                borderRadius: '4px',
+                backgroundColor: fdrs.bg,
+                color: fdrs.color,
+                fontWeight: '800',
+                border: `1px solid ${fdrs.color}44`,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px'
+              }}>
+                <Flame size={12} strokeWidth={2.5} />
+                <span>Indeks Kebakaran: {fdrs.code}</span>
+              </span>
+            )}
           </div>
           <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', margin: '2px 0 0 0', fontWeight: '500' }}>
-            Gunakan scroll mouse atau cubit layar untuk zoom in/out detail kota hingga seluruh kepulauan
+            Peta sebaran lingkungan real-time: Kualitas Udara, Seismik Gempa, Erupsi PVMBG & Karhutla Satelit
           </p>
         </div>
 
         {/* Filter Badges / Layer Toggles */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
           <button
             onClick={() => setShowCities(!showCities)}
             aria-label="Toggle layer stasiun kota"
             style={{
-              padding: '4px 9px',
+              padding: '5px 10px',
+              minHeight: '32px',
               borderRadius: 'var(--radius-sm)',
-              backgroundColor: showCities ? 'rgba(16, 185, 129, 0.12)' : 'var(--bg-muted)',
+              backgroundColor: showCities ? 'rgba(16, 185, 129, 0.15)' : 'var(--bg-muted)',
               color: showCities ? 'var(--color-primary)' : 'var(--text-muted)',
               border: '1px solid var(--border-flat)',
               cursor: 'pointer',
@@ -313,17 +334,18 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
               transition: 'all 0.15s'
             }}
           >
-            <span style={{ width: '8px', height: '8px', borderRadius: '2px', backgroundColor: showCities ? 'var(--color-primary)' : '#9ca3af' }}></span>
-            <span>Kota ({INDONESIA_CITIES.length})</span>
+            <MapPin size={13} strokeWidth={2.2} />
+            <span>Kota ({visibleCities.length})</span>
           </button>
 
           <button
             onClick={() => setShowEarthquakes(!showEarthquakes)}
-            aria-label="Toggle layer gempa BMKG"
+            aria-label="Toggle layer gempa bumi BMKG"
             style={{
-              padding: '4px 9px',
+              padding: '5px 10px',
+              minHeight: '32px',
               borderRadius: 'var(--radius-sm)',
-              backgroundColor: showEarthquakes ? 'rgba(239, 68, 68, 0.12)' : 'var(--bg-muted)',
+              backgroundColor: showEarthquakes ? 'rgba(239, 68, 68, 0.15)' : 'var(--bg-muted)',
               color: showEarthquakes ? 'var(--color-danger)' : 'var(--text-muted)',
               border: '1px solid var(--border-flat)',
               cursor: 'pointer',
@@ -335,7 +357,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
               transition: 'all 0.15s'
             }}
           >
-            <span style={{ width: '8px', height: '8px', borderRadius: '2px', backgroundColor: showEarthquakes ? 'var(--color-danger)' : '#9ca3af' }}></span>
+            <Activity size={13} strokeWidth={2.2} />
             <span>Gempa ({earthquakes ? earthquakes.length : 0})</span>
           </button>
 
@@ -343,7 +365,8 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
             onClick={() => setShowVolcanoes(!showVolcanoes)}
             aria-label="Toggle layer gunung api PVMBG"
             style={{
-              padding: '4px 9px',
+              padding: '5px 10px',
+              minHeight: '32px',
               borderRadius: 'var(--radius-sm)',
               backgroundColor: showVolcanoes ? 'rgba(249, 115, 22, 0.15)' : 'var(--bg-muted)',
               color: showVolcanoes ? '#ea580c' : 'var(--text-muted)',
@@ -357,13 +380,37 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
               transition: 'all 0.15s'
             }}
           >
-            <span>🌋 Gunung Api ({INDONESIA_VOLCANOES.length})</span>
+            <Mountain size={13} strokeWidth={2.2} />
+            <span>Gunung Api ({INDONESIA_VOLCANOES.length})</span>
+          </button>
+
+          <button
+            onClick={() => setShowHotspots(!showHotspots)}
+            aria-label="Toggle layer titik panas karhutla"
+            style={{
+              padding: '5px 10px',
+              minHeight: '32px',
+              borderRadius: 'var(--radius-sm)',
+              backgroundColor: showHotspots ? 'rgba(239, 68, 68, 0.15)' : 'var(--bg-muted)',
+              color: showHotspots ? '#dc2626' : 'var(--text-muted)',
+              border: '1px solid var(--border-flat)',
+              cursor: 'pointer',
+              fontWeight: '700',
+              fontSize: '0.725rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+              transition: 'all 0.15s'
+            }}
+          >
+            <Flame size={13} strokeWidth={2.2} />
+            <span>Titik Panas ({hotspots ? hotspots.length : 0})</span>
           </button>
         </div>
       </div>
 
       {/* Map Container */}
-      <div className="map-wrapper" style={{ position: 'relative', width: '100%', height: '420px' }}>
+      <div className="map-wrapper" style={{ position: 'relative', width: '100%', height: '440px', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
         <MapContainer
           key={'map-container'}
           center={initialCenter}
@@ -381,7 +428,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
           <CustomMapControls
             onResetNusantara={handleResetNusantara}
             onFocusCity={handleFocusCity}
-            cityName={currentLocation.city || currentLocation.name}
+            cityName={currentLocation?.city || currentLocation?.name}
           />
           
           <TileLayer
@@ -392,20 +439,24 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
           />
 
           {/* Current selected city indicator rings */}
-          <Circle
-            center={[currentLocation.lat, currentLocation.lon]}
-            radius={25000}
-            pathOptions={{ color: '#10b981', fillColor: '#10b981', fillOpacity: 0.25, weight: 2 }}
-          />
-          <Circle
-            center={[currentLocation.lat, currentLocation.lon]}
-            radius={8000}
-            pathOptions={{ color: '#059669', fillColor: '#059669', fillOpacity: 0.65, weight: 3 }}
-          />
+          {currentLocation?.lat && currentLocation?.lon && (
+            <>
+              <Circle
+                center={[currentLocation.lat, currentLocation.lon]}
+                radius={25000}
+                pathOptions={{ color: '#10b981', fillColor: '#10b981', fillOpacity: 0.25, weight: 2 }}
+              />
+              <Circle
+                center={[currentLocation.lat, currentLocation.lon]}
+                radius={8000}
+                pathOptions={{ color: '#059669', fillColor: '#059669', fillOpacity: 0.65, weight: 3 }}
+              />
+            </>
+          )}
 
-          {/* City markers with adaptive LOD & crisp SVG icon */}
+          {/* City markers */}
           {showCities && visibleCities.map((city) => {
-            const isSelected = city.name === (currentLocation.city || currentLocation.name);
+            const isSelected = city.name === (currentLocation?.city || currentLocation?.name);
             return (
               <Marker
                 key={city.name}
@@ -416,7 +467,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
                 }}
               >
                 <Popup>
-                  <div style={{ padding: '6px', textAlign: 'center', fontFamily: 'Outfit, sans-serif' }}>
+                  <div style={{ padding: '6px', textAlign: 'center', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
                     <strong style={{ fontSize: '0.95rem', color: '#111827', display: 'block' }}>{city.name}</strong>
                     <p style={{ margin: '3px 0 0 0', fontSize: '0.75rem', color: '#6b7280' }}>Provinsi: {city.province}</p>
                     <p style={{ margin: '2px 0 6px 0', fontSize: '0.7rem', color: '#9ca3af' }}>Koordinat: {city.lat.toFixed(2)}, {city.lon.toFixed(2)}</p>
@@ -434,11 +485,78 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
                         width: '100%'
                       }}
                     >
-                      🔍 Zoom & Pantau Kota Ini
+                      Zoom & Pantau Kota Ini
                     </button>
                   </div>
                 </Popup>
               </Marker>
+            );
+          })}
+
+          {/* Karhutla Hotspot Satellite Markers */}
+          {showHotspots && hotspots && hotspots.map((h) => {
+            if (!h.lat || !h.lon) return null;
+            return (
+              <React.Fragment key={h.id}>
+                <Circle
+                  center={[h.lat, h.lon]}
+                  radius={18000}
+                  pathOptions={{
+                    color: '#ef4444',
+                    fillColor: '#dc2626',
+                    fillOpacity: 0.35,
+                    weight: 1.5
+                  }}
+                />
+                <Marker
+                  position={[h.lat, h.lon]}
+                  icon={flameIcon}
+                >
+                  <Popup>
+                    <div style={{ padding: '6px', textAlign: 'center', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                        <span style={{ fontSize: '0.95rem', fontWeight: '800', color: '#111827' }}>{h.regency}</span>
+                      </div>
+                      <span style={{
+                        display: 'inline-block',
+                        margin: '4px 0',
+                        padding: '2px 7px',
+                        borderRadius: '3px',
+                        backgroundColor: '#fee2e2',
+                        color: '#dc2626',
+                        fontSize: '0.7rem',
+                        fontWeight: '800'
+                      }}>
+                        Satelit {h.satellite} · {h.confidence}
+                      </span>
+                      <p style={{ margin: '2px 0', fontSize: '0.75rem', color: '#4b5563', fontWeight: '600' }}>
+                        {h.province} · {h.type}
+                      </p>
+                      <p style={{ margin: '2px 0 6px 0', fontSize: '0.7rem', color: '#6b7280' }}>
+                        Suhu: {h.brightnessK} K · Daya: {h.frpMw} MW
+                      </p>
+                      <button
+                        onClick={() => {
+                          setTargetView({ center: [h.lat, h.lon], zoom: 11 });
+                        }}
+                        style={{
+                          padding: '5px 10px',
+                          borderRadius: '4px',
+                          backgroundColor: '#dc2626',
+                          color: '#fff',
+                          border: 'none',
+                          cursor: 'pointer',
+                          fontSize: '0.725rem',
+                          fontWeight: '800',
+                          width: '100%'
+                        }}
+                      >
+                        Fokus ke Titik Ini
+                      </button>
+                    </div>
+                  </Popup>
+                </Marker>
+              </React.Fragment>
             );
           })}
 
@@ -458,9 +576,9 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
                 }}
               >
                 <Popup>
-                  <div style={{ padding: '4px', fontFamily: 'Outfit, sans-serif' }}>
+                  <div style={{ padding: '4px', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <span style={{ fontSize: '1.1rem' }}>🌋</span>
+                      <Mountain size={15} color={status.color} />
                       <strong style={{ fontSize: '0.95rem', color: '#111827' }}>{v.name}</strong>
                     </div>
                     <span style={{
@@ -500,7 +618,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, onSelectCity, isDar
                 pathOptions={{ color: color, fillColor: color, fillOpacity: 0.45, weight: 2 }}
               >
                 <Popup>
-                  <div style={{ padding: '4px', fontFamily: 'Outfit, sans-serif' }}>
+                  <div style={{ padding: '4px', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
                     <span style={{ fontWeight: '800', color: color, fontSize: '0.95rem', display: 'block' }}>
                       Gempa M {q.magnitude}
                     </span>
