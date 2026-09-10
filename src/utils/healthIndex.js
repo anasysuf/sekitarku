@@ -1,3 +1,14 @@
+/**
+ * Menghitung skor kesehatan lingkungan komposit (0-100) dan ekuivalensi hisapan rokok pasif.
+ * Mengintegrasikan AQI US-EPA, konsentrasi PM2.5, kenyamanan termal (suhu & kelembapan), dan indeks radiasi UV.
+ *
+ * @param {number} aqi - Indeks Kualitas Udara (AQI US 0-500)
+ * @param {number} temp - Suhu udara aktual (°C)
+ * @param {number} humidity - Kelembapan relatif (%)
+ * @param {number} uvIndex - Indeks radiasi ultraviolet (0-11+)
+ * @param {number} pm25 - Konsentrasi partikulat halus PM2.5 (µg/m³)
+ * @returns {Object} Skor terikat (0-100), label kategori, palet warna, estimasi rokok pasif, dan rekomendasi aktivitas
+ */
 export function calculateEcoHealthScore(aqi, temp, humidity, uvIndex, pm25) {
   const safeAqi = Math.max(0, Number(aqi) || 0);
   const safeTemp = Number(temp) || 28;

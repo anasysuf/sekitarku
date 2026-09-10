@@ -126,9 +126,7 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
         return currentY + lineHeight;
       };
 
-      // =========================================================================
-      // 2. HEADER
-      // =========================================================================
+      // Infographic Header
       ctx.fillStyle = '#0F172A';
       ctx.font = '800 68px "Outfit", sans-serif';
       ctx.fillText('Sekitarku', 80, 135);
@@ -137,9 +135,7 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
       ctx.font = '700 30px "Outfit", sans-serif';
       ctx.fillText('Laporan Lingkungan & Cuaca Real-Time', 80, 185);
 
-      // =========================================================================
-      // 3. LOCATION HERO CARD
-      // =========================================================================
+      // Location Hero Card
       drawCard(80, 225, 920, 220, '#FFFFFF', '#E2E8F0');
 
       ctx.fillStyle = '#0F172A';
@@ -154,9 +150,7 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
       ctx.font = '700 26px "Outfit", sans-serif';
       ctx.fillText(`${dateFormatted}`, 120, 405);
 
-      // =========================================================================
-      // 4. ECO-HEALTH COMPOSITE SCORE CARD
-      // =========================================================================
+      // Eco-Health Composite Score Card
       drawCard(80, 470, 920, 270, '#FFFFFF', '#E2E8F0');
 
       ctx.fillStyle = '#64748B';
@@ -195,9 +189,7 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
       const cigsNote = `Setara ${cigsVal} batang rokok/hari (Paparan PM2.5)`;
       drawWrappedText(cigsNote, 120, 700, 840, 34, 1);
 
-      // =========================================================================
-      // 5. GRID: AQI & WEATHER CARDS
-      // =========================================================================
+      // Grid: AQI & Weather Cards
       
       // AQI Card
       drawCard(80, 765, 440, 335, '#FFFFFF', '#E2E8F0');
@@ -241,9 +233,7 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
       ctx.font = '600 24px "Outfit", sans-serif';
       ctx.fillText(`${t.humidity}: ${humidity}%`, 600, 1045);
 
-      // =========================================================================
-      // 6. KARHUTLA & KABUT ASAP ALERT CARD
-      // =========================================================================
+      // Karhutla & Wildfire Haze Alert Card
       const hazeCardBorder = isHazeActive ? '#EF4444' : '#E2E8F0';
       drawCard(80, 1125, 920, 315, '#FFFFFF', hazeCardBorder);
 
@@ -299,9 +289,7 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
         drawWrappedText(noFireText, 120, 1392, 840, 26, 1);
       }
 
-      // =========================================================================
-      // 7. SEISMIC / EARTHQUAKE CARD
-      // =========================================================================
+      // Seismic & Earthquake Warning Card
       if (latestEarthquake) {
         drawCard(80, 1465, 920, 245, '#FFFFFF', '#E2E8F0');
 
@@ -353,9 +341,7 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
         ctx.fillText('Tetap pantau pembaruan berkala dari BMKG & Sekitarku.', 120, 1635);
       }
 
-      // =========================================================================
-      // 8. FOOTER BRANDING
-      // =========================================================================
+      // Footer Attribution & Branding
       ctx.fillStyle = '#0F172A';
       ctx.font = '800 32px "Outfit", sans-serif';
       ctx.textAlign = 'center';
@@ -503,9 +489,7 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
         {/* Modal Body / 1:1 Identical Infographic Preview Container */}
         <div style={{ padding: '1rem 1.25rem', overflowY: 'auto', flex: 1 }}>
           
-          {/* ========================================================================= */}
-          {/* 1:1 PNG REFLECTIVE CANVAS PREVIEW CARD                                    */}
-          {/* ========================================================================= */}
+          {/* 1:1 Live Preview Canvas Card */}
           <div style={{
             borderRadius: '16px',
             backgroundColor: '#F8FAFC',
