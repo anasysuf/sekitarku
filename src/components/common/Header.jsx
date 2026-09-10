@@ -18,7 +18,7 @@ export function Header({
   onOpenEmergency,
   onOpenWidget
 }) {
-  const t = translations.id;
+  const t = translations;
 
   return (
     <header style={{ marginBottom: '1.75rem' }}>
