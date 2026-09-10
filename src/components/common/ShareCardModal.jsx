@@ -540,9 +540,9 @@ export function ShareCardModal({
             </div>
 
             {/* City Title & EcoHealth Score */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.85rem' }}>
-              <div>
-                <h4 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.85rem', gap: '0.5rem' }}>
+              <div style={{ minWidth: 0 }}>
+                <h4 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {location.name}
                 </h4>
                 <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>
@@ -555,7 +555,9 @@ export function ShareCardModal({
                 backgroundColor: health.score >= 80 ? 'var(--color-secondary-bg)' : health.score >= 50 ? 'var(--color-warning-bg)' : 'var(--color-danger-bg)',
                 color: health.score >= 80 ? 'var(--color-secondary)' : health.score >= 50 ? '#b45309' : 'var(--color-danger)',
                 fontSize: '0.75rem',
-                fontWeight: '800'
+                fontWeight: '800',
+                whiteSpace: 'nowrap',
+                flexShrink: 0
               }}>
                 Skor: {health.score}/100
               </div>
@@ -573,7 +575,7 @@ export function ShareCardModal({
                 <div style={{ fontSize: '1.45rem', fontWeight: '800', color: aqiInfo.color, margin: '0.15rem 0' }}>
                   {aqi} AQI
                 </div>
-                <span style={{ fontSize: '0.725rem', fontWeight: '700', color: aqiInfo.color }}>{aqiInfo.label}</span>
+                <span style={{ fontSize: '0.725rem', fontWeight: '700', color: aqiInfo.color, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{aqiInfo.label}</span>
               </div>
 
               <div style={{
@@ -586,7 +588,7 @@ export function ShareCardModal({
                 <div style={{ fontSize: '1.45rem', fontWeight: '800', color: 'var(--text-main)', margin: '0.15rem 0' }}>
                   {temp}°C
                 </div>
-                <span style={{ fontSize: '0.725rem', fontWeight: '700', color: 'var(--text-main)' }}>{weatherVisual.label}</span>
+                <span style={{ fontSize: '0.725rem', fontWeight: '700', color: 'var(--text-main)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{weatherVisual.label}</span>
               </div>
             </div>
 
@@ -598,7 +600,7 @@ export function ShareCardModal({
               marginBottom: '0.85rem',
               boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem', gap: '0.5rem' }}>
                 <span style={{ fontSize: '0.675rem', fontWeight: '800', color: '#ea580c', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Flame size={13} /> STATUS KARHUTLA & KABUT ASAP
                 </span>
@@ -613,7 +615,9 @@ export function ShareCardModal({
                     color: '#dc2626',
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: '3px'
+                    gap: '3px',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0
                   }}>
                     <Wind size={10} /> ⚠️ Terpapar Asap
                   </span>
@@ -624,7 +628,9 @@ export function ShareCardModal({
                     padding: '2px 8px',
                     borderRadius: 'var(--radius-full)',
                     backgroundColor: '#ecfdf5',
-                    color: '#059669'
+                    color: '#059669',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0
                   }}>
                     🟢 Asap: Bersih
                   </span>
@@ -639,7 +645,8 @@ export function ShareCardModal({
                   padding: '2px 8px',
                   borderRadius: 'var(--radius-full)',
                   backgroundColor: fdrs.bg,
-                  color: fdrs.color
+                  color: fdrs.color,
+                  whiteSpace: 'nowrap'
                 }}>
                   Lahan: {fdrs.code}
                 </span>
@@ -669,29 +676,34 @@ export function ShareCardModal({
             {/* Quake Preview in Modal */}
             {latestEarthquake && (
               <div style={{
-                padding: '0.75rem',
+                padding: '0.85rem',
                 borderRadius: 'var(--radius-md)',
                 backgroundColor: 'var(--bg-card)',
                 marginBottom: '0.85rem',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
               }}>
-                <span style={{ fontSize: '0.675rem', fontWeight: '800', color: 'var(--color-danger)', display: 'block' }}>
-                  ⚡ GEMPA TERKINI (BMKG)
-                </span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginTop: '0.25rem' }}>
-                  <div style={{
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem', gap: '0.5rem' }}>
+                  <span style={{ fontSize: '0.675rem', fontWeight: '800', color: 'var(--color-danger)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    ⚡ GEMPA TERKINI (BMKG)
+                  </span>
+                  <span style={{
                     padding: '2px 8px',
                     borderRadius: 'var(--radius-full)',
                     backgroundColor: 'var(--color-danger-bg)',
                     color: 'var(--color-danger)',
                     fontWeight: '800',
-                    fontSize: '0.95rem'
+                    fontSize: '0.75rem',
+                    whiteSpace: 'nowrap',
+                    flexShrink: 0
                   }}>
                     M {latestEarthquake.magnitude}
-                  </div>
-                  <div style={{ fontSize: '0.775rem', fontWeight: '700', color: 'var(--text-main)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {latestEarthquake.wilayah}
-                  </div>
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.775rem', fontWeight: '700', color: 'var(--text-main)', lineHeight: 1.35, marginBottom: '0.2rem' }}>
+                  {latestEarthquake.wilayah}
+                </div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600' }}>
+                  Kedalaman: {latestEarthquake.depth || latestEarthquake.kedalaman || '10 km'} {latestEarthquake.dateTime || latestEarthquake.time ? `· ${latestEarthquake.dateTime || latestEarthquake.time}` : ''}
                 </div>
               </div>
             )}
