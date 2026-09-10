@@ -22,7 +22,6 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
   const aqiInfo = getAqiInfo(aqiVal, lang);
   const temp = Math.round(weatherData?.current?.temperature || weatherData?.current?.temperature_2m || 30);
   const weatherLabel = weatherData?.current?.weatherCodeInfo?.label || 'Cerah Berawan';
-  const humidity = weatherData?.current?.relative_humidity_2m || 75;
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://sekitarku.vercel.app';
   
@@ -37,6 +36,66 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
     setCopiedType(type);
     setTimeout(() => setCopiedType(null), 2500);
   };
+
+  // Reusable Live Card Component matching exact design
+  const renderLiveWidgetCard = () => (
+    <div
+      style={{
+        padding: '0.85rem 1.15rem',
+        backgroundColor: 'var(--bg-card)',
+        borderRadius: '12px',
+        border: 'var(--border-thick)',
+        boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '0.65rem'
+      }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ fontSize: '1rem', lineHeight: 1 }}>🌿</span>
+          <strong style={{ fontSize: '0.9rem', color: 'var(--text-main)', fontWeight: '800' }}>
+            Sekitarku • {cityName}
+          </strong>
+        </div>
+        <span
+          style={{
+            fontSize: '0.725rem',
+            padding: '3px 9px',
+            borderRadius: '6px',
+            backgroundColor: aqiInfo.bg,
+            color: aqiInfo.color,
+            fontWeight: '800'
+          }}
+        >
+          AQI {aqiVal} ({aqiInfo.label})
+        </span>
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          backgroundColor: 'var(--bg-muted)',
+          padding: '0.55rem 0.85rem',
+          borderRadius: '8px'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <strong style={{ fontSize: '1.05rem', fontWeight: '900', color: 'var(--text-main)' }}>
+            {temp}°C
+          </strong>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+            {weatherLabel}
+          </span>
+        </div>
+        <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: '500' }}>
+          Sumber: BMKG
+        </span>
+      </div>
+    </div>
+  );
 
   return (
     <div className="modal-overlay animate-fade-in" onClick={onClose} role="dialog" aria-modal="true">
@@ -133,40 +192,7 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
                 Pratinjau Widget Android ({cityName})
               </span>
 
-              <div
-                style={{
-                  maxWidth: '360px',
-                  margin: '0 auto',
-                  padding: '1rem 1.15rem',
-                  backgroundColor: 'var(--bg-card)',
-                  borderRadius: '16px',
-                  border: '1.5px solid var(--border-flat)',
-                  boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.65rem'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', boxShadow: '0 0 6px #10b981' }} />
-                    <strong style={{ fontSize: '0.85rem', color: 'var(--text-main)' }}>Sekitarku • {cityName}</strong>
-                  </div>
-                  <span style={{ fontSize: '0.675rem', padding: '2px 7px', borderRadius: '4px', backgroundColor: aqiInfo.bg, color: aqiInfo.color, fontWeight: '800' }}>
-                    AQI {aqiVal} · {aqiInfo.label}
-                  </span>
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                    <span style={{ fontSize: '1.65rem', fontWeight: '900', color: 'var(--text-main)', lineHeight: 1 }}>{temp}°C</span>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600' }}>{weatherLabel}</span>
-                  </div>
-                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600' }}>
-                    Lembap: {humidity}%
-                  </span>
-                </div>
-              </div>
+              {renderLiveWidgetCard()}
             </div>
 
             {/* Panduan Langkah Pemasangan di Android */}
@@ -206,37 +232,35 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
                 Pratinjau Widget Live ({cityName})
               </span>
 
-              {/* Mini Card Preview */}
-              <div
-                style={{
-                  padding: '0.85rem 1rem',
-                  backgroundColor: 'var(--bg-card)',
-                  borderRadius: 'var(--radius-md)',
-                  border: 'var(--border-thick)',
-                  boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.6rem'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', boxShadow: '0 0 6px #10b981' }} />
-                    <strong style={{ fontSize: '0.875rem', color: 'var(--text-main)' }}>Sekitarku • {cityName}</strong>
-                  </div>
-                  <span style={{ fontSize: '0.7rem', padding: '2px 7px', borderRadius: '4px', backgroundColor: aqiInfo.bg, color: aqiInfo.color, fontWeight: '800' }}>
-                    AQI {aqiVal} ({aqiInfo.label})
-                  </span>
-                </div>
+              {renderLiveWidgetCard()}
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--bg-muted)', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius-sm)' }}>
-                  <div>
-                    <span style={{ fontSize: '1.15rem', fontWeight: '900', color: 'var(--text-main)' }}>{temp}°C</span>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginLeft: '6px' }}>{weatherLabel}</span>
+              {/* Pratinjau Markdown / SVG Badge */}
+              <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ fontSize: '0.725rem', fontWeight: '700', color: 'var(--text-muted)' }}>
+                  Pratinjau Markdown / SVG Badge:
+                </span>
+                <div
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    borderRadius: '6px',
+                    overflow: 'hidden',
+                    fontSize: '0.775rem',
+                    fontWeight: '800',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                    lineHeight: '1.2'
+                  }}
+                >
+                  <div style={{ backgroundColor: '#10b981', color: '#ffffff', padding: '5px 10px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <span style={{ fontSize: '0.85rem' }}>🌿</span>
+                    <span>Sekitarku</span>
                   </div>
-                  <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)', fontWeight: '600' }}>
-                    Sumber: BMKG
-                  </span>
+                  <div style={{ backgroundColor: '#1e293b', color: '#f8fafc', padding: '5px 10px' }}>
+                    {cityName} ({temp}°C)
+                  </div>
+                  <div style={{ backgroundColor: aqiInfo.color || '#ef4444', color: '#ffffff', padding: '5px 10px' }}>
+                    AQI {aqiVal} • {aqiInfo.label}
+                  </div>
                 </div>
               </div>
             </div>
