@@ -5,8 +5,6 @@ import {
   Copy,
   Check,
   X,
-  Flame,
-  Wind,
   Sparkles
 } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi.js';
@@ -421,6 +419,9 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const cigsVal = health.cigs ?? health.cigarettesEquivalent ?? 0;
+  const depthStr = latestEarthquake?.depth || latestEarthquake?.kedalaman || '-';
+
   return (
     <div
       style={{
@@ -442,8 +443,8 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
         className="flat-card"
         style={{
           width: '100%',
-          maxWidth: '460px',
-          maxHeight: '90vh',
+          maxWidth: '480px',
+          maxHeight: '92vh',
           display: 'flex',
           flexDirection: 'column',
           backgroundColor: 'var(--bg-card)',
@@ -454,21 +455,21 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Modal Header */}
+        {/* Modal Window Header */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          padding: '1.25rem 1.5rem',
+          padding: '1rem 1.25rem',
           borderBottom: 'var(--border-thick)',
           backgroundColor: 'var(--bg-card)'
         }}>
           <div>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: 0, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Sparkles size={18} color="var(--color-primary)" />
+            <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+              <Sparkles size={16} color="var(--color-primary)" />
               {t.shareModalTitle}
             </h3>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '2px 0 0 0', fontWeight: '500' }}>
+            <p style={{ fontSize: '0.775rem', color: 'var(--text-muted)', margin: '2px 0 0 0', fontWeight: '500' }}>
               {t.shareModalSubtitle}
             </p>
           </div>
@@ -487,232 +488,288 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
               justifyContent: 'center'
             }}
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
-        {/* Modal Body / Scrollable Content */}
-        <div style={{ padding: '1.25rem 1.5rem', overflowY: 'auto', flex: 1 }}>
+        {/* Modal Body / 1:1 Identical Infographic Preview Container */}
+        <div style={{ padding: '1rem 1.25rem', overflowY: 'auto', flex: 1 }}>
           
-          {/* Aesthetic Live Card Preview */}
+          {/* ========================================================================= */}
+          {/* 1:1 PNG REFLECTIVE CANVAS PREVIEW CARD                                    */}
+          {/* ========================================================================= */}
           <div style={{
-            borderRadius: 'var(--radius-lg)',
-            padding: '1.25rem',
-            background: 'var(--bg-muted)',
-            border: '1px solid var(--border-flat)',
+            borderRadius: '16px',
+            backgroundColor: '#F8FAFC',
+            border: '2px solid #E2E8F0',
+            overflow: 'hidden',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
             position: 'relative'
           }}>
-            {/* Top Badge */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
-              <span style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Sekitarku • Infografis
-              </span>
-              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600' }}>
-                {dateFormatted}
-              </span>
-            </div>
+            {/* Top Decorative Brand Banner */}
+            <div style={{ height: '6px', backgroundColor: '#10B981', width: '100%' }} />
 
-            {/* City & Province Header */}
-            <div style={{ marginBottom: '1rem' }}>
-              <h4 style={{ fontSize: '1.35rem', fontWeight: '900', color: 'var(--text-main)', margin: 0, lineHeight: 1.2 }}>
-                {locationName}
-              </h4>
-              <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', margin: '2px 0 0 0', fontWeight: '600' }}>
-                {locationProvince}
-              </p>
-            </div>
-
-            {/* Eco-Health Score Preview Banner */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '0.85rem 1rem',
-              borderRadius: 'var(--radius-md)',
-              backgroundColor: 'var(--bg-card)',
-              marginBottom: '0.85rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
-            }}>
-              <div>
-                <span style={{ fontSize: '0.675rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                  {t.ecoScoreTitle}
-                </span>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
-                  <span style={{ fontSize: '1.6rem', fontWeight: '900', color: health.color }}>
-                    {health.score}
-                  </span>
-                  <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-muted)' }}>
-                    /100
-                  </span>
-                </div>
-                <div style={{ fontSize: '0.75rem', fontWeight: '700', color: health.cigs > 1.5 ? '#dc2626' : 'var(--text-muted)', marginTop: '3px' }}>
-                  🚬 Setara {health.cigs ?? 0} batang rokok/hari
-                </div>
-              </div>
-              <span style={{
-                padding: '4px 10px',
-                borderRadius: 'var(--radius-full)',
-                backgroundColor: health.color,
-                color: '#ffffff',
-                fontWeight: '800',
-                fontSize: '0.75rem',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-              }}>
-                {health.category}
-              </span>
-            </div>
-
-            {/* AQI and Weather Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.65rem', marginBottom: '0.85rem' }}>
+            <div style={{ padding: '1.15rem' }}>
               
-              {/* AQI */}
-              <div style={{ padding: '0.75rem', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-                <span style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                  {t.airQualityTitle}
-                </span>
-                <div style={{ fontSize: '1.25rem', fontWeight: '900', color: aqiInfo.color, margin: '2px 0' }}>
-                  {aqi} <span style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-muted)' }}>AQI</span>
-                </div>
-                <span style={{ fontSize: '0.725rem', fontWeight: '800', color: 'var(--text-main)' }}>
-                  {aqiInfo.label}
+              {/* Infographic Header */}
+              <div style={{ marginBottom: '0.85rem' }}>
+                <h4 style={{ fontSize: '1.25rem', fontWeight: '900', color: '#0F172A', margin: 0, lineHeight: 1.15, fontFamily: 'Outfit, sans-serif' }}>
+                  Sekitarku
+                </h4>
+                <p style={{ fontSize: '0.75rem', color: '#64748B', margin: '2px 0 0 0', fontWeight: '700', fontFamily: 'Outfit, sans-serif' }}>
+                  Laporan Lingkungan & Cuaca Real-Time
+                </p>
+              </div>
+
+              {/* 1. Location Hero Card */}
+              <div style={{
+                padding: '0.85rem 1rem',
+                borderRadius: '12px',
+                backgroundColor: '#FFFFFF',
+                border: '1.5px solid #E2E8F0',
+                marginBottom: '0.75rem'
+              }}>
+                <h5 style={{ fontSize: '1.1rem', fontWeight: '900', color: '#0F172A', margin: 0, lineHeight: 1.2, fontFamily: 'Outfit, sans-serif' }}>
+                  {locationName}
+                </h5>
+                <p style={{ fontSize: '0.775rem', color: '#64748B', margin: '2px 0 4px 0', fontWeight: '600', fontFamily: 'Outfit, sans-serif' }}>
+                  {locationProvince}
+                </p>
+                <span style={{ fontSize: '0.725rem', color: '#059669', fontWeight: '700', fontFamily: 'Outfit, sans-serif' }}>
+                  📅 {dateFormatted}
                 </span>
               </div>
 
-              {/* Weather */}
-              <div style={{ padding: '0.75rem', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
-                <span style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
-                  {t.weatherTitle}
-                </span>
-                <div style={{ fontSize: '1.25rem', fontWeight: '900', color: 'var(--text-main)', margin: '2px 0' }}>
-                  {temp}°C
+              {/* 2. Eco-Health Composite Score Card */}
+              <div style={{
+                padding: '0.85rem 1rem',
+                borderRadius: '12px',
+                backgroundColor: '#FFFFFF',
+                border: '1.5px solid #E2E8F0',
+                marginBottom: '0.75rem'
+              }}>
+                <div style={{ fontSize: '0.675rem', fontWeight: '800', color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.03em', fontFamily: 'Outfit, sans-serif' }}>
+                  {t.ecoScoreTitle}
                 </div>
-                <span style={{ fontSize: '0.725rem', fontWeight: '800', color: 'var(--text-main)' }}>
-                  {weatherVisual.label}
-                </span>
-              </div>
-            </div>
-
-            {/* Karhutla & Kabut Asap Preview in Modal */}
-            <div style={{
-              padding: '0.85rem',
-              borderRadius: 'var(--radius-md)',
-              backgroundColor: 'var(--bg-card)',
-              marginBottom: '0.85rem',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem', gap: '0.5rem' }}>
-                <span style={{ fontSize: '0.675rem', fontWeight: '800', color: '#ea580c', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <Flame size={13} /> {t.karhutlaCardHeader}
-                </span>
                 
-                {isHazeActive ? (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '4px 0 6px 0' }}>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '3px' }}>
+                    <span style={{ fontSize: '1.85rem', fontWeight: '900', color: health.color, lineHeight: 1, fontFamily: 'Outfit, sans-serif' }}>
+                      {health.score}
+                    </span>
+                    <span style={{ fontSize: '0.9rem', fontWeight: '800', color: '#64748B', fontFamily: 'Outfit, sans-serif' }}>
+                      /100
+                    </span>
+                  </div>
+
                   <span style={{
-                    fontSize: '0.65rem',
-                    fontWeight: '800',
-                    padding: '2px 8px',
-                    borderRadius: 'var(--radius-full)',
-                    backgroundColor: '#fee2e2',
-                    color: '#dc2626',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '3px',
-                    whiteSpace: 'nowrap',
-                    flexShrink: 0
-                  }}>
-                    <Wind size={10} /> {t.hazeActiveBadge}
-                  </span>
-                ) : (
-                  <span style={{
-                    fontSize: '0.65rem',
-                    fontWeight: '800',
-                    padding: '2px 8px',
-                    borderRadius: 'var(--radius-full)',
-                    backgroundColor: '#ecfdf5',
-                    color: '#059669',
-                    whiteSpace: 'nowrap',
-                    flexShrink: 0
-                  }}>
-                    {t.hazeCleanBadge}
-                  </span>
-                )}
-              </div>
-
-              {/* Status Row */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', margin: '0.35rem 0' }}>
-                <span style={{
-                  fontSize: '0.725rem',
-                  fontWeight: '800',
-                  padding: '2px 8px',
-                  borderRadius: 'var(--radius-full)',
-                  backgroundColor: fdrs.bg,
-                  color: fdrs.color,
-                  whiteSpace: 'nowrap'
-                }}>
-                  {t.landLocalBadge}: {fdrs.code}
-                </span>
-
-                <span style={{ fontSize: '0.725rem', fontWeight: '600', color: 'var(--text-muted)' }}>
-                  {nearestFire ? `📍 ${nearestFire.regency} (${nearestFire.distanceKm} km)` : t.noHotspotsNearby}
-                </span>
-              </div>
-
-              {/* Plain language note */}
-              <div style={{
-                marginTop: '0.45rem',
-                padding: '0.5rem 0.65rem',
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: isHazeActive ? '#fee2e2' : 'var(--bg-muted)',
-                fontSize: '0.725rem',
-                color: isHazeActive ? '#991b1b' : 'var(--text-muted)',
-                lineHeight: 1.35,
-                fontWeight: isHazeActive ? '700' : '500'
-              }}>
-                {isHazeActive ? '⚠️ Terpapar Kabut Asap' : '🟢 Bebas Asap'}
-              </div>
-            </div>
-
-            {/* Quake Preview in Modal */}
-            {latestEarthquake && (
-              <div style={{
-                padding: '0.85rem',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: 'var(--bg-card)',
-                marginBottom: '0.85rem',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem', gap: '0.5rem' }}>
-                  <span style={{ fontSize: '0.675rem', fontWeight: '800', color: 'var(--color-danger)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    ⚡ {t.quakeTitle.toUpperCase()} (BMKG)
-                  </span>
-                  <span style={{
-                    padding: '2px 8px',
-                    borderRadius: 'var(--radius-full)',
-                    backgroundColor: 'var(--color-danger-bg)',
-                    color: 'var(--color-danger)',
+                    padding: '4px 10px',
+                    borderRadius: '8px',
+                    backgroundColor: health.color,
+                    color: '#FFFFFF',
                     fontWeight: '800',
                     fontSize: '0.75rem',
-                    whiteSpace: 'nowrap',
-                    flexShrink: 0
+                    fontFamily: 'Outfit, sans-serif',
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.1)'
                   }}>
-                    M {latestEarthquake.magnitude}
+                    {health.category}
                   </span>
                 </div>
-                <div style={{ fontSize: '0.775rem', fontWeight: '700', color: 'var(--text-main)', lineHeight: 1.35, marginBottom: '0.2rem' }}>
-                  {latestEarthquake.wilayah}
-                </div>
-                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600' }}>
-                  {t.depth}: {latestEarthquake.depth || latestEarthquake.kedalaman || '10 km'} {latestEarthquake.dateTime || latestEarthquake.time ? `· ${latestEarthquake.dateTime || latestEarthquake.time}` : ''}
+
+                <div style={{ fontSize: '0.725rem', fontWeight: '600', color: '#334155', fontFamily: 'Outfit, sans-serif' }}>
+                  🚬 Setara {cigsVal} batang rokok/hari (Paparan PM2.5)
                 </div>
               </div>
-            )}
 
-            <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)', textAlign: 'center', fontWeight: '600' }}>
-              {'Data Resmi BMKG, PVMBG & NASA • sekitarku.vercel.app'}
+              {/* 3. Grid: AQI & Weather Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.65rem', marginBottom: '0.75rem' }}>
+                
+                {/* AQI Card */}
+                <div style={{
+                  padding: '0.75rem',
+                  borderRadius: '12px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1.5px solid #E2E8F0'
+                }}>
+                  <div style={{ fontSize: '0.65rem', fontWeight: '800', color: aqiInfo.color, textTransform: 'uppercase', fontFamily: 'Outfit, sans-serif' }}>
+                    KUALITAS UDARA
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', margin: '2px 0' }}>
+                    <span style={{ fontSize: '1.65rem', fontWeight: '900', color: aqiInfo.color, lineHeight: 1.1, fontFamily: 'Outfit, sans-serif' }}>
+                      {aqi}
+                    </span>
+                    <span style={{ fontSize: '0.7rem', fontWeight: '700', color: '#64748B', fontFamily: 'Outfit, sans-serif' }}>
+                      AQI US
+                    </span>
+                  </div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: '800', color: '#0F172A', fontFamily: 'Outfit, sans-serif', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {aqiInfo.label}
+                  </div>
+                  <div style={{ fontSize: '0.675rem', color: '#64748B', fontWeight: '600', marginTop: '2px', fontFamily: 'Outfit, sans-serif' }}>
+                    PM2.5: {pm25} µg/m³
+                  </div>
+                </div>
+
+                {/* Weather Card */}
+                <div style={{
+                  padding: '0.75rem',
+                  borderRadius: '12px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1.5px solid #E2E8F0'
+                }}>
+                  <div style={{ fontSize: '0.65rem', fontWeight: '800', color: '#3B82F6', textTransform: 'uppercase', fontFamily: 'Outfit, sans-serif' }}>
+                    CUACA SAAT INI
+                  </div>
+                  <div style={{ fontSize: '1.65rem', fontWeight: '900', color: '#0F172A', margin: '2px 0', lineHeight: 1.1, fontFamily: 'Outfit, sans-serif' }}>
+                    {temp}°C
+                  </div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: '800', color: '#0F172A', fontFamily: 'Outfit, sans-serif', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {weatherVisual.label}
+                  </div>
+                  <div style={{ fontSize: '0.675rem', color: '#64748B', fontWeight: '600', marginTop: '2px', fontFamily: 'Outfit, sans-serif' }}>
+                    {t.humidity}: {humidity}%
+                  </div>
+                </div>
+
+              </div>
+
+              {/* 4. Karhutla & Kabut Asap Alert Card */}
+              <div style={{
+                padding: '0.85rem 1rem',
+                borderRadius: '12px',
+                backgroundColor: '#FFFFFF',
+                border: `1.5px solid ${isHazeActive ? '#EF4444' : '#E2E8F0'}`,
+                marginBottom: '0.75rem'
+              }}>
+                <div style={{ fontSize: '0.675rem', fontWeight: '800', color: '#EA580C', textTransform: 'uppercase', marginBottom: '0.4rem', fontFamily: 'Outfit, sans-serif' }}>
+                  🔥 {t.karhutlaCardHeader.toUpperCase()}
+                </div>
+
+                {/* Status Badges Row */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginBottom: '0.45rem' }}>
+                  <span style={{
+                    padding: '3px 8px',
+                    borderRadius: '6px',
+                    backgroundColor: fdrs.bg || '#ECFDF5',
+                    color: fdrs.color || '#10B981',
+                    fontSize: '0.68rem',
+                    fontWeight: '800',
+                    fontFamily: 'Outfit, sans-serif'
+                  }}>
+                    {t.landLocalBadge}: {fdrs.code}
+                  </span>
+
+                  <span style={{
+                    padding: '3px 8px',
+                    borderRadius: '6px',
+                    backgroundColor: isHazeActive ? '#FEE2E2' : '#ECFDF5',
+                    color: isHazeActive ? '#DC2626' : '#059669',
+                    fontSize: '0.68rem',
+                    fontWeight: '800',
+                    fontFamily: 'Outfit, sans-serif'
+                  }}>
+                    {isHazeActive ? '⚠️ TERPAPAR KABUT ASAP' : '🟢 Kabut Asap: Bersih'}
+                  </span>
+                </div>
+
+                {/* Advisory */}
+                <div style={{
+                  fontSize: '0.7rem',
+                  fontWeight: isHazeActive ? '700' : '600',
+                  color: isHazeActive ? '#DC2626' : '#334155',
+                  lineHeight: 1.35,
+                  marginBottom: '0.35rem',
+                  fontFamily: 'Outfit, sans-serif'
+                }}>
+                  {isHazeActive
+                    ? `⚠️ Terdeteksi paparan kabut asap (${nearestFire ? `${nearestFire.distanceKm} km dari ${nearestFire.regency}` : 'partikel asap karhutla'}). Gunakan masker N95 / KN95.`
+                    : 'Kondisi udara bersih dari kabut asap kebakaran hutan dalam jarak dekat.'}
+                </div>
+
+                {/* Hotspot details */}
+                <div style={{ fontSize: '0.68rem', fontWeight: '600', color: '#64748B', fontFamily: 'Outfit, sans-serif' }}>
+                  {nearestFire
+                    ? `Titik Panas: ${nearestFire.regency} (${nearestFire.distanceKm} km) • Satelit ${nearestFire.satellite || 'SNPP'}`
+                    : '📍 Tidak terdeteksi titik panas dalam radius 400 km'}
+                </div>
+              </div>
+
+              {/* 5. Seismic / Earthquake Card */}
+              {latestEarthquake ? (
+                <div style={{
+                  padding: '0.85rem 1rem',
+                  borderRadius: '12px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1.5px solid #E2E8F0',
+                  marginBottom: '0.85rem'
+                }}>
+                  <div style={{ fontSize: '0.675rem', fontWeight: '800', color: '#EF4444', textTransform: 'uppercase', marginBottom: '0.45rem', fontFamily: 'Outfit, sans-serif' }}>
+                    ⚡ GEMPA TERKINI (BMKG)
+                  </div>
+                  
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div style={{
+                      backgroundColor: '#FEF2F2',
+                      border: '1.5px solid #EF4444',
+                      borderRadius: '8px',
+                      padding: '4px 8px',
+                      textAlign: 'center',
+                      minWidth: '65px',
+                      flexShrink: 0
+                    }}>
+                      <div style={{ fontSize: '1.05rem', fontWeight: '900', color: '#EF4444', lineHeight: 1.1, fontFamily: 'Outfit, sans-serif' }}>
+                        M {latestEarthquake.magnitude}
+                      </div>
+                      <div style={{ fontSize: '0.55rem', fontWeight: '800', color: '#EF4444', textTransform: 'uppercase', fontFamily: 'Outfit, sans-serif' }}>
+                        {t.magnitude}
+                      </div>
+                    </div>
+
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: '0.775rem', fontWeight: '700', color: '#0F172A', lineHeight: 1.3, fontFamily: 'Outfit, sans-serif' }}>
+                        {latestEarthquake.wilayah}
+                      </div>
+                      <div style={{ fontSize: '0.68rem', color: '#64748B', fontWeight: '600', marginTop: '2px', fontFamily: 'Outfit, sans-serif' }}>
+                        {t.depth}: {depthStr} • {latestEarthquake.potensi || 'Tidak berpotensi tsunami'}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div style={{
+                  padding: '0.85rem 1rem',
+                  borderRadius: '12px',
+                  backgroundColor: '#FFFFFF',
+                  border: '1.5px solid #E2E8F0',
+                  marginBottom: '0.85rem'
+                }}>
+                  <div style={{ fontSize: '0.675rem', fontWeight: '800', color: '#10B981', textTransform: 'uppercase', marginBottom: '0.2rem', fontFamily: 'Outfit, sans-serif' }}>
+                    INFORMASI KESELAMATAN
+                  </div>
+                  <div style={{ fontSize: '0.75rem', fontWeight: '700', color: '#0F172A', fontFamily: 'Outfit, sans-serif' }}>
+                    Tidak ada peringatan bencana kritis saat ini.
+                  </div>
+                  <div style={{ fontSize: '0.68rem', color: '#64748B', fontWeight: '600', fontFamily: 'Outfit, sans-serif' }}>
+                    Tetap pantau pembaruan berkala dari BMKG & Sekitarku.
+                  </div>
+                </div>
+              )}
+
+              {/* 6. Footer Branding */}
+              <div style={{ textAlign: 'center', paddingTop: '0.25rem' }}>
+                <div style={{ fontSize: '0.825rem', fontWeight: '900', color: '#0F172A', fontFamily: 'Outfit, sans-serif' }}>
+                  sekitarku.vercel.app
+                </div>
+                <div style={{ fontSize: '0.65rem', color: '#64748B', fontWeight: '600', marginTop: '1px', fontFamily: 'Outfit, sans-serif' }}>
+                  Data Resmi BMKG, PVMBG & NASA • Dipantau Secara Real-Time
+                </div>
+              </div>
+
             </div>
           </div>
 
           {/* Action Sharing Buttons Grid */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginTop: '1.25rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginTop: '1.15rem' }}>
             
             {/* Primary Action: Bagikan */}
             <button
@@ -776,8 +833,8 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
 
         </div>
 
-        {/* Footer */}
-        <div style={{ padding: '0.75rem 1.5rem', borderTop: 'var(--border-thick)', backgroundColor: 'var(--bg-muted)', fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textAlign: 'center' }}>
+        {/* Footer info */}
+        <div style={{ padding: '0.65rem 1.25rem', borderTop: 'var(--border-thick)', backgroundColor: 'var(--bg-muted)', fontSize: '0.725rem', fontWeight: '600', color: 'var(--text-muted)', textAlign: 'center' }}>
           {t.shareSupportHint}
         </div>
       </div>
