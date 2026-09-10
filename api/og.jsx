@@ -159,7 +159,7 @@ export default function handler(request) {
                   fontWeight: '500',
                 }}
               >
-                Pantau AQI, BMKG, Seismik Gempa & Gunung Api PVMBG
+                Pantau AQI, Cuaca BMKG, Seismik Gempa, Erupsi PVMBG & Titik Panas Karhutla
               </p>
             </div>
 

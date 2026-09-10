@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Share2, Download, Copy, Check, X } from 'lucide-react';
+import { Share2, Download, Copy, Check, X, Flame, Activity } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi';
 import { calculateEcoHealthScore } from '../../utils/healthIndex';
 import { getWeatherVisual } from '../../utils/weatherIcons';
@@ -12,6 +12,7 @@ export function ShareCardModal({
   airQualityData,
   weatherData,
   latestEarthquake,
+  karhutlaData,
   lang = 'id'
 }) {
   const [copied, setCopied] = useState(false);
@@ -20,7 +21,7 @@ export function ShareCardModal({
   if (!isOpen) return null;
 
   const aqi = airQualityData?.current?.aqi || 0;
-  const pm25 = airQualityData?.current?.pm25 || 0;
+  const pm25 = airQualityData?.current?.pm25 || airQualityData?.current?.pm2_5 || 0;
   const temp = weatherData?.current?.temp || 28;
   const humidity = weatherData?.current?.humidity || 70;
   const uvIndex = weatherData?.current?.uvIndex || 0;
@@ -31,7 +32,10 @@ export function ShareCardModal({
   const weatherVisual = getWeatherVisual(weatherCode, lang);
   const dateFormatted = formatFullCurrentDate(new Date(), lang);
 
-  const shareText = `🌿 Pantauan Lingkungan ${location.name} (${dateFormatted}):\n• Kualitas Udara (AQI): ${aqi} (${aqiInfo.label})\n• Cuaca: ${temp}°C, ${weatherVisual.label}\n• Skor Kesehatan Lingkungan: ${health.score}/100 (${health.category})\n${latestEarthquake ? `• Gempa Terkini: M ${latestEarthquake.magnitude} (${latestEarthquake.wilayah})\n` : ''}🌐 Cek real-time di https://sekitarku.vercel.app`;
+  const fdrs = karhutlaData?.fdrs || { code: 'AMAN', label: 'Aman / Rendah', color: '#10b981' };
+  const nearestFire = karhutlaData?.nearest;
+
+  const shareText = `🌿 Pantauan Lingkungan ${location.name} (${dateFormatted}):\n• Kualitas Udara (AQI): ${aqi} (${aqiInfo.label})\n• Cuaca: ${temp}°C, ${weatherVisual.label}\n• Skor Kesehatan Lingkungan: ${health.score}/100 (${health.category})\n• Indeks Karhutla (FDRS): ${fdrs.code} (${fdrs.label})\n${latestEarthquake ? `• Gempa Terkini: M ${latestEarthquake.magnitude} (${latestEarthquake.wilayah})\n` : ''}🌐 Cek real-time di https://sekitarku.vercel.app`;
 
   // Draw 9:16 high quality story infographic on HTML5 canvas with zero overflow
   const generateCanvasImage = () => {
@@ -64,7 +68,7 @@ export function ShareCardModal({
         ctx.stroke();
       };
 
-      // Helper: Draw Wrapped and Truncated Text with Strict Bounds
+      // Helper: Draw Wrapped and Truncated Text
       const drawWrappedText = (text, x, y, maxWidth, lineHeight, maxLines = 2) => {
         if (!text) return y;
         const words = String(text).split(' ');
@@ -79,260 +83,216 @@ export function ShareCardModal({
           if (metrics.width > maxWidth && n > 0) {
             linesCount++;
             if (linesCount >= maxLines) {
-              // Truncate current line with ellipsis
-              let truncated = line;
-              while (truncated.length > 0 && ctx.measureText(truncated + '...').width > maxWidth) {
-                truncated = truncated.slice(0, -1);
-              }
-              ctx.fillText(truncated + '...', x, currentY);
+              ctx.fillText(line + '...', x, currentY);
               return currentY + lineHeight;
             }
             ctx.fillText(line, x, currentY);
-            line = words[n];
+            line = words[n] + ' ';
             currentY += lineHeight;
           } else {
             line = testLine;
           }
         }
-        ctx.fillText(line, x, currentY);
-        return currentY + lineHeight;
+        if (line && linesCount < maxLines) {
+          ctx.fillText(line, x, currentY);
+          currentY += lineHeight;
+        }
+        return currentY;
       };
 
-      // 2. Header
-      ctx.fillStyle = '#0F172A';
-      ctx.font = '800 68px "Outfit", sans-serif';
-      ctx.fillText('Sekitarku', 80, 140);
+      // --- HEADER SECTION ---
+      ctx.fillStyle = '#10B981';
+      ctx.font = 'bold 38px sans-serif';
+      ctx.fillText('SEKITARKU', 80, 110);
 
       ctx.fillStyle = '#64748B';
-      ctx.font = '700 32px "Outfit", sans-serif';
-      ctx.fillText('Laporan Lingkungan & Cuaca Real-Time', 80, 195);
+      ctx.font = '600 24px sans-serif';
+      ctx.fillText('LAPORAN RESMI KONDISI LINGKUNGAN & MITIGASI BENCANA', 80, 150);
 
-      // 3. Location Hero Card
-      drawCard(80, 250, 920, 250, '#FFFFFF', '#E2E8F0');
-
-      ctx.fillStyle = '#0F172A';
-      ctx.font = '800 54px "Outfit", sans-serif';
-      drawWrappedText(location.name, 120, 330, 840, 60, 1);
-
-      ctx.fillStyle = '#64748B';
-      ctx.font = '600 30px "Outfit", sans-serif';
-      drawWrappedText(location.province || 'Indonesia', 120, 385, 840, 38, 1);
-
-      ctx.fillStyle = '#059669';
-      ctx.font = '700 28px "Outfit", sans-serif';
-      ctx.fillText(`📅 ${dateFormatted}`, 120, 445);
-
-      // 4. Eco-Health Composite Score Card
-      drawCard(80, 530, 920, 320, '#FFFFFF', '#E2E8F0');
-
-      ctx.fillStyle = '#64748B';
-      ctx.font = '800 26px "Outfit", sans-serif';
-      ctx.fillText('SKOR KUALITAS LINGKUNGAN', 120, 595);
-
-      ctx.fillStyle = health.color || '#10B981';
-      ctx.font = '800 96px "Outfit", sans-serif';
-      ctx.fillText(`${health.score}`, 120, 705);
-
-      ctx.fillStyle = '#64748B';
-      ctx.font = '800 44px "Outfit", sans-serif';
-      ctx.fillText('/100', 250, 705);
-
-      // Dynamic Score Badge
-      const badgeText = health.category || 'Baik';
-      ctx.font = '800 32px "Outfit", sans-serif';
-      const badgeTextWidth = ctx.measureText(badgeText).width;
-      const badgeWidth = Math.min(420, Math.max(260, badgeTextWidth + 60));
-      const badgeX = 960 - badgeWidth;
-
-      ctx.beginPath();
-      if (ctx.roundRect) ctx.roundRect(badgeX, 630, badgeWidth, 80, 18);
-      else ctx.rect(badgeX, 630, badgeWidth, 80);
-      ctx.fillStyle = health.color || '#10B981';
-      ctx.fill();
-
-      ctx.fillStyle = '#FFFFFF';
-      ctx.textAlign = 'center';
-      ctx.fillText(badgeText, badgeX + (badgeWidth / 2), 682);
-      ctx.textAlign = 'left';
-
-      ctx.fillStyle = '#334155';
-      ctx.font = '600 28px "Outfit", sans-serif';
-      drawWrappedText(`Perkiraan setara paparan ${health.cigs || '0'} batang rokok/hari.`, 120, 790, 840, 36, 1);
-
-      // 5. Grid: AQI & Weather Cards
-      drawCard(80, 880, 440, 370, '#FFFFFF', '#E2E8F0');
-
-      ctx.fillStyle = aqiInfo.color || '#10B981';
-      ctx.font = '800 26px "Outfit", sans-serif';
-      ctx.fillText('KUALITAS UDARA', 120, 940);
-
-      ctx.fillStyle = aqiInfo.color || '#10B981';
-      ctx.font = '800 84px "Outfit", sans-serif';
-      ctx.fillText(`${aqi}`, 120, 1045);
-
-      ctx.fillStyle = '#64748B';
-      ctx.font = '700 30px "Outfit", sans-serif';
-      ctx.fillText('AQI US', 280, 1045);
+      // --- HERO CARD: LOCATION & HEALTH SCORE (y: 200, h: 320) ---
+      drawCard(80, 200, 920, 320, '#FFFFFF', '#E2E8F0');
 
       ctx.fillStyle = '#0F172A';
-      ctx.font = '800 34px "Outfit", sans-serif';
-      drawWrappedText(aqiInfo.label, 120, 1120, 360, 40, 1);
+      ctx.font = 'bold 64px sans-serif';
+      ctx.fillText(location.name.substring(0, 22), 125, 290);
 
       ctx.fillStyle = '#64748B';
-      ctx.font = '600 26px "Outfit", sans-serif';
-      ctx.fillText(`PM2.5: ${pm25} µg/m³`, 120, 1190);
+      ctx.font = '600 28px sans-serif';
+      ctx.fillText(`${location.province || 'Indonesia'} · ${dateFormatted}`, 125, 340);
 
-      // Weather Card
-      drawCard(560, 880, 440, 370, '#FFFFFF', '#E2E8F0');
+      // Eco Health Score Badge
+      const scoreBg = health.score >= 80 ? '#ECFDF5' : health.score >= 50 ? '#FEF3C7' : '#FEE2E2';
+      const scoreColor = health.score >= 80 ? '#059669' : health.score >= 50 ? '#D97706' : '#DC2626';
+
+      drawCard(125, 380, 830, 100, scoreBg, scoreColor);
+      ctx.fillStyle = scoreColor;
+      ctx.font = 'bold 36px sans-serif';
+      ctx.fillText(`Skor Kesehatan Lingkungan: ${health.score}/100 (${health.category})`, 160, 444);
+
+      // --- ROW 1: AQI & WEATHER (y: 560, h: 420) ---
+      
+      // AQI CARD (Left)
+      drawCard(80, 560, 440, 420, '#FFFFFF', '#E2E8F0');
+
+      ctx.fillStyle = aqiInfo.color;
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText('KUALITAS UDARA (AQI)', 120, 620);
+
+      ctx.fillStyle = aqiInfo.color;
+      ctx.font = 'bold 96px sans-serif';
+      ctx.fillText(String(aqi), 120, 725);
+
+      ctx.fillStyle = '#0F172A';
+      ctx.font = 'bold 34px sans-serif';
+      ctx.fillText(aqiInfo.label.substring(0, 18), 120, 785);
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '500 24px sans-serif';
+      ctx.fillText(`PM2.5: ${pm25} µg/m³`, 120, 835);
+      ctx.fillText('Standar US-EPA & ISPU', 120, 875);
+
+      // WEATHER CARD (Right)
+      drawCard(560, 560, 440, 420, '#FFFFFF', '#E2E8F0');
 
       ctx.fillStyle = '#0284C7';
-      ctx.font = '800 26px "Outfit", sans-serif';
-      ctx.fillText('CUACA & SUHU', 600, 940);
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText('CUACA & SUHU', 600, 620);
 
       ctx.fillStyle = '#0F172A';
-      ctx.font = '800 84px "Outfit", sans-serif';
-      ctx.fillText(`${temp}°C`, 600, 1045);
+      ctx.font = 'bold 96px sans-serif';
+      ctx.fillText(`${temp}°C`, 600, 725);
 
       ctx.fillStyle = '#0F172A';
-      ctx.font = '800 34px "Outfit", sans-serif';
-      drawWrappedText(weatherVisual.label, 600, 1120, 360, 40, 1);
+      ctx.font = 'bold 34px sans-serif';
+      ctx.fillText(weatherVisual.label.substring(0, 18), 600, 785);
 
       ctx.fillStyle = '#64748B';
-      ctx.font = '600 26px "Outfit", sans-serif';
-      ctx.fillText(`Kelembapan: ${humidity}%`, 600, 1190);
+      ctx.font = '500 24px sans-serif';
+      ctx.fillText(`Kelembapan: ${humidity}%`, 600, 835);
+      ctx.fillText(`Indeks Radiasi UV: ${uvIndex}`, 600, 875);
 
-      // 6. Seismic / Earthquake Card (Adaptive Multi-line Layout)
+      // --- ROW 2: EARTHQUAKE (y: 1020, h: 330) ---
+      drawCard(80, 1020, 920, 330, '#FFFFFF', '#E2E8F0');
+
+      ctx.fillStyle = '#DC2626';
+      ctx.font = 'bold 26px sans-serif';
+      ctx.fillText('⚡ GEMPA BUMI TERKINI (BMKG)', 125, 1080);
+
       if (latestEarthquake) {
-        drawCard(80, 1280, 920, 290, '#FFFFFF', '#E2E8F0');
+        // Magnitude Pill
+        drawCard(125, 1115, 200, 80, '#FEE2E2', '#DC2626');
+        ctx.fillStyle = '#DC2626';
+        ctx.font = 'bold 44px sans-serif';
+        ctx.fillText(`M ${latestEarthquake.magnitude}`, 160, 1172);
 
-        ctx.fillStyle = '#EF4444';
-        ctx.font = '800 26px "Outfit", sans-serif';
-        ctx.fillText('GEMPA TERKINI (BMKG)', 120, 1335);
-
-        // Magnitude Pill Badge
-        ctx.beginPath();
-        if (ctx.roundRect) ctx.roundRect(120, 1370, 170, 150, 18);
-        else ctx.rect(120, 1370, 170, 150);
-        ctx.fillStyle = '#FEF2F2';
-        ctx.fill();
-        ctx.strokeStyle = '#EF4444';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        ctx.fillStyle = '#EF4444';
-        ctx.font = '800 52px "Outfit", sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(`M ${latestEarthquake.magnitude}`, 205, 1455);
-        ctx.font = '700 22px "Outfit", sans-serif';
-        ctx.fillText('MAGNITUDO', 205, 1495);
-        ctx.textAlign = 'left';
-
-        // Location & Depth with auto-wrap
         ctx.fillStyle = '#0F172A';
-        ctx.font = '700 28px "Outfit", sans-serif';
-        const nextY = drawWrappedText(latestEarthquake.wilayah || 'Indonesia', 320, 1410, 640, 36, 2);
+        ctx.font = 'bold 28px sans-serif';
+        drawWrappedText(latestEarthquake.wilayah, 355, 1145, 600, 38, 2);
 
         ctx.fillStyle = '#64748B';
-        ctx.font = '600 24px "Outfit", sans-serif';
-        const quakeDetails = `Kedalaman: ${latestEarthquake.depth || '-'} • ${latestEarthquake.potensi || 'Tidak berpotensi tsunami'}`;
-        drawWrappedText(quakeDetails, 320, Math.max(1485, nextY + 10), 640, 32, 2);
+        ctx.font = '500 22px sans-serif';
+        ctx.fillText(`Kedalaman: ${latestEarthquake.kedalaman} · ${latestEarthquake.date} ${latestEarthquake.time}`, 125, 1255);
+        ctx.fillText(latestEarthquake.potensi || 'Tidak berpotensi tsunami', 125, 1290);
       } else {
-        drawCard(80, 1280, 920, 260, '#FFFFFF', '#E2E8F0');
-
-        ctx.fillStyle = '#10B981';
-        ctx.font = '800 26px "Outfit", sans-serif';
-        ctx.fillText('INFORMASI KESELAMATAN', 120, 1340);
-
-        ctx.fillStyle = '#0F172A';
-        ctx.font = '700 30px "Outfit", sans-serif';
-        ctx.fillText('Tidak ada peringatan bencana kritis saat ini.', 120, 1410);
-
         ctx.fillStyle = '#64748B';
-        ctx.font = '600 26px "Outfit", sans-serif';
-        ctx.fillText('Tetap pantau pembaruan berkala dari BMKG & Sekitarku.', 120, 1465);
+        ctx.font = '500 28px sans-serif';
+        ctx.fillText('Tidak ada aktivitas gempa signifikan baru terdeteksi.', 125, 1180);
       }
 
-      // 7. Footer Branding
+      // --- ROW 3: FOREST FIRE / KARHUTLA & FDRS (y: 1390, h: 290) ---
+      drawCard(80, 1390, 920, 290, '#FFFFFF', '#E2E8F0');
+
+      ctx.fillStyle = '#EA580C';
+      ctx.font = 'bold 26px sans-serif';
+      ctx.fillText('🔥 POTENSI KARHUTLA & TITIK PANAS SATELIT', 125, 1450);
+
+      // FDRS Badge
+      drawCard(125, 1485, 280, 75, fdrs.bg || '#ECFDF5', fdrs.color || '#10B981');
+      ctx.fillStyle = fdrs.color || '#10B981';
+      ctx.font = 'bold 28px sans-serif';
+      ctx.fillText(`FDRS: ${fdrs.code}`, 155, 1535);
+
       ctx.fillStyle = '#0F172A';
-      ctx.font = '800 34px "Outfit", sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText('sekitarku.vercel.app', 540, 1680);
+      ctx.font = 'bold 26px sans-serif';
+      ctx.fillText(fdrs.label, 430, 1520);
 
       ctx.fillStyle = '#64748B';
-      ctx.font = '600 26px "Outfit", sans-serif';
-      ctx.fillText('Data Resmi BMKG & Open-Meteo • Dipantau Secara Real-Time', 540, 1730);
+      ctx.font = '500 22px sans-serif';
+      if (nearestFire) {
+        ctx.fillText(`Titik Panas Terdekat: ${nearestFire.regency} (${nearestFire.distanceKm} km dari lokasi)`, 125, 1600);
+        ctx.fillText(`Satelit: ${nearestFire.satellite} · Tipe: ${nearestFire.type}`, 125, 1635);
+      } else {
+        ctx.fillText('Nihil titik panas aktif dalam radius 400 km.', 125, 1600);
+      }
 
-      ctx.textAlign = 'left';
+      // --- FOOTER SECTION (y: 1720) ---
+      ctx.strokeStyle = '#E2E8F0';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(80, 1720);
+      ctx.lineTo(1000, 1720);
+      ctx.stroke();
 
+      ctx.fillStyle = '#0F172A';
+      ctx.font = 'bold 36px sans-serif';
+      ctx.fillText('sekitarku.vercel.app', 80, 1780);
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '500 22px sans-serif';
+      ctx.fillText('Sumber Resmi: BMKG, PVMBG Magma, NASA FIRMS & Copernicus', 80, 1825);
+      ctx.fillText('Data diperbarui secara real-time untuk mitigasi bencana', 80, 1855);
+
+      // Export as Blob
       canvas.toBlob((blob) => {
         resolve(blob);
       }, 'image/png');
     });
   };
 
-  // Unified Share: Web Share API with image file -> triggers OS Share Sheet (WhatsApp Status, Instagram Story, X, etc.)
-  const handleNativeShare = async () => {
-    setIsGenerating(true);
+  const handleDownloadImage = async () => {
     try {
+      setIsGenerating(true);
       const blob = await generateCanvasImage();
-      if (!blob) throw new Error('Gagal membuat gambar');
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sekitarku-${location.name.toLowerCase().replace(/\s+/g, '-')}-${new Date().toISOString().slice(0, 10)}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Gagal generate gambar:', err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
-      const fileName = `Sekitarku_${location.name.replace(/\s+/g, '_')}_${Date.now()}.png`;
-      const file = new File([blob], fileName, { type: 'image/png' });
+  const handleNativeShare = async () => {
+    try {
+      setIsGenerating(true);
+      const blob = await generateCanvasImage();
+      const file = new File([blob], `sekitarku-${location.name.toLowerCase().replace(/\s+/g, '-')}.png`, { type: 'image/png' });
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
+          files: [file],
           title: `Pantauan Lingkungan ${location.name}`,
-          text: shareText,
-          files: [file]
+          text: shareText
         });
       } else if (navigator.share) {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        a.click();
-        URL.revokeObjectURL(url);
-
         await navigator.share({
           title: `Pantauan Lingkungan ${location.name}`,
           text: shareText,
           url: 'https://sekitarku.vercel.app'
         });
       } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        a.click();
-        URL.revokeObjectURL(url);
-        navigator.clipboard?.writeText(shareText);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 3000);
+        handleDownloadImage();
       }
     } catch (err) {
       if (err.name !== 'AbortError') {
-        console.error('Share error:', err);
+        handleDownloadImage();
       }
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const handleDownloadImage = async () => {
-    setIsGenerating(true);
-    try {
-      const blob = await generateCanvasImage();
-      if (blob) {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `Sekitarku_${location.name.replace(/\s+/g, '_')}_${Date.now()}.png`;
-        a.click();
-        URL.revokeObjectURL(url);
-      }
-    } catch (err) {
-      console.error('Download error:', err);
     } finally {
       setIsGenerating(false);
     }
@@ -345,21 +305,22 @@ export function ShareCardModal({
   };
 
   return (
-    <div className="modal-overlay animate-fade-in" onClick={onClose}>
+    <div className="modal-overlay animate-fade-in" onClick={onClose} role="dialog" aria-modal="true">
       <div
-        className="modal-content"
+        className="modal-content animate-scale-up"
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: '480px',
+          maxWidth: '520px',
           width: '95%',
           maxHeight: '90vh',
+          padding: 0,
           display: 'flex',
           flexDirection: 'column',
-          padding: 0,
-          overflow: 'hidden'
+          overflow: 'hidden',
+          borderRadius: 'var(--radius-lg)'
         }}
       >
-        {/* Header */}
+        {/* Header Modal */}
         <div style={{
           padding: '1.25rem 1.5rem',
           borderBottom: 'var(--border-thick)',
@@ -368,10 +329,10 @@ export function ShareCardModal({
           alignItems: 'center',
           backgroundColor: 'var(--bg-muted)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
             <div style={{
-              width: '36px',
-              height: '36px',
+              width: '34px',
+              height: '34px',
               borderRadius: 'var(--radius-sm)',
               backgroundColor: 'var(--color-primary-bg)',
               color: 'var(--color-primary)',
@@ -379,7 +340,7 @@ export function ShareCardModal({
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <Share2 size={20} strokeWidth={2.5} />
+              <Share2 size={18} strokeWidth={2.5} />
             </div>
             <div>
               <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.02em' }}>
@@ -454,6 +415,34 @@ export function ShareCardModal({
               </div>
             </div>
 
+            {/* Karhutla Preview in Modal */}
+            <div style={{
+              padding: '0.75rem',
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: 'var(--bg-card)',
+              border: 'var(--border-thick)',
+              marginBottom: '0.85rem'
+            }}>
+              <span style={{ fontSize: '0.675rem', fontWeight: '800', color: '#ea580c', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <Flame size={13} /> POTENSI KARHUTLA & TITIK PANAS (BMKG & NASA)
+              </span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.35rem' }}>
+                <span style={{
+                  fontSize: '0.75rem',
+                  fontWeight: '800',
+                  padding: '2px 8px',
+                  borderRadius: 'var(--radius-sm)',
+                  backgroundColor: fdrs.color,
+                  color: '#fff'
+                }}>
+                  FDRS: {fdrs.code} ({fdrs.label})
+                </span>
+                <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>
+                  {nearestFire ? `📍 ${nearestFire.regency} (${nearestFire.distanceKm} km)` : 'Nihil titik panas dekat'}
+                </span>
+              </div>
+            </div>
+
             {/* Quake Preview in Modal */}
             {latestEarthquake && (
               <div style={{
@@ -464,7 +453,7 @@ export function ShareCardModal({
                 marginBottom: '0.85rem'
               }}>
                 <span style={{ fontSize: '0.675rem', fontWeight: '800', color: 'var(--color-danger)', display: 'block' }}>
-                  GEMPA TERKINI (BMKG)
+                  ⚡ GEMPA TERKINI (BMKG)
                 </span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', marginTop: '0.25rem' }}>
                   <div style={{
@@ -486,14 +475,14 @@ export function ShareCardModal({
             )}
 
             <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)', textAlign: 'center', fontWeight: '600' }}>
-              Data Resmi BMKG & Open-Meteo • sekitarku.vercel.app
+              Data Resmi BMKG, PVMBG & NASA • sekitarku.vercel.app
             </div>
           </div>
 
           {/* Action Sharing Buttons Grid */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginTop: '1.25rem' }}>
             
-            {/* Unified Primary Action: Bagikan (Direct OS Sheet / Intent / File Share) */}
+            {/* Unified Primary Action: Bagikan */}
             <button
               onClick={handleNativeShare}
               disabled={isGenerating}
