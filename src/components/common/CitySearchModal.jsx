@@ -15,7 +15,7 @@ const POPULAR_CITIES = [
   'Palembang'
 ];
 
-export function CitySearchModal({ isOpen, onClose, onSelectCity, currentCity }) {
+export function CitySearchModal({ isOpen, onClose, onSelectCity, currentCity = {} }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('Semua');
   const inputRef = useRef(null);
@@ -243,7 +243,7 @@ export function CitySearchModal({ isOpen, onClose, onSelectCity, currentCity }) 
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.45rem' }}>
               {filteredCities.slice(0, 80).map((city) => {
-                const isSelected = currentCity.name.replace(' (GPS)', '') === city.name;
+                const isSelected = currentCity?.name ? currentCity.name.replace(' (GPS)', '') === city.name : false;
                 return (
                   <div
                     key={city.name}
