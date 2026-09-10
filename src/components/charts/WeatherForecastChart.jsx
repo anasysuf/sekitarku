@@ -54,7 +54,7 @@ export function WeatherForecastChart({ dailyData, lang = 'id' }) {
           borderRadius: 'var(--radius-sm)',
           backgroundColor: 'var(--bg-muted)',
           color: 'var(--text-muted)',
-          border: 'var(--border-thick)'
+          border: '1px solid var(--border-flat)'
         }}>
           Rentang: <strong style={{ color: 'var(--text-main)' }}>{lowestTemp}°C - {highestTemp}°C</strong>
         </span>
@@ -81,7 +81,7 @@ export function WeatherForecastChart({ dailyData, lang = 'id' }) {
               className="forecast-item"
               style={{
                 backgroundColor: idx === 0 ? 'var(--color-primary-bg)' : 'var(--bg-muted)',
-                borderColor: idx === 0 ? 'var(--color-primary)' : 'var(--border-thick)',
+                border: idx === 0 ? '1.5px solid var(--color-primary)' : '1px solid var(--border-flat)',
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
@@ -156,7 +156,7 @@ export function WeatherForecastChart({ dailyData, lang = 'id' }) {
                 backgroundColor: 'var(--bg-card)',
                 padding: '4px 8px',
                 borderRadius: 'var(--radius-sm)',
-                border: '1px solid var(--border-flat)',
+                border: 'none', boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
                 width: '90%',
                 marginTop: '0.2rem'
               }}>
