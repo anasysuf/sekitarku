@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Copy, Check, Code, Smartphone, Globe, ExternalLink, Sparkles, Download, CheckCircle2 } from 'lucide-react';
+import { X, Copy, Check, Smartphone, Globe, CheckCircle2, AlertCircle } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi';
 
 export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, weatherData, lang = 'id' }) {
@@ -26,13 +26,10 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://sekitarku.vercel.app';
   
-  // Android Widget endpoints
-  const widgetJsonUrl = `${baseUrl}/api/widget?city=${encodeURIComponent(cityName)}&lat=${location?.lat || -6.2}&lon=${location?.lon || 106.8}`;
-  const badgeUrl = `${baseUrl}/api/badge?city=${encodeURIComponent(cityName)}&aqi=${aqiVal}&status=${encodeURIComponent(aqiInfo.label)}&temp=${temp}`;
-
   // Web Iframe & Markdown
   const iframeUrl = `${baseUrl}/?embed=true&city=${encodeURIComponent(cityName)}`;
   const iframeCode = `<iframe src="${iframeUrl}" width="340" height="190" frameborder="0" style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 16px rgba(0,0,0,0.1);" title="Sekitarku Live Widget - ${cityName}"></iframe>`;
+  const badgeUrl = `${baseUrl}/api/badge?city=${encodeURIComponent(cityName)}&aqi=${aqiVal}&status=${encodeURIComponent(aqiInfo.label)}&temp=${temp}`;
   const markdownBadge = `[![Sekitarku AQI & Cuaca ${cityName}](${badgeUrl})](${baseUrl})`;
 
   const handleCopy = (text, type) => {
@@ -47,7 +44,7 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
         className="modal-content animate-scale-up"
         onClick={(e) => e.stopPropagation()}
         style={{
-          maxWidth: '580px',
+          maxWidth: '560px',
           width: '95%',
           padding: '1.5rem',
           maxHeight: '90vh',
@@ -70,7 +67,7 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
                 Pasang Widget Sekitarku
               </h3>
               <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                Pantau kualitas udara & cuaca langsung di Layar Utama HP Android atau Website Anda
+                Pantau kualitas udara & cuaca langsung di Layar Utama HP Android atau Web Anda
               </p>
             </div>
           </div>
@@ -130,10 +127,10 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
         {activeTab === 'android' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             
-            {/* Android Home Screen Widget Mockup Preview */}
+            {/* Widget Mockup Preview */}
             <div style={{ padding: '1rem', backgroundColor: 'var(--bg-muted)', borderRadius: 'var(--radius-md)', border: 'var(--border-thick)' }}>
               <span style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted)', display: 'block', marginBottom: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                Pratinjau Widget Android di HP ({cityName})
+                Pratinjau Widget Android ({cityName})
               </span>
 
               <div
@@ -172,48 +169,28 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
               </div>
             </div>
 
-            {/* Cara 1: PWA Home Screen (Termudah & Otomatis) */}
-            <div style={{ padding: '0.85rem 1rem', backgroundColor: 'var(--bg-card)', borderRadius: 'var(--radius-md)', border: 'var(--border-thick)' }}>
-              <strong style={{ fontSize: '0.825rem', color: 'var(--text-main)', display: 'block', marginBottom: '0.4rem' }}>
-                Metode 1: Pasang via Chrome / Edge di HP Android (Otomatis)
-              </strong>
-              <ol style={{ margin: 0, paddingLeft: '1.2rem', fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-                <li>Buka website <strong>sekitarku.vercel.app</strong> di browser Chrome HP Android Anda.</li>
-                <li>Klik menu titik tiga <strong>(⋮)</strong> di pojok kanan atas browser.</li>
-                <li>Pilih <strong>"Tambahkan ke Layar Utama"</strong> atau <strong>"Install Aplikasi"</strong>.</li>
-                <li>Kembali ke layar utama HP, tekan & tahan ruang kosong, lalu pilih menu <strong>Widget &rarr; Sekitarku</strong>.</li>
+            {/* Panduan Langkah Pemasangan di Android */}
+            <div style={{ padding: '0.95rem 1.15rem', backgroundColor: 'var(--bg-card)', borderRadius: 'var(--radius-md)', border: 'var(--border-thick)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '0.6rem' }}>
+                <CheckCircle2 size={16} color="var(--color-primary)" />
+                <strong style={{ fontSize: '0.85rem', color: 'var(--text-main)' }}>
+                  Cara Memasang Widget di Layar Utama HP Android:
+                </strong>
+              </div>
+              <ol style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '0.775rem', color: 'var(--text-muted)', lineHeight: 1.7 }}>
+                <li>Buka website <strong>sekitarku.vercel.app</strong> melalui browser <strong>Google Chrome</strong> di HP Android Anda.</li>
+                <li>Tekan tombol menu titik tiga <strong>(⋮)</strong> di sudut kanan atas Chrome.</li>
+                <li>Pilih opsi <strong>"Install Aplikasi"</strong> (atau <em>"Tambahkan ke Layar Utama"</em>).</li>
+                <li>Setelah terpasang, pergi ke Layar Utama HP &rarr; <strong>Tekan dan tahan area kosong</strong> &rarr; Pilih <strong>Widget</strong> &rarr; Seret widget <strong>Sekitarku</strong> ke layar utama.</li>
               </ol>
             </div>
 
-            {/* Cara 2: Custom Live API JSON / HTTP Widget */}
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                <label style={{ fontSize: '0.775rem', fontWeight: '700', color: 'var(--text-main)' }}>
-                  Metode 2: Endpoint API JSON Live (Untuk KWGT / HTTP Request Widget Android)
-                </label>
-                <button
-                  onClick={() => handleCopy(widgetJsonUrl, 'json')}
-                  className="flat-btn-secondary"
-                  style={{ padding: '3px 8px', fontSize: '0.7rem', gap: '4px' }}
-                >
-                  {copiedType === 'json' ? <Check size={12} color="var(--color-primary)" /> : <Copy size={12} />}
-                  <span>{copiedType === 'json' ? 'Tersalin!' : 'Salin URL JSON'}</span>
-                </button>
-              </div>
-              <input
-                readOnly
-                value={widgetJsonUrl}
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  fontSize: '0.725rem',
-                  fontFamily: 'monospace',
-                  backgroundColor: 'var(--bg-muted)',
-                  border: 'var(--border-flat)',
-                  borderRadius: 'var(--radius-sm)',
-                  color: 'var(--text-main)'
-                }}
-              />
+            {/* Catatan Kompatibilitas */}
+            <div style={{ padding: '0.65rem 0.85rem', backgroundColor: 'var(--bg-muted)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-flat)', fontSize: '0.725rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <AlertCircle size={14} color="var(--color-secondary)" style={{ flexShrink: 0 }} />
+              <span>
+                Fitur widget home screen Android didukung pada Chrome versi 115+ dengan sistem PWA standar Google.
+              </span>
             </div>
 
           </div>

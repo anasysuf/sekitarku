@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sekitarku-cache-v9';
+const CACHE_NAME = 'sekitarku-cache-v10';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -100,3 +100,33 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+
+// PWA Widget Lifecycle Handlers for Android
+self.addEventListener('widgetinstall', (event) => {
+  event.waitUntil(updateWidgetData(event.widget));
+});
+
+self.addEventListener('widgetresume', (event) => {
+  event.waitUntil(updateWidgetData(event.widget));
+});
+
+self.addEventListener('widgetclick', (event) => {
+  if (event.action === 'refresh') {
+    event.waitUntil(updateWidgetData(event.widget));
+  } else {
+    event.waitUntil(clients.openWindow('/'));
+  }
+});
+
+async function updateWidgetData(widget) {
+  try {
+    const template = await (await fetch('/widget.json')).text();
+    const data = await (await fetch('/api/widget')).text();
+    if (self.widgets && self.widgets.updateByTag) {
+      await self.widgets.updateByTag('sekitarku-widget', { template, data });
+    }
+  } catch (e) {
+    console.log('[SW] Widget update notice:', e);
+  }
+}
