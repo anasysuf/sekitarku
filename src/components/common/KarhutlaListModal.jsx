@@ -235,7 +235,7 @@ export function KarhutlaListModal({ isOpen, onClose, userLocation, onSelectHotsp
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.35rem' }}>
                     {h.distanceKm !== null && (
                       <span style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--color-primary)' }}>
-                        📍 {h.distanceKm} km
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><MapPin size={12} /> {h.distanceKm} km</span>
                       </span>
                     )}
                   </div>

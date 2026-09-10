@@ -95,7 +95,7 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <span style={{ fontSize: '1rem', lineHeight: 1 }}>🌿</span>
+                <Leaf size={16} color="var(--color-primary)" />
                 <strong style={{ fontSize: '0.9rem', color: 'var(--text-main)', fontWeight: '800' }}>
                   Sekitarku • {cityName}
                 </strong>
@@ -156,7 +156,7 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
               }}
             >
               <div style={{ backgroundColor: '#10b981', color: '#ffffff', padding: '5px 10px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <span style={{ fontSize: '0.85rem' }}>🌿</span>
+                <Leaf size={14} color="var(--color-primary)" />
                 <span>Sekitarku</span>
               </div>
               <div style={{ backgroundColor: '#1e293b', color: '#f8fafc', padding: '5px 10px' }}>

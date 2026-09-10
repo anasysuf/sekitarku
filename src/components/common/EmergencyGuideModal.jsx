@@ -220,7 +220,7 @@ export function EmergencyGuideModal({ isOpen, onClose }) {
           {activeTab === 'kontak' && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.65rem' }}>
               <div style={{ padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-danger-bg)', border: '1px solid var(--color-danger)', fontSize: '0.8rem', color: 'var(--color-danger)', fontWeight: '700' }}>
-                ⚠️ Panggilan 112 dapat dihubungi dari semua operator seluler bebas pulsa, bahkan saat ponsel terkunci.
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><AlertTriangle size={13} style={{ flexShrink: 0 }} /> Panggilan 112 dapat dihubungi dari semua operator seluler bebas pulsa, bahkan saat ponsel terkunci.</span>
               </div>
 
               {EMERGENCY_CONTACTS.map((c) => (

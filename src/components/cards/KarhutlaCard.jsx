@@ -32,14 +32,14 @@ export function KarhutlaCard({ karhutlaData, airQualityData, location, onOpenMod
   let statusBorder = 'var(--border-flat)';
   let statusTextColor = 'var(--text-main)';
   let statusIcon = <ShieldCheck size={16} color="var(--color-primary)" />;
-  let statusMessage = '⚠️ Terdeteksi titik kebakaran lahan sangat dekat (' + nearest.distanceKm + ' km). Risiko asap pekat tinggi.';
+  let statusMessage = 'Terdeteksi titik kebakaran lahan sangat dekat (' + nearest.distanceKm + ' km). Risiko asap pekat tinggi.';
 
   if (isHazeActive) {
     statusBannerBg = 'var(--color-danger-bg)';
     statusBorder = 'var(--color-danger)';
     statusTextColor = 'var(--color-danger)';
     statusIcon = <Wind size={16} color="var(--color-danger)" />;
-    statusMessage = `🚨 PERINGATAN KABUT ASAP: Udara terpapar asap kiriman dari titik api ${nearest?.regency || 'wilayah sekitar'} (${nearest?.distanceKm || 0} km). Lahan setempat aman dari api, namun gunakan masker N95 untuk pernapasan!`;
+    statusMessage = `PERINGATAN KABUT ASAP: Udara terpapar asap kiriman dari titik api ${nearest?.regency || 'wilayah sekitar'} (${nearest?.distanceKm || 0} km). Lahan setempat aman dari api, namun gunakan masker N95 untuk pernapasan!`;
   } else if (isHighRisk) {
     statusBannerBg = 'var(--color-danger-bg)';
     statusBorder = 'var(--color-danger)';

@@ -5,7 +5,15 @@ import {
   Copy,
   Check,
   X,
-  Sparkles
+  Sparkles,
+  Calendar,
+  Flame,
+  Zap,
+  MapPin,
+  AlertTriangle,
+  ShieldCheck,
+  Cigarette,
+  Wind
 } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi.js';
 import { calculateEcoHealthScore } from '../../utils/healthIndex.js';
@@ -144,7 +152,7 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
 
       ctx.fillStyle = '#059669';
       ctx.font = '700 26px "Outfit", sans-serif';
-      ctx.fillText(`📅 ${dateFormatted}`, 120, 405);
+      ctx.fillText(`${dateFormatted}`, 120, 405);
 
       // =========================================================================
       // 4. ECO-HEALTH COMPOSITE SCORE CARD
@@ -184,7 +192,7 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
       ctx.fillStyle = '#334155';
       ctx.font = '600 26px "Outfit", sans-serif';
       const cigsVal = health.cigs ?? health.cigarettesEquivalent ?? 0;
-      const cigsNote = `🚬 Setara ${cigsVal} batang rokok/hari (Paparan PM2.5)`;
+      const cigsNote = `Setara ${cigsVal} batang rokok/hari (Paparan PM2.5)`;
       drawWrappedText(cigsNote, 120, 700, 840, 34, 1);
 
       // =========================================================================
@@ -258,7 +266,7 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
       // Kabut Asap Badge
       const hazeBadgeBg = isHazeActive ? '#FEE2E2' : '#ECFDF5';
       const hazeBadgeColor = isHazeActive ? '#DC2626' : '#059669';
-      const hazeBadgeText = isHazeActive ? '⚠️ TERPAPAR KABUT ASAP' : '🟢 Kabut Asap: Bersih';
+      const hazeBadgeText = isHazeActive ? 'TERPAPAR KABUT ASAP' : 'Kabut Asap: Bersih';
 
       ctx.beginPath();
       if (ctx.roundRect) ctx.roundRect(410, 1200, 470, 52, 14);
@@ -274,7 +282,7 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
       ctx.fillStyle = isHazeActive ? '#DC2626' : '#334155';
       ctx.font = isHazeActive ? '700 22px "Outfit", sans-serif' : '600 22px "Outfit", sans-serif';
       if (isHazeActive) {
-        const hazeWarnText = `⚠️ Terdeteksi paparan kabut asap (${isHazeActive && nearestFire ? `${nearestFire.distanceKm} km dari ${nearestFire.regency}` : 'partikel asap karhutla'}). Gunakan masker N95 / KN95.`;
+        const hazeWarnText = `Peringatan: Terdeteksi paparan kabut asap (${isHazeActive && nearestFire ? `${nearestFire.distanceKm} km dari ${nearestFire.regency}` : 'partikel asap karhutla'}). Gunakan masker N95 / KN95.`;
         drawWrappedText(hazeWarnText, 120, 1290, 840, 32, 2);
       } else {
         const hazeSafeText = 'Kondisi udara bersih dari kabut asap kebakaran hutan dalam jarak dekat.';
@@ -287,7 +295,7 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
         const hotspotText = `Titik Panas: ${nearestFire.regency} (${nearestFire.distanceKm} km) • Satelit ${nearestFire.satellite || 'SNPP'}`;
         drawWrappedText(hotspotText, 120, 1392, 840, 26, 1);
       } else {
-        const noFireText = '📍 Tidak terdeteksi titik panas dalam radius 400 km';
+        const noFireText = 'Tidak terdeteksi titik panas dalam radius 400 km';
         drawWrappedText(noFireText, 120, 1392, 840, 26, 1);
       }
 
@@ -535,8 +543,8 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
                 <p style={{ fontSize: '0.775rem', color: '#64748B', margin: '2px 0 4px 0', fontWeight: '600', fontFamily: 'Outfit, sans-serif' }}>
                   {locationProvince}
                 </p>
-                <span style={{ fontSize: '0.725rem', color: '#059669', fontWeight: '700', fontFamily: 'Outfit, sans-serif' }}>
-                  📅 {dateFormatted}
+                <span style={{ fontSize: '0.725rem', color: '#059669', fontWeight: '700', fontFamily: 'Outfit, sans-serif', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <Calendar size={13} /> {dateFormatted}
                 </span>
               </div>
 
@@ -576,8 +584,8 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
                   </span>
                 </div>
 
-                <div style={{ fontSize: '0.725rem', fontWeight: '600', color: '#334155', fontFamily: 'Outfit, sans-serif' }}>
-                  🚬 Setara {cigsVal} batang rokok/hari (Paparan PM2.5)
+                <div style={{ fontSize: '0.725rem', fontWeight: '600', color: '#334155', fontFamily: 'Outfit, sans-serif', display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                  <Cigarette size={14} color="#64748b" /> Setara {cigsVal} batang rokok/hari (Paparan PM2.5)
                 </div>
               </div>
 
@@ -641,8 +649,8 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
                 border: `1.5px solid ${isHazeActive ? '#EF4444' : '#E2E8F0'}`,
                 marginBottom: '0.75rem'
               }}>
-                <div style={{ fontSize: '0.675rem', fontWeight: '800', color: '#EA580C', textTransform: 'uppercase', marginBottom: '0.4rem', fontFamily: 'Outfit, sans-serif' }}>
-                  🔥 {t.karhutlaCardHeader.toUpperCase()}
+                <div style={{ fontSize: '0.675rem', fontWeight: '800', color: '#EA580C', textTransform: 'uppercase', marginBottom: '0.4rem', fontFamily: 'Outfit, sans-serif', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                  <Flame size={13} /> {t.karhutlaCardHeader.toUpperCase()}
                 </div>
 
                 {/* Status Badges Row */}
@@ -666,9 +674,12 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
                     color: isHazeActive ? '#DC2626' : '#059669',
                     fontSize: '0.68rem',
                     fontWeight: '800',
-                    fontFamily: 'Outfit, sans-serif'
+                    fontFamily: 'Outfit, sans-serif',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px'
                   }}>
-                    {isHazeActive ? '⚠️ TERPAPAR KABUT ASAP' : '🟢 Kabut Asap: Bersih'}
+                    {isHazeActive ? <><AlertTriangle size={11} /> TERPAPAR KABUT ASAP</> : <><ShieldCheck size={11} /> Kabut Asap: Bersih</>}
                   </span>
                 </div>
 
@@ -681,16 +692,16 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
                   marginBottom: '0.35rem',
                   fontFamily: 'Outfit, sans-serif'
                 }}>
-                  {isHazeActive
-                    ? `⚠️ Terdeteksi paparan kabut asap (${nearestFire ? `${nearestFire.distanceKm} km dari ${nearestFire.regency}` : 'partikel asap karhutla'}). Gunakan masker N95 / KN95.`
-                    : 'Kondisi udara bersih dari kabut asap kebakaran hutan dalam jarak dekat.'}
+                  isHazeActive
+                    ? `Terdeteksi paparan kabut asap (${nearestFire ? `${nearestFire.distanceKm} km dari ${nearestFire.regency}` : 'partikel asap karhutla'}). Gunakan masker N95 / KN95.`
+                    : 'Kondisi udara bersih dari kabut asap kebakaran hutan dalam jarak dekat.'
                 </div>
 
                 {/* Hotspot details */}
                 <div style={{ fontSize: '0.68rem', fontWeight: '600', color: '#64748B', fontFamily: 'Outfit, sans-serif' }}>
                   {nearestFire
                     ? `Titik Panas: ${nearestFire.regency} (${nearestFire.distanceKm} km) • Satelit ${nearestFire.satellite || 'SNPP'}`
-                    : '📍 Tidak terdeteksi titik panas dalam radius 400 km'}
+                    : 'Tidak terdeteksi titik panas dalam radius 400 km'}
                 </div>
               </div>
 
@@ -703,8 +714,8 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
                   border: '1.5px solid #E2E8F0',
                   marginBottom: '0.85rem'
                 }}>
-                  <div style={{ fontSize: '0.675rem', fontWeight: '800', color: '#EF4444', textTransform: 'uppercase', marginBottom: '0.45rem', fontFamily: 'Outfit, sans-serif' }}>
-                    ⚡ GEMPA TERKINI (BMKG)
+                  <div style={{ fontSize: '0.675rem', fontWeight: '800', color: '#EF4444', textTransform: 'uppercase', marginBottom: '0.45rem', fontFamily: 'Outfit, sans-serif', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <Zap size={13} /> GEMPA TERKINI (BMKG)
                   </div>
                   
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
