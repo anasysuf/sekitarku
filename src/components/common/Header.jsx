@@ -1,7 +1,19 @@
 import React from 'react';
-import { Sun, Moon, MapPin, RefreshCw, Compass, Bell, BellRing, Search, Calendar, Share2, ShieldAlert } from 'lucide-react';
 import { formatFullCurrentDate } from '../../utils/format';
-import { translations } from '../../utils/i18n';
+import { i18n } from '../../utils/i18n';
+import {
+  Compass,
+  MapPin,
+  Search,
+  RefreshCw,
+  Bell,
+  BellRing,
+  Moon,
+  Sun,
+  Share2,
+  ShieldAlert,
+  Calendar
+} from 'lucide-react';
 
 export function Header({
   location,
@@ -15,68 +27,71 @@ export function Header({
   notificationsEnabled,
   onRequestNotification,
   onOpenShare,
-  onOpenEmergency,
-  onOpenWidget
+  onOpenEmergency
 }) {
-  const t = translations;
+  const t = i18n.id;
+
+  const displayName = location?.name || 'Jakarta Pusat';
+  const displayProvince = (location?.province && location?.province !== displayName)
+    ? location.province
+    : (displayName.includes('Jakarta') ? 'DKI Jakarta' : (location?.province || 'Indonesia'));
 
   return (
-    <header style={{ marginBottom: '1.75rem' }}>
-      
-      {/* Top Bar: Brand & Primary Action Badges */}
-      <div style={{
+    <header className="app-header">
+      {/* Top Bar: Brand, Live Indicator & Primary Actions */}
+      <div className="header-top-row" style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
-        gap: '1rem',
-        paddingBottom: '1.25rem',
-        borderBottom: 'var(--border-thick)'
+        gap: '0.85rem'
       }}>
         
-        {/* Brand & Date */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-          <div style={{
-            width: '44px',
-            height: '44px',
-            borderRadius: 'var(--radius-md)',
-            backgroundColor: 'var(--color-secondary)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#ffffff',
-            flexShrink: 0
-          }}>
+        {/* Brand & Subtitle */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
+          <div
+            style={{
+              width: '42px',
+              height: '42px',
+              backgroundColor: 'var(--color-secondary)',
+              borderRadius: 'var(--radius-md)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'var(--text-inverse)',
+              flexShrink: 0
+            }}
+          >
             <Compass size={24} strokeWidth={2.5} />
           </div>
-          <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <h1 style={{ fontSize: '1.45rem', fontWeight: '800', letterSpacing: '-0.02em', margin: 0, color: 'var(--text-main)' }}>
-                {t.appTitle}
+          <div style={{ minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <h1 style={{ fontSize: '1.35rem', fontWeight: '900', letterSpacing: '-0.03em', margin: 0, color: 'var(--text-main)' }}>
+                {t.appName}
               </h1>
               <span style={{
-                fontSize: '0.675rem',
-                fontWeight: '800',
-                padding: '2px 7px',
+                fontSize: '0.65rem',
+                fontWeight: '900',
+                padding: '2px 6px',
                 borderRadius: 'var(--radius-sm)',
                 backgroundColor: 'var(--color-secondary)',
-                color: '#ffffff',
+                color: 'var(--text-inverse)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.04em'
               }}>
                 {t.liveBadge}
               </span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginTop: '2px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: '500' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '2px', flexWrap: 'wrap' }}>
+              <span style={{ fontSize: '0.775rem', color: 'var(--text-muted)', fontWeight: '500' }}>
                 {t.appSubtitle}
               </span>
               <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>•</span>
               <div style={{
                 display: 'inline-flex',
                 alignItems: 'center',
-                gap: '0.3rem',
-                fontSize: '0.75rem',
+                gap: '0.25rem',
+                fontSize: '0.725rem',
                 fontWeight: '700',
                 color: 'var(--color-primary)'
               }}>
@@ -88,13 +103,13 @@ export function Header({
         </div>
 
         {/* Priority Actions: Share & Emergency */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+        <div className="header-action-buttons" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
           <button
             onClick={onOpenShare}
             aria-label="Bagikan Laporan"
-            className="flat-btn-secondary"
+            className="flat-btn-secondary header-btn"
             style={{
-              padding: '0.5rem 0.95rem',
+              padding: '0.45rem 0.85rem',
               minHeight: '38px',
               color: 'var(--color-primary)',
               borderColor: 'var(--color-primary)',
@@ -102,16 +117,16 @@ export function Header({
               fontWeight: '700'
             }}
           >
-            <Share2 size={16} strokeWidth={2.5} />
+            <Share2 size={15} strokeWidth={2.5} />
             <span>{t.share || 'Bagikan'}</span>
           </button>
 
           <button
             onClick={onOpenEmergency}
             aria-label="Kontak Darurat & Tanggap Bencana"
-            className="flat-btn-secondary"
+            className="flat-btn-secondary header-btn"
             style={{
-              padding: '0.5rem 0.95rem',
+              padding: '0.45rem 0.85rem',
               minHeight: '38px',
               color: 'var(--color-danger)',
               borderColor: 'var(--color-danger)',
@@ -119,7 +134,7 @@ export function Header({
               fontWeight: '700'
             }}
           >
-            <ShieldAlert size={16} strokeWidth={2.5} />
+            <ShieldAlert size={15} strokeWidth={2.5} />
             <span>{t.emergency || 'Darurat 112'}</span>
           </button>
         </div>
@@ -127,13 +142,13 @@ export function Header({
       </div>
 
       {/* Bottom Bar: Search & Compact Utility Toolbar */}
-      <div style={{
+      <div className="header-bottom-row" style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
-        gap: '0.75rem',
-        marginTop: '1rem'
+        gap: '0.65rem',
+        marginTop: '0.85rem'
       }}>
         
         {/* City Search Bar with integrated GPS trigger */}
@@ -145,7 +160,7 @@ export function Header({
             style={{
               flex: 1,
               justifyContent: 'space-between',
-              padding: '0.6rem 0.9rem',
+              padding: '0.5rem 0.85rem',
               minHeight: '40px',
               backgroundColor: 'var(--bg-card)'
             }}
@@ -153,16 +168,16 @@ export function Header({
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0 }}>
               <MapPin size={16} color="var(--color-secondary)" style={{ flexShrink: 0 }} />
               <div style={{ minWidth: 0, textAlign: 'left' }}>
-                <span style={{ fontSize: '0.875rem', fontWeight: '700', color: 'var(--text-main)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {location.name}
+                <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {displayName}
                 </span>
-                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {location.province}
+                <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {displayProvince}
                 </span>
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--text-muted)', fontSize: '0.725rem', backgroundColor: 'var(--bg-muted)', padding: '2px 7px', borderRadius: 'var(--radius-sm)', border: 'var(--border-thick)' }}>
-              <Search size={12} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--text-muted)', fontSize: '0.7rem', backgroundColor: 'var(--bg-muted)', padding: '2px 7px', borderRadius: 'var(--radius-sm)', border: 'var(--border-thick)' }}>
+              <Search size={11} />
               <span>{t.searchCity}</span>
             </div>
           </button>
@@ -172,7 +187,7 @@ export function Header({
             disabled={gpsLoading}
             aria-label={t.gps}
             title={t.gps}
-            className={`flat-btn-secondary ${location.isGps ? 'active' : ''}`}
+            className={`flat-btn-secondary ${location?.isGps ? 'active' : ''}`}
             style={{
               minWidth: '40px',
               minHeight: '40px',
@@ -189,7 +204,7 @@ export function Header({
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '0.4rem',
+          gap: '0.35rem',
           backgroundColor: 'var(--bg-muted)',
           padding: '3px',
           borderRadius: 'var(--radius-md)',
@@ -202,8 +217,8 @@ export function Header({
             aria-label={notificationsEnabled ? t.notifyActive : t.notifyEnable}
             title={notificationsEnabled ? t.notifyActive : t.notifyEnable}
             style={{
-              width: '36px',
-              height: '36px',
+              width: '34px',
+              height: '34px',
               borderRadius: 'var(--radius-sm)',
               border: notificationsEnabled ? '1px solid var(--color-secondary)' : 'none',
               backgroundColor: notificationsEnabled ? 'var(--color-secondary-bg)' : 'transparent',
@@ -215,10 +230,8 @@ export function Header({
               transition: 'transform var(--anim-fast)'
             }}
           >
-            {notificationsEnabled ? <BellRing size={16} strokeWidth={2.5} /> : <Bell size={16} strokeWidth={2.2} />}
+            {notificationsEnabled ? <BellRing size={15} strokeWidth={2.5} /> : <Bell size={15} strokeWidth={2.2} />}
           </button>
-
-          
 
           {/* Refresh */}
           <button
@@ -226,8 +239,8 @@ export function Header({
             aria-label={t.refresh}
             title={t.refresh}
             style={{
-              width: '36px',
-              height: '36px',
+              width: '34px',
+              height: '34px',
               borderRadius: 'var(--radius-sm)',
               border: 'none',
               backgroundColor: 'transparent',
@@ -238,17 +251,17 @@ export function Header({
               justifyContent: 'center'
             }}
           >
-            <RefreshCw size={15} strokeWidth={2.2} />
+            <RefreshCw size={14} strokeWidth={2.2} />
           </button>
 
           {/* Theme Toggle */}
           <button
             onClick={onToggleDark}
             aria-label={t.themeToggle}
-            title={isDark ? "Beralih ke Mode Terang" : "Beralih ke Mode Gelap"}
+            title={isDark ? 'Beralih ke Mode Terang' : 'Beralih ke Mode Gelap'}
             style={{
-              height: '36px',
-              padding: '0 10px',
+              height: '34px',
+              padding: '0 9px',
               borderRadius: 'var(--radius-sm)',
               border: isDark ? '1px solid var(--color-accent)' : '1px solid var(--color-primary)',
               backgroundColor: isDark ? 'var(--color-accent-bg)' : 'var(--color-primary-bg)',
@@ -257,18 +270,18 @@ export function Header({
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
-              fontSize: '0.75rem',
+              fontSize: '0.725rem',
               fontWeight: '800'
             }}
           >
             {isDark ? (
               <>
-                <Sun size={15} strokeWidth={2.5} />
+                <Sun size={14} strokeWidth={2.5} />
                 <span>{t.lightMode || 'Terang'}</span>
               </>
             ) : (
               <>
-                <Moon size={15} strokeWidth={2.5} />
+                <Moon size={14} strokeWidth={2.5} />
                 <span>{t.darkMode || 'Gelap'}</span>
               </>
             )}

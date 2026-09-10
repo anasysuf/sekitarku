@@ -123,7 +123,7 @@ export function App() {
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
   const [isVolcanoOpen, setIsVolcanoOpen] = useState(false);
   const [isKarhutlaOpen, setIsKarhutlaOpen] = useState(false);
-  const [karhutlaData, setKarhutlaData] = useState(() => fetchKarhutlaData(-6.2088, 106.8456, getDefaultWeather(-6.2088, 106.8456), false));
+  const [karhutlaData, setKarhutlaData] = useState(() => fetchKarhutlaData(location?.lat || -6.1805, location?.lon || 106.8284, getDefaultWeather(location?.lat || -6.1805, location?.lon || 106.8284), false));
   const [isWidgetOpen, setIsWidgetOpen] = useState(false);
 
   // PWA Prompt
@@ -233,8 +233,8 @@ export function App() {
   // Load City-Specific Data (Weather, AQI, Karhutla) with Instant SWR Cache
   const loadData = async (force = false) => {
     // 1. Check synchronous cache first for instant 0ms UI render
-    const safeLat = Number(location?.lat) || -6.2088;
-    const safeLon = Number(location?.lon) || 106.8456;
+    const safeLat = Number(location?.lat) || -6.1805;
+    const safeLon = Number(location?.lon) || 106.8284;
     const cachedWeather = apiCache.get(`weather_${safeLat.toFixed(3)}_${safeLon.toFixed(3)}`);
     const cachedAqi = apiCache.get(`aqi_${safeLat.toFixed(3)}_${safeLon.toFixed(3)}`);
 
@@ -449,25 +449,26 @@ export function App() {
       {/* PWA Install Banner */}
       {installPrompt && showPwaBanner && (
         <div className="pwa-banner animate-fade-in">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <Download size={18} color="var(--color-primary)" />
-            <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)' }}>
-              Pasang aplikasi Sekitarku di layar utama HP Anda untuk akses instan & offline.
-            </span>
+          <div className="pwa-banner-content">
+            <div className="pwa-banner-icon">
+              <Download size={16} strokeWidth={2.5} />
+            </div>
+            <div className="pwa-banner-text">
+              <span className="pwa-banner-title">Pasang Sekitarku di HP</span>
+              <span className="pwa-banner-desc">Akses instan di layar utama & dapat digunakan saat offline.</span>
+            </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div className="pwa-banner-actions">
             <button
               onClick={handleInstallPwa}
-              className="flat-btn-primary"
-              style={{ minHeight: '36px', padding: '6px 14px', fontSize: '0.8rem' }}
+              className="flat-btn-primary pwa-btn-install"
             >
-              {t.pwaInstall}
+              {t.pwaInstall || 'Pasang Aplikasi'}
             </button>
             <button
               onClick={() => setShowPwaBanner(false)}
               aria-label="Tutup"
-              className="flat-btn-secondary"
-              style={{ minHeight: '36px', padding: '6px 10px' }}
+              className="flat-btn-secondary pwa-btn-close"
             >
               <X size={16} />
             </button>
