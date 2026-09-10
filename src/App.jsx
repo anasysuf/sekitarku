@@ -425,6 +425,7 @@ export function App() {
       {/* Karhutla & Fire Danger Rating Card (BMKG FDRS & NASA FIRMS) */}
       <KarhutlaCard
         karhutlaData={karhutlaData}
+        airQualityData={airQualityData}
         location={location}
         onOpenModal={() => setIsKarhutlaOpen(true)}
         loading={loading}

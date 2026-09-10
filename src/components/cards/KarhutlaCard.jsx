@@ -1,8 +1,9 @@
 import React from 'react';
-import { Flame, Compass, ChevronRight, AlertTriangle, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { Flame, Compass, ChevronRight, AlertTriangle, ShieldCheck, ShieldAlert, Wind } from 'lucide-react';
 
 export function KarhutlaCard({
   karhutlaData,
+  airQualityData,
   location,
   onOpenModal,
   loading,
@@ -18,10 +19,16 @@ export function KarhutlaCard({
   }
 
   const { fdrs, nearest, totalInIndo } = karhutlaData;
+  const currentAqi = airQualityData?.current?.aqi || 0;
+  const isUnhealthyAir = currentAqi >= 150;
+
   const isHighRisk = fdrs.code === 'TINGGI' || fdrs.code === 'EKSTREM';
   const isModerateRisk = fdrs.code === 'SEDANG';
   const isVeryNear = nearest && nearest.distanceKm <= 50;
-  const isNearby = nearest && nearest.distanceKm <= 150;
+  const isNearby = nearest && nearest.distanceKm <= 120;
+
+  // Korelasi Silang Cerdas (Compound Risk): Udara Berbahaya + Ada Titik Api Terdekat
+  const isHazeSpillover = isUnhealthyAir && isNearby;
 
   // Compute status banner styling & copy
   let statusBannerBg = 'var(--bg-subtle)';
@@ -30,24 +37,30 @@ export function KarhutlaCard({
   let statusIcon = <ShieldCheck size={16} color="var(--color-primary)" />;
   let statusMessage = `Tingkat potensi kebakaran di wilayah ${location.name} terpantau AMAN dan terkendali.`;
 
-  if (isVeryNear) {
+  if (isHazeSpillover) {
+    statusBannerBg = 'var(--color-danger-bg)';
+    statusBorder = 'var(--color-danger)';
+    statusTextColor = 'var(--color-danger)';
+    statusIcon = <Wind size={16} color="var(--color-danger)" />;
+    statusMessage = `🚨 TERDETEKSI KABUT ASAP: Kualitas udara buruk (AQI ${currentAqi}) di ${location.name} terindikasi kuat dipicu sebaran asap karhutla dari ${nearest.regency} (${nearest.distanceKm} km). Gunakan masker N95 & tutup ventilasi!`;
+  } else if (isVeryNear) {
     statusBannerBg = 'var(--color-danger-bg)';
     statusBorder = 'var(--color-danger)';
     statusTextColor = 'var(--color-danger)';
     statusIcon = <ShieldAlert size={16} color="var(--color-danger)" />;
-    statusMessage = `PERINGATAN: Titik panas satelit terdeteksi hanya berjarak ${nearest.distanceKm} km dari ${location.name}. Waspadai potensi kabut asap!`;
+    statusMessage = `PERINGATAN: Titik panas satelit aktif hanya berjarak ${nearest.distanceKm} km dari ${location.name}. Waspadai potensi kabut asap tebal!`;
   } else if (isHighRisk) {
     statusBannerBg = 'var(--color-danger-bg)';
     statusBorder = 'var(--color-danger)';
     statusTextColor = 'var(--color-danger)';
     statusIcon = <AlertTriangle size={16} color="var(--color-danger)" />;
-    statusMessage = `STATUS RAWAN: Vegetasi di wilayah ${location.name} sangat kering & mudah terbakar akibat suhu panas/rendah hujan.`;
+    statusMessage = `STATUS RAWAN: Vegetasi di wilayah ${location.name} sangat kering & mudah terbakar akibat suhu panas / rendah hujan.`;
   } else if (isNearby) {
     statusBannerBg = 'var(--color-warning-bg)';
     statusBorder = 'var(--color-warning)';
     statusTextColor = '#b45309';
     statusIcon = <AlertTriangle size={16} color="#b45309" />;
-    statusMessage = `Titik panas terdekat berada di ${nearest.regency} (${nearest.distanceKm} km dari ${location.name}). Kondisi lokal masih terpantau aman.`;
+    statusMessage = `Titik panas terdekat berada di ${nearest.regency} (${nearest.distanceKm} km dari ${location.name}). Kondisi lahan lokal masih terpantau aman.`;
   } else if (isModerateRisk) {
     statusBannerBg = 'var(--color-warning-bg)';
     statusBorder = 'var(--color-warning)';
@@ -66,7 +79,7 @@ export function KarhutlaCard({
             width: '32px',
             height: '32px',
             borderRadius: 'var(--radius-full)',
-            backgroundColor: fdrs.color,
+            backgroundColor: isHazeSpillover ? '#ef4444' : fdrs.color,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -79,29 +92,49 @@ export function KarhutlaCard({
               Indeks Kebakaran Hutan & Titik Panas
             </h3>
             <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: '600' }}>
-              Data FDRS BMKG · Satelit NASA FIRMS
+              Data FDRS BMKG · Satelit NASA FIRMS · Deteksi Asap Lintas Wilayah
             </span>
           </div>
         </div>
 
-        {/* Status Badge */}
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '5px',
-          fontSize: '0.75rem',
-          fontWeight: '800',
-          padding: '4px 12px',
-          borderRadius: 'var(--radius-sm)',
-          backgroundColor: fdrs.color,
-          color: '#ffffff'
-        }}>
-          <Flame size={13} strokeWidth={2.5} />
-          <span>{fdrs.code} ({fdrs.label})</span>
+        {/* Status Badges */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+          {isHazeSpillover && (
+            <span style={{
+              fontSize: '0.725rem',
+              fontWeight: '800',
+              padding: '4px 10px',
+              borderRadius: 'var(--radius-sm)',
+              backgroundColor: 'rgba(239, 68, 68, 0.15)',
+              color: '#dc2626',
+              border: '1px solid #dc2626',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}>
+              <Wind size={12} strokeWidth={2.5} />
+              <span>Waspada Asap Karhutla</span>
+            </span>
+          )}
+
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '5px',
+            fontSize: '0.75rem',
+            fontWeight: '800',
+            padding: '4px 12px',
+            borderRadius: 'var(--radius-sm)',
+            backgroundColor: fdrs.color,
+            color: '#ffffff'
+          }}>
+            <Flame size={13} strokeWidth={2.5} />
+            <span>FDRS: {fdrs.code} ({fdrs.label})</span>
+          </div>
         </div>
       </div>
 
-      {/* Main Info */}
+      {/* Main Info Grid */}
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
@@ -139,23 +172,23 @@ export function KarhutlaCard({
           )}
         </div>
 
-        {/* Right: FDRS Condition & Safety Notes */}
+        {/* Right: FDRS Condition & Explanation */}
         <div>
           <span style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            Potensi Kebakaran & Vegetasi ({location.name})
+            Potensi Kebakaran Lahan Lokal ({location.name})
           </span>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-main)', margin: '0.25rem 0 0 0', fontWeight: '600', lineHeight: 1.4 }}>
             {fdrs.desc}
           </p>
-          <span style={{ fontSize: '0.725rem', color: isHighRisk ? 'var(--color-danger)' : 'var(--text-muted)', fontWeight: '700', display: 'block', marginTop: '0.35rem' }}>
-            Satelit Pemantau: VIIRS SNPP, NOAA-20 & MODIS (Near Real-Time)
+          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '500', display: 'block', marginTop: '0.35rem' }}>
+            *FDRS mengukur kemudahan tersulutnya vegetasi setempat, sedangkan sebaran asap luar dipantau via korelasi AQI.
           </span>
         </div>
       </div>
 
       {/* Safety Evaluation Status Strip */}
       <div style={{
-        padding: '0.65rem 0.95rem',
+        padding: '0.75rem 1rem',
         backgroundColor: statusBannerBg,
         border: `1.5px solid ${statusBorder}`,
         borderRadius: 'var(--radius-sm)',
@@ -166,11 +199,11 @@ export function KarhutlaCard({
         fontWeight: '600',
         color: statusTextColor,
         flexWrap: 'wrap',
-        gap: '0.5rem'
+        gap: '0.65rem'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 300px' }}>
           {statusIcon}
-          <span>{statusMessage}</span>
+          <span style={{ lineHeight: 1.4 }}>{statusMessage}</span>
         </div>
 
         <button
@@ -180,7 +213,8 @@ export function KarhutlaCard({
             padding: '4px 10px',
             minHeight: '30px',
             fontSize: '0.725rem',
-            gap: '0.3rem'
+            gap: '0.3rem',
+            whiteSpace: 'nowrap'
           }}
         >
           <span>Semua Titik Api ({totalInIndo} Titik)</span>
