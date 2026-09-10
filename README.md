@@ -1,10 +1,6 @@
 # 🌿 Sekitarku — Platform Pemantauan Lingkungan Hidup & Mitigasi Bencana Real-Time Indonesia
 
 <p align="center">
-  <img src="public/icons/icon-512x512.png" alt="Logo Sekitarku" width="96" height="96" style="border-radius: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.12);" />
-</p>
-
-<p align="center">
   <strong>Platform Pemantauan Lingkungan & Mitigasi Bencana Real-Time Nusantara</strong><br>
   <em>Menyajikan Data Kualitas Udara (AQI & PM2.5), Cuaca, Deteksi Karhutla (FDRS & Satelit NASA), Aktivitas Gunung Api (PVMBG), dan Peringatan Dini Gempa Bumi (BMKG) dalam Satu Dasbor Presisi Tanpa Latensi.</em>
 </p>
@@ -13,7 +9,7 @@
   <a href="https://sekitarku.vercel.app" target="_blank">
     <img src="https://img.shields.io/badge/Akses_Website-sekitarku.vercel.app-2563eb?style=for-the-badge&logo=vercel&logoColor=white" alt="Website" />
   </a>
-  <img src="https://img.shields.io/badge/Versi-1.1.0-10b981?style=for-the-badge" alt="Versi" />
+  <img src="https://img.shields.io/badge/Versi-1.2.0-10b981?style=for-the-badge" alt="Versi" />
   <img src="https://img.shields.io/badge/Lisensi-MIT-f59e0b?style=for-the-badge" alt="Lisensi" />
   <img src="https://img.shields.io/badge/Status_Data-100%25_Real--Time-059669?style=for-the-badge" alt="Realtime" />
 </p>
@@ -192,40 +188,6 @@ Sistem Sekitarku dirancang dengan standar performa tinggi untuk menjamin kecepat
   - PVMBG / MAGMA Indonesia (Pusat Vulkanologi & Mitigasi Bencana Geologi)
   - NASA FIRMS (Fire Information for Resource Management System)
   - Open-Meteo Weather & Air Quality API
-
----
-
-## 💻 Panduan Menjalankan Secara Lokal (Local Development)
-
-### Prasyarat:
-- [Node.js](https://nodejs.org/) (versi 18 ke atas disarankan)
-- [npm](https://www.npmjs.com/) atau [pnpm](https://pnpm.io/)
-
-### Langkah Instalasi:
-
-```bash
-# 1. Klon repositori
-git clone https://github.com/anasysuf/sekitarku.git
-
-# 2. Masuk ke direktori proyek
-cd sekitarku
-
-# 3. Pasang seluruh dependensi
-npm install
-
-# 4. Jalankan server pengembangan lokal (Vite)
-npm run dev
-```
-
-Aplikasi akan berjalan di `http://localhost:3000` (atau port yang dialokasikan oleh Vite).
-
-### Membangun Versi Produksi:
-
-```bash
-npm run build
-```
-
-Hasil build yang teroptimasi akan tersimpan di direktori `dist/`.
 
 ---
 
