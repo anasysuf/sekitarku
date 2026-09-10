@@ -181,20 +181,61 @@ export function App() {
     }
   };
 
-  const loadData = async (force = false) => {
-    setLoading(true);
+    // Load Nationwide Earthquake Data on mount or manual refresh
+  const loadEarthquakeData = async (force = false) => {
     try {
-      const [weather, aqi, quake, quakeList] = await Promise.all([
-        fetchWeatherData(location.lat, location.lon, force),
-        fetchAirQualityData(location.lat, location.lon, force),
+      const [quake, quakeList] = await Promise.all([
         fetchLatestEarthquake(force),
         fetchRecentEarthquakes(force)
       ]);
+      if (quake) setLatestEarthquake(quake);
+      if (quakeList && quakeList.length > 0) setRecentEarthquakes(quakeList);
+    } catch (err) {
+      console.warn('Earthquake fetch error:', err);
+    }
+  };
 
-      setWeatherData(weather);
-      setAirQualityData(aqi);
-      setLatestEarthquake(quake);
-      setRecentEarthquakes(quakeList);
+  useEffect(() => {
+    loadEarthquakeData();
+  }, []);
+
+  // Load City-Specific Data (Weather, AQI, Karhutla) with Instant SWR Cache
+  const loadData = async (force = false) => {
+    // 1. Check synchronous cache first for instant 0ms UI render
+    const cachedWeather = apiCache.get(`weather_${location.lat.toFixed(3)}_${location.lon.toFixed(3)}`);
+    const cachedAqi = apiCache.get(`aqi_${location.lat.toFixed(3)}_${location.lon.toFixed(3)}`);
+
+    if (cachedWeather && cachedAqi && !force) {
+      setWeatherData(cachedWeather);
+      setAirQualityData(cachedAqi);
+      const karhutla = fetchKarhutlaData(location.lat, location.lon, cachedWeather, false);
+      setKarhutlaData(karhutla);
+      setLoading(false);
+      // Revalidate in background silently
+      Promise.all([
+        fetchWeatherData(location.lat, location.lon, true),
+        fetchAirQualityData(location.lat, location.lon, true)
+      ]).then(([freshWeather, freshAqi]) => {
+        if (freshWeather) setWeatherData(freshWeather);
+        if (freshAqi) setAirQualityData(freshAqi);
+        const freshKarhutla = fetchKarhutlaData(location.lat, location.lon, freshWeather, true);
+        setKarhutlaData(freshKarhutla);
+        setLastUpdated(new Date());
+      }).catch(() => {});
+      return;
+    }
+
+    // 2. If not in cache or forced, show loading and fetch parallel
+    setLoading(true);
+    try {
+      const [weather, aqi] = await Promise.all([
+        fetchWeatherData(location.lat, location.lon, force),
+        fetchAirQualityData(location.lat, location.lon, force)
+      ]);
+
+      if (weather) setWeatherData(weather);
+      if (aqi) setAirQualityData(aqi);
+
       const karhutla = fetchKarhutlaData(location.lat, location.lon, weather, force);
       setKarhutlaData(karhutla);
       setLastUpdated(new Date());
@@ -214,9 +255,10 @@ export function App() {
     }
   };
 
-  useEffect(() => {
-    loadData();
-  }, [location.lat, location.lon]);
+  const handleManualRefresh = () => {
+    loadEarthquakeData(true);
+    loadData(true);
+  };
 
   const handleFocusQuake = (quake) => {
     if (quake && quake.lat && quake.lon) {
@@ -241,7 +283,7 @@ export function App() {
         weatherData={weatherData}
         airQualityData={airQualityData}
         loading={loading}
-        onRefresh={() => loadData(true)}
+        onRefresh={handleManualRefresh}
       />
     );
   }
@@ -256,7 +298,7 @@ export function App() {
         gpsLoading={gpsLoading}
         isDark={isDark}
         onToggleDark={toggleDarkMode}
-        onRefresh={() => loadData(true)}
+        onRefresh={handleManualRefresh}
         lastUpdated={lastUpdated}
         notificationsEnabled={notificationsEnabled}
         onRequestNotification={handleRequestNotification}

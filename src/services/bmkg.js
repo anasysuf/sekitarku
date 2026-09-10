@@ -12,7 +12,7 @@ export async function fetchLatestEarthquake(forceRefresh = false) {
   }
 
   try {
-    const res = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json', {
+    const res = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json', { signal: AbortSignal.timeout(5000),
       headers: { 'Accept': 'application/json' }
     });
     if (!res.ok) throw new Error(`BMKG Error: ${res.status}`);
@@ -52,7 +52,7 @@ export async function fetchRecentEarthquakes(forceRefresh = false) {
   }
 
   try {
-    const res = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json', {
+    const res = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json', { signal: AbortSignal.timeout(5000),
       headers: { 'Accept': 'application/json' }
     });
     if (!res.ok) throw new Error(`BMKG Error: ${res.status}`);

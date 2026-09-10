@@ -14,7 +14,7 @@ export async function fetchAirQualityData(lat, lon, forceRefresh = false) {
   try {
     const url = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&current=us_aqi,pm2_5,pm10,carbon_monoxide,nitrogen_dioxide,sulphur_dioxide,ozone,dust&hourly=us_aqi,pm2_5,pm10,carbon_monoxide,ozone&timezone=Asia%2FJakarta&forecast_days=3`;
     
-    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' }, signal: AbortSignal.timeout(6000) });
     if (!res.ok) throw new Error(`Open-Meteo Air Quality status: ${res.status}`);
     const data = await res.json();
 
