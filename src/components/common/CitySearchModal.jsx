@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect, useDeferredValue } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Search, X, MapPin, ChevronRight, Compass, Flame } from 'lucide-react';
 import { INDONESIA_CITIES, REGIONS } from '../../utils/cities';
 
@@ -54,9 +54,11 @@ export function CitySearchModal({ isOpen, onClose, onSelectCity, currentCity = {
          city.region.toLowerCase().includes(q))
       );
     });
-  }, [deferredSearch, selectedRegion]);
+  }, [searchTerm, selectedRegion]);
 
   if (!isOpen) return null;
+
+  const currentCityCleanName = currentCity?.name ? currentCity.name.replace(' (GPS)', '') : '';
 
   return (
     <div
@@ -243,7 +245,7 @@ export function CitySearchModal({ isOpen, onClose, onSelectCity, currentCity = {
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.45rem' }}>
               {filteredCities.slice(0, 80).map((city) => {
-                const isSelected = currentCity?.name ? currentCity.name.replace(' (GPS)', '') === city.name : false;
+                const isSelected = currentCityCleanName ? currentCityCleanName === city.name : false;
                 return (
                   <div
                     key={city.name}
@@ -311,3 +313,5 @@ export function CitySearchModal({ isOpen, onClose, onSelectCity, currentCity = {
     </div>
   );
 }
+
+export default CitySearchModal;
