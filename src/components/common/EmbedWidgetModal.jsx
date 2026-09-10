@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Copy, Check, Globe, Code2 } from 'lucide-react';
+import { X, Copy, Check, Globe, Code2, Leaf } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi';
 
 export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, weatherData }) {

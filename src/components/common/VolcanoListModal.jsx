@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Flame, X, Search } from 'lucide-react';
+import { Flame, X, Search, MapPin } from 'lucide-react';
 import { getNearbyVolcanoes } from '../../services/volcano';
 
 const REGIONS = ['Semua', 'Jawa', 'Sumatera', 'Bali & Nusa Tenggara', 'Sulawesi', 'Maluku'];
