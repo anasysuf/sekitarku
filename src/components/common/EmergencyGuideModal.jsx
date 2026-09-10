@@ -131,15 +131,19 @@ export function EmergencyGuideModal({ isOpen, onClose }) {
         </div>
 
         {/* Tab Navigation with Clean Responsive Touch Bar */}
-        <div style={{
+        <div className="no-scrollbar" style={{
           display: 'flex',
-          gap: '0.4rem',
-          padding: '0.6rem 0.85rem',
+          gap: '0.45rem',
+          padding: '0.75rem 0.85rem',
           borderBottom: 'var(--border-thick)',
           backgroundColor: 'var(--bg-muted)',
           overflowX: 'auto',
+          overflowY: 'hidden',
+          flexShrink: 0,
+          alignItems: 'center',
           WebkitOverflowScrolling: 'touch',
-          scrollbarWidth: 'none'
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
         }}>
           
           <button
@@ -148,8 +152,7 @@ export function EmergencyGuideModal({ isOpen, onClose }) {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.35rem',
-              padding: '0.45rem 0.8rem',
-              minHeight: '36px',
+              padding: '0.45rem 0.85rem', minHeight: '38px', height: '38px', boxSizing: 'border-box',
               borderRadius: 'var(--radius-sm)',
               fontSize: '0.775rem',
               fontWeight: '800',
@@ -172,8 +175,7 @@ export function EmergencyGuideModal({ isOpen, onClose }) {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.35rem',
-              padding: '0.45rem 0.8rem',
-              minHeight: '36px',
+              padding: '0.45rem 0.85rem', minHeight: '38px', height: '38px', boxSizing: 'border-box',
               borderRadius: 'var(--radius-sm)',
               fontSize: '0.775rem',
               fontWeight: '800',
@@ -196,8 +198,7 @@ export function EmergencyGuideModal({ isOpen, onClose }) {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.35rem',
-              padding: '0.45rem 0.8rem',
-              minHeight: '36px',
+              padding: '0.45rem 0.85rem', minHeight: '38px', height: '38px', boxSizing: 'border-box',
               borderRadius: 'var(--radius-sm)',
               fontSize: '0.775rem',
               fontWeight: '800',
@@ -220,8 +221,7 @@ export function EmergencyGuideModal({ isOpen, onClose }) {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '0.35rem',
-              padding: '0.45rem 0.8rem',
-              minHeight: '36px',
+              padding: '0.45rem 0.85rem', minHeight: '38px', height: '38px', boxSizing: 'border-box',
               borderRadius: 'var(--radius-sm)',
               fontSize: '0.775rem',
               fontWeight: '800',
