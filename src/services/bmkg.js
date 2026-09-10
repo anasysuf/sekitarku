@@ -1,4 +1,4 @@
-import { apiCache } from '../utils/apiCache';
+import { apiCache } from '../utils/apiCache.js';
 
 /**
  * Layanan data gempa bumi BMKG dengan cache 3 menit

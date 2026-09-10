@@ -1,5 +1,5 @@
-import { apiCache } from '../utils/apiCache';
-import { calculateFdrs, getNearbyHotspots } from '../utils/karhutla';
+import { apiCache } from '../utils/apiCache.js';
+import { calculateFdrs, getNearbyHotspots } from '../utils/karhutla.js';
 
 /**
  * Layanan data Karhutla (Kebakaran Hutan & Lahan) & Hotspot Satelit BMKG / NASA FIRMS

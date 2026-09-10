@@ -1,4 +1,4 @@
-import { apiCache } from '../utils/apiCache';
+import { apiCache } from '../utils/apiCache.js';
 
 /**
  * Open-Meteo Air Quality API with 5-minute TTL Cache

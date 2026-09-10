@@ -1,4 +1,4 @@
-import { apiCache } from '../utils/apiCache';
+import { apiCache } from '../utils/apiCache.js';
 
 /**
  * Open-Meteo Weather Service with 5-minute TTL Cache

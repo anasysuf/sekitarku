@@ -1,6 +1,6 @@
-import { INDONESIA_VOLCANOES, VOLCANO_STATUS_LEVELS } from '../utils/volcanoes';
-import { calculateDistance } from '../utils/geo';
-import { apiCache } from '../utils/apiCache';
+import { INDONESIA_VOLCANOES, VOLCANO_STATUS_LEVELS } from '../utils/volcanoes.js';
+import { calculateDistance } from '../utils/geo.js';
+import { apiCache } from '../utils/apiCache.js';
 
 /**
  * Layanan Monitoring Vulkanologi & Gunung Api PVMBG / MAGMA Indonesia
