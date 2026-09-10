@@ -14,11 +14,12 @@ import { INDONESIA_CITIES } from './utils/cities';
 import { apiCache } from './utils/apiCache';
 import { useGeolocation } from './hooks/useGeolocation';
 import { useDarkMode } from './hooks/useDarkMode';
+import { triggerHaptic } from './utils/haptics';
 import { fetchWeatherData, getDefaultWeather } from './services/weather';
 import { fetchAirQualityData, getDefaultAqi } from './services/airQuality';
 import { fetchLatestEarthquake, fetchRecentEarthquakes, getDefaultEarthquake } from './services/bmkg';
 import { i18n } from './utils/i18n';
-import { Download, AlertTriangle, X, Loader2 } from 'lucide-react';
+import { Download, AlertTriangle, X, Loader2, WifiOff } from 'lucide-react';
 
 // Lazy load heavy components for peak initial load speed & performance
 const AqiChart = lazy(() =>
@@ -130,6 +131,34 @@ export function App() {
 
   // Notification state
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  // Online / Offline Status
+  const [isOnline, setIsOnline] = useState(() => typeof navigator !== 'undefined' ? navigator.onLine : true);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Dynamic SEO Title & Meta Tag Synchronization
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const aqiStr = airQualityData?.current?.aqi ? `AQI ${airQualityData.current.aqi}` : 'Real-Time';
+      document.title = `Sekitarku: ${location.name} • ${aqiStr} & Cuaca BMKG`;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        metaDesc.setAttribute(
+          'content',
+          `Pantauan kualitas udara (${aqiStr}), suhu ${weatherData?.current?.temp || 29}°C, gempa BMKG & karhutla di ${location.name}, ${location.province}.`
+        );
+      }
+    }
+  }, [location.name, location.province, airQualityData?.current?.aqi, weatherData?.current?.temp]);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e) => {
@@ -262,7 +291,36 @@ export function App() {
     loadData();
   }, [location?.lat, location?.lon]);
 
+  // Touch Pull-to-Refresh on Mobile
+  const [touchStart, setTouchStart] = useState(0);
+  const [isPulling, setIsPulling] = useState(false);
+
+  const handleTouchStart = (e) => {
+    if (window.scrollY === 0 && e.touches.length === 1) {
+      setTouchStart(e.touches[0].clientY);
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (touchStart > 0 && window.scrollY === 0) {
+      const dist = e.touches[0].clientY - touchStart;
+      if (dist > 70) {
+        setIsPulling(true);
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (isPulling) {
+      triggerHaptic(20);
+      handleManualRefresh();
+    }
+    setTouchStart(0);
+    setIsPulling(false);
+  };
+
   const handleManualRefresh = () => {
+    triggerHaptic(15);
     loadEarthquakeData(true);
     loadData(true);
   };
@@ -296,7 +354,7 @@ export function App() {
   }
 
   return (
-    <div className="app-container">
+    <div className="app-container" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
       {/* Header */}
       <Header
         location={location}
@@ -413,6 +471,26 @@ export function App() {
               <X size={16} />
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Offline Mode Indicator */}
+      {!isOnline && (
+        <div style={{
+          backgroundColor: '#92400e',
+          color: '#fef3c7',
+          padding: '0.55rem 1rem',
+          borderRadius: 'var(--radius-md)',
+          marginBottom: '1rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.5rem',
+          fontSize: '0.8rem',
+          fontWeight: '700'
+        }}>
+          <WifiOff size={16} />
+          <span>Mode Offline: Menampilkan data cache lokal terakhir.</span>
         </div>
       )}
 

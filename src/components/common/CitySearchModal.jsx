@@ -1,6 +1,9 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Search, X, MapPin, ChevronRight, Compass, Flame } from 'lucide-react';
 import { INDONESIA_CITIES, REGIONS } from '../../utils/cities';
+import { fetchWeatherData } from '../../services/weather';
+import { fetchAirQualityData } from '../../services/airQuality';
+import { triggerHaptic } from '../../utils/haptics';
 
 const POPULAR_CITIES = [
   'Jakarta Pusat',
@@ -55,6 +58,13 @@ export function CitySearchModal({ isOpen, onClose, onSelectCity, currentCity = {
       );
     });
   }, [searchTerm, selectedRegion]);
+
+  // Prefetch city data into cache on hover/touch for instant click response
+  const prefetchCityData = (city) => {
+    if (!city?.lat || !city?.lon) return;
+    fetchWeatherData(city.lat, city.lon, false).catch(() => {});
+    fetchAirQualityData(city.lat, city.lon, false).catch(() => {});
+  };
 
   if (!isOpen) return null;
 
@@ -172,7 +182,10 @@ export function CitySearchModal({ isOpen, onClose, onSelectCity, currentCity = {
                 return (
                   <button
                     key={name}
+                    onMouseEnter={() => prefetchCityData(cityObj)}
+                    onTouchStart={() => prefetchCityData(cityObj)}
                     onClick={() => {
+                      triggerHaptic(12);
                       onSelectCity(cityObj);
                       onClose();
                     }}
@@ -208,7 +221,7 @@ export function CitySearchModal({ isOpen, onClose, onSelectCity, currentCity = {
             {REGIONS.map((r) => (
               <button
                 key={r}
-                onClick={() => setSelectedRegion(r)}
+                onClick={() => { triggerHaptic(8); setSelectedRegion(r); }}
                 style={{
                   padding: '4px 10px',
                   borderRadius: 'var(--radius-full)',
@@ -249,7 +262,10 @@ export function CitySearchModal({ isOpen, onClose, onSelectCity, currentCity = {
                 return (
                   <div
                     key={city.name}
+                    onMouseEnter={() => prefetchCityData(city)}
+                    onTouchStart={() => prefetchCityData(city)}
                     onClick={() => {
+                      triggerHaptic(12);
                       onSelectCity(city);
                       onClose();
                     }}

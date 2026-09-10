@@ -1,14 +1,14 @@
 /**
- * Smart Client-side API Cache with TTL (Time To Live)
- * Uses in-memory Map with fallback to sessionStorage for lightning fast instant city navigation.
+ * Persistent Client-side API Cache with TTL (Time To Live)
+ * Uses in-memory Map + localStorage for instant 0ms offline & cross-session performance.
  */
 
 const memoryCache = new Map();
-const DEFAULT_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const DEFAULT_TTL_MS = 15 * 60 * 1000; // 15 minutes TTL
 
 export const apiCache = {
   get(key) {
-    // 1. Check memory cache
+    // 1. Check memory cache first
     const memItem = memoryCache.get(key);
     if (memItem) {
       if (Date.now() < memItem.expiry) {
@@ -17,21 +17,21 @@ export const apiCache = {
       memoryCache.delete(key);
     }
 
-    // 2. Check sessionStorage
+    // 2. Check localStorage
     try {
-      if (typeof window !== 'undefined' && window.sessionStorage) {
-        const raw = sessionStorage.getItem('sekitarku_cache_' + key);
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const raw = localStorage.getItem('sekitarku_cache_' + key);
         if (raw) {
           const parsed = JSON.parse(raw);
           if (Date.now() < parsed.expiry) {
             memoryCache.set(key, parsed);
             return parsed.data;
           }
-          sessionStorage.removeItem('sekitarku_cache_' + key);
+          localStorage.removeItem('sekitarku_cache_' + key);
         }
       }
     } catch {
-      // Ignore sessionStorage errors (e.g. quota or incognito)
+      // Storage quota or private browsing fallback
     }
 
     return null;
@@ -48,23 +48,28 @@ export const apiCache = {
     memoryCache.set(key, item);
 
     try {
-      if (typeof window !== 'undefined' && window.sessionStorage) {
-        sessionStorage.setItem('sekitarku_cache_' + key, JSON.stringify(item));
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem('sekitarku_cache_' + key, JSON.stringify(item));
       }
     } catch {
-      // Storage quota exceeded or disabled
+      // Auto-cleanup oldest cache items if quota exceeded
+      try {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          const keys = Object.keys(localStorage).filter(k => k.startsWith('sekitarku_cache_'));
+          keys.slice(0, 10).forEach(k => localStorage.removeItem(k));
+          localStorage.setItem('sekitarku_cache_' + key, JSON.stringify(item));
+        }
+      } catch {}
     }
   },
 
   clear() {
     memoryCache.clear();
     try {
-      if (typeof window !== 'undefined' && window.sessionStorage) {
-        const keys = Object.keys(sessionStorage).filter(k => k.startsWith('sekitarku_cache_'));
-        keys.forEach(k => sessionStorage.removeItem(k));
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const keys = Object.keys(localStorage).filter(k => k.startsWith('sekitarku_cache_'));
+        keys.forEach(k => localStorage.removeItem(k));
       }
-    } catch {
-      // Ignore
-    }
+    } catch {}
   }
 };
