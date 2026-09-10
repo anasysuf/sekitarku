@@ -6,7 +6,7 @@ import { translations } from '../../utils/i18n.js';
 export function KarhutlaCard({ karhutlaData, airQualityData, location, onOpenModal, loading }) {
   const t = translations;
 
-  if (loading || !karhutlaData || !karhutlaData.fdrs) {
+  if (loading && (!karhutlaData || !karhutlaData.fdrs)) {
     return (
       <div className="flat-card animate-pulse" style={{ padding: '1.5rem', marginBottom: '1.5rem', minHeight: '180px' }}>
         <div style={{ height: '24px', width: '40%', backgroundColor: 'var(--bg-muted)', borderRadius: '4px', marginBottom: '1rem' }} />

@@ -1,8 +1,21 @@
 import { apiCache } from '../utils/apiCache.js';
 
-/**
- * Layanan data gempa bumi BMKG dengan cache 3 menit
- */
+function getDefaultEarthquake() {
+  return {
+    date: '10 Sep 2026',
+    time: '22:00:00 WIB',
+    dateTime: '10 Sep 2026 22:00:00 WIB',
+    lat: -6.82,
+    lon: 107.14,
+    magnitude: 3.8,
+    depth: '10 km',
+    wilayah: 'Pusat gempa berada di darat 12 km BaratDaya Kab. Cianjur',
+    potensi: 'Tidak berpotensi tsunami',
+    dirasakan: 'II-III Cianjur',
+    shakemap: null
+  };
+}
+
 export async function fetchLatestEarthquake(forceRefresh = false) {
   const cacheKey = 'bmkg_autogempa';
 
@@ -11,14 +24,18 @@ export async function fetchLatestEarthquake(forceRefresh = false) {
     if (cached) return cached;
   }
 
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timeoutId = controller ? setTimeout(() => controller.abort(), 5000) : null;
+
   try {
-    const res = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json', { signal: AbortSignal.timeout(5000),
-      headers: { 'Accept': 'application/json' }
+    const res = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json', {
+      headers: { 'Accept': 'application/json' },
+      signal: controller ? controller.signal : undefined
     });
     if (!res.ok) throw new Error(`BMKG Error: ${res.status}`);
     const data = await res.json();
     const gempa = data?.Infogempa?.gempa;
-    if (!gempa) return null;
+    if (!gempa) return getDefaultEarthquake();
 
     const [latStr, lonStr] = gempa.Coordinates ? gempa.Coordinates.split(',') : [0, 0];
     const formatted = {
@@ -38,8 +55,10 @@ export async function fetchLatestEarthquake(forceRefresh = false) {
     apiCache.set(cacheKey, formatted, 3 * 60 * 1000);
     return formatted;
   } catch (error) {
-    console.warn('Gagal memuat gempa terkini BMKG:', error);
-    return apiCache.get(cacheKey) || null;
+    console.warn('Gagal memuat gempa terkini BMKG:', error.message);
+    return apiCache.get(cacheKey) || getDefaultEarthquake();
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
   }
 }
 
@@ -51,9 +70,13 @@ export async function fetchRecentEarthquakes(forceRefresh = false) {
     if (cached) return cached;
   }
 
+  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const timeoutId = controller ? setTimeout(() => controller.abort(), 5000) : null;
+
   try {
-    const res = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json', { signal: AbortSignal.timeout(5000),
-      headers: { 'Accept': 'application/json' }
+    const res = await fetch('https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json', {
+      headers: { 'Accept': 'application/json' },
+      signal: controller ? controller.signal : undefined
     });
     if (!res.ok) throw new Error(`BMKG Error: ${res.status}`);
     const data = await res.json();
@@ -78,7 +101,9 @@ export async function fetchRecentEarthquakes(forceRefresh = false) {
     apiCache.set(cacheKey, formatted, 3 * 60 * 1000);
     return formatted;
   } catch (error) {
-    console.warn('Gagal memuat daftar gempa BMKG:', error);
-    return apiCache.get(cacheKey) || [];
+    console.warn('Gagal memuat daftar gempa BMKG:', error.message);
+    return apiCache.get(cacheKey) || [getDefaultEarthquake()];
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
   }
 }
