@@ -8,7 +8,9 @@ import { apiCache } from '../utils/apiCache.js';
 export function getNearbyVolcanoes(lat, lon, maxRadiusKm = 250) {
   if (!lat || !lon) return { nearest: null, list: [], alertCount: 0 };
 
-  const cacheKey = `volcano_${lat.toFixed(2)}_${lon.toFixed(2)}`;
+  const safeLat = Number(lat) || -6.2088;
+  const safeLon = Number(lon) || 106.8456;
+  const cacheKey = `volcano_${safeLat.toFixed(2)}_${safeLon.toFixed(2)}`;
   const cached = apiCache.get(cacheKey);
   if (cached) return cached;
 

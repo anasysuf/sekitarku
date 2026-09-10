@@ -202,8 +202,10 @@ export function App() {
   // Load City-Specific Data (Weather, AQI, Karhutla) with Instant SWR Cache
   const loadData = async (force = false) => {
     // 1. Check synchronous cache first for instant 0ms UI render
-    const cachedWeather = apiCache.get(`weather_${location.lat.toFixed(3)}_${location.lon.toFixed(3)}`);
-    const cachedAqi = apiCache.get(`aqi_${location.lat.toFixed(3)}_${location.lon.toFixed(3)}`);
+    const safeLat = Number(location?.lat) || -6.2088;
+    const safeLon = Number(location?.lon) || 106.8456;
+    const cachedWeather = apiCache.get(`weather_${safeLat.toFixed(3)}_${safeLon.toFixed(3)}`);
+    const cachedAqi = apiCache.get(`aqi_${safeLat.toFixed(3)}_${safeLon.toFixed(3)}`);
 
     if (cachedWeather && cachedAqi && !force) {
       setWeatherData(cachedWeather);
@@ -257,7 +259,7 @@ export function App() {
 
   useEffect(() => {
     loadData();
-  }, [location.lat, location.lon]);
+  }, [location?.lat, location?.lon]);
 
   const handleManualRefresh = () => {
     loadEarthquakeData(true);
