@@ -255,6 +255,10 @@ export function App() {
     }
   };
 
+  useEffect(() => {
+    loadData();
+  }, [location.lat, location.lon]);
+
   const handleManualRefresh = () => {
     loadEarthquakeData(true);
     loadData(true);
