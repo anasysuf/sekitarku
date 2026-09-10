@@ -32,7 +32,7 @@ export function ShareCardModal({
   const weatherVisual = getWeatherVisual(weatherCode, lang);
   const dateFormatted = formatFullCurrentDate(new Date(), lang);
 
-  const fdrs = karhutlaData?.fdrs || { code: 'AMAN', label: 'Aman / Rendah', color: '#10b981' };
+  const fdrs = karhutlaData?.fdrs || { code: 'AMAN', label: 'Aman / Rendah', desc: 'Kondisi tanah & vegetasi basah. Sangat kecil kemungkinan kebakaran.', color: '#10b981', bg: '#ecfdf5' };
   const nearestFire = karhutlaData?.nearest;
 
   const shareText = `🌿 Pantauan Lingkungan ${location.name} (${dateFormatted}):\n• Kualitas Udara (AQI): ${aqi} (${aqiInfo.label})\n• Cuaca: ${temp}°C, ${weatherVisual.label}\n• Skor Kesehatan Lingkungan: ${health.score}/100 (${health.category})\n• Indeks Karhutla (FDRS): ${fdrs.code} (${fdrs.label})\n${latestEarthquake ? `• Gempa Terkini: M ${latestEarthquake.magnitude} (${latestEarthquake.wilayah})\n` : ''}🌐 Cek real-time di https://sekitarku.vercel.app`;
@@ -45,30 +45,30 @@ export function ShareCardModal({
       canvas.height = 1920;
       const ctx = canvas.getContext('2d');
 
-      // 1. Clean Canvas Background
+      // 1. Background
       ctx.fillStyle = '#F8FAFC';
       ctx.fillRect(0, 0, 1080, 1920);
 
-      // Top Decorative Brand Banner
+      // Top Brand Stripe
       ctx.fillStyle = '#10B981';
-      ctx.fillRect(0, 0, 1080, 24);
+      ctx.fillRect(0, 0, 1080, 20);
 
       // Helper for clean rounded cards
-      const drawCard = (x, y, w, h, fill, border) => {
+      const drawCard = (x, y, w, h, fill, border, radius = 24) => {
         ctx.beginPath();
         if (ctx.roundRect) {
-          ctx.roundRect(x, y, w, h, 28);
+          ctx.roundRect(x, y, w, h, radius);
         } else {
           ctx.rect(x, y, w, h);
         }
         ctx.fillStyle = fill;
         ctx.fill();
         ctx.strokeStyle = border;
-        ctx.lineWidth = 4;
+        ctx.lineWidth = 3;
         ctx.stroke();
       };
 
-      // Helper: Draw Wrapped and Truncated Text
+      // Helper: Draw Wrapped Text with Strict Bounds
       const drawWrappedText = (text, x, y, maxWidth, lineHeight, maxLines = 2) => {
         if (!text) return y;
         const words = String(text).split(' ');
@@ -100,147 +100,170 @@ export function ShareCardModal({
         return currentY;
       };
 
-      // --- HEADER SECTION ---
+      // ==========================================
+      // 1. HEADER SECTION (y: 60 - 140)
+      // ==========================================
       ctx.fillStyle = '#10B981';
-      ctx.font = 'bold 38px sans-serif';
-      ctx.fillText('SEKITARKU', 80, 110);
+      ctx.font = 'bold 36px sans-serif';
+      ctx.fillText('SEKITARKU', 80, 95);
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '700 20px sans-serif';
+      ctx.fillText('LAPORAN RESMI KONDISI LINGKUNGAN & MITIGASI BENCANA', 80, 130);
+
+      // ==========================================
+      // 2. HERO LOCATION CARD (y: 170, h: 260)
+      // ==========================================
+      drawCard(80, 170, 920, 260, '#FFFFFF', '#E2E8F0');
+
+      ctx.fillStyle = '#0F172A';
+      ctx.font = 'bold 56px sans-serif';
+      ctx.fillText(location.name.substring(0, 24), 120, 250);
 
       ctx.fillStyle = '#64748B';
       ctx.font = '600 24px sans-serif';
-      ctx.fillText('LAPORAN RESMI KONDISI LINGKUNGAN & MITIGASI BENCANA', 80, 150);
+      ctx.fillText(`${location.province || 'Indonesia'} · ${dateFormatted}`, 120, 295);
 
-      // --- HERO CARD: LOCATION & HEALTH SCORE (y: 200, h: 320) ---
-      drawCard(80, 200, 920, 320, '#FFFFFF', '#E2E8F0');
-
-      ctx.fillStyle = '#0F172A';
-      ctx.font = 'bold 64px sans-serif';
-      ctx.fillText(location.name.substring(0, 22), 125, 290);
-
-      ctx.fillStyle = '#64748B';
-      ctx.font = '600 28px sans-serif';
-      ctx.fillText(`${location.province || 'Indonesia'} · ${dateFormatted}`, 125, 340);
-
-      // Eco Health Score Badge
+      // Eco Health Score Pill (Clean & Fitted)
       const scoreBg = health.score >= 80 ? '#ECFDF5' : health.score >= 50 ? '#FEF3C7' : '#FEE2E2';
       const scoreColor = health.score >= 80 ? '#059669' : health.score >= 50 ? '#D97706' : '#DC2626';
 
-      drawCard(125, 380, 830, 100, scoreBg, scoreColor);
+      drawCard(120, 330, 840, 70, scoreBg, scoreColor, 16);
       ctx.fillStyle = scoreColor;
-      ctx.font = 'bold 36px sans-serif';
-      ctx.fillText(`Skor Kesehatan Lingkungan: ${health.score}/100 (${health.category})`, 160, 444);
+      ctx.font = 'bold 26px sans-serif';
+      ctx.fillText(`Skor Kesehatan: ${health.score}/100 (${health.category})`, 150, 374);
 
-      // --- ROW 1: AQI & WEATHER (y: 560, h: 420) ---
+      // ==========================================
+      // 3. ROW 1: AQI & WEATHER (y: 460, h: 360)
+      // ==========================================
       
-      // AQI CARD (Left)
-      drawCard(80, 560, 440, 420, '#FFFFFF', '#E2E8F0');
+      // Left: AQI Card
+      drawCard(80, 460, 445, 360, '#FFFFFF', '#E2E8F0');
 
       ctx.fillStyle = aqiInfo.color;
-      ctx.font = 'bold 24px sans-serif';
-      ctx.fillText('KUALITAS UDARA (AQI)', 120, 620);
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillText('KUALITAS UDARA (AQI)', 115, 510);
 
       ctx.fillStyle = aqiInfo.color;
-      ctx.font = 'bold 96px sans-serif';
-      ctx.fillText(String(aqi), 120, 725);
+      ctx.font = 'bold 80px sans-serif';
+      ctx.fillText(String(aqi), 115, 600);
 
       ctx.fillStyle = '#0F172A';
-      ctx.font = 'bold 34px sans-serif';
-      ctx.fillText(aqiInfo.label.substring(0, 18), 120, 785);
+      ctx.font = 'bold 26px sans-serif';
+      drawWrappedText(aqiInfo.label, 115, 650, 375, 32, 2);
 
       ctx.fillStyle = '#64748B';
-      ctx.font = '500 24px sans-serif';
-      ctx.fillText(`PM2.5: ${pm25} µg/m³`, 120, 835);
-      ctx.fillText('Standar US-EPA & ISPU', 120, 875);
+      ctx.font = '600 20px sans-serif';
+      ctx.fillText(`PM2.5: ${pm25} µg/m³`, 115, 740);
+      ctx.fillText('Standar US-EPA & ISPU', 115, 775);
 
-      // WEATHER CARD (Right)
-      drawCard(560, 560, 440, 420, '#FFFFFF', '#E2E8F0');
+      // Right: Weather Card
+      drawCard(555, 460, 445, 360, '#FFFFFF', '#E2E8F0');
 
       ctx.fillStyle = '#0284C7';
-      ctx.font = 'bold 24px sans-serif';
-      ctx.fillText('CUACA & SUHU', 600, 620);
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillText('CUACA & SUHU', 590, 510);
 
       ctx.fillStyle = '#0F172A';
-      ctx.font = 'bold 96px sans-serif';
-      ctx.fillText(`${temp}°C`, 600, 725);
+      ctx.font = 'bold 80px sans-serif';
+      ctx.fillText(`${temp}°C`, 590, 600);
 
       ctx.fillStyle = '#0F172A';
-      ctx.font = 'bold 34px sans-serif';
-      ctx.fillText(weatherVisual.label.substring(0, 18), 600, 785);
+      ctx.font = 'bold 26px sans-serif';
+      drawWrappedText(weatherVisual.label, 590, 650, 375, 32, 2);
 
       ctx.fillStyle = '#64748B';
-      ctx.font = '500 24px sans-serif';
-      ctx.fillText(`Kelembapan: ${humidity}%`, 600, 835);
-      ctx.fillText(`Indeks Radiasi UV: ${uvIndex}`, 600, 875);
+      ctx.font = '600 20px sans-serif';
+      ctx.fillText(`Kelembapan: ${humidity}%`, 590, 740);
+      ctx.fillText(`Indeks Radiasi UV: ${uvIndex}`, 590, 775);
 
-      // --- ROW 2: EARTHQUAKE (y: 1020, h: 330) ---
-      drawCard(80, 1020, 920, 330, '#FFFFFF', '#E2E8F0');
+      // ==========================================
+      // 4. ROW 2: GEMPA TERKINI (y: 850, h: 300)
+      // ==========================================
+      drawCard(80, 850, 920, 300, '#FFFFFF', '#E2E8F0');
 
       ctx.fillStyle = '#DC2626';
-      ctx.font = 'bold 26px sans-serif';
-      ctx.fillText('⚡ GEMPA BUMI TERKINI (BMKG)', 125, 1080);
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText('⚡ GEMPA BUMI TERKINI (BMKG)', 120, 905);
 
       if (latestEarthquake) {
         // Magnitude Pill
-        drawCard(125, 1115, 200, 80, '#FEE2E2', '#DC2626');
+        drawCard(120, 935, 170, 75, '#FEE2E2', '#DC2626', 16);
         ctx.fillStyle = '#DC2626';
-        ctx.font = 'bold 44px sans-serif';
-        ctx.fillText(`M ${latestEarthquake.magnitude}`, 160, 1172);
+        ctx.font = 'bold 38px sans-serif';
+        ctx.fillText(`M ${latestEarthquake.magnitude}`, 150, 987);
 
+        // Location text
         ctx.fillStyle = '#0F172A';
-        ctx.font = 'bold 28px sans-serif';
-        drawWrappedText(latestEarthquake.wilayah, 355, 1145, 600, 38, 2);
+        ctx.font = 'bold 24px sans-serif';
+        drawWrappedText(latestEarthquake.wilayah || 'Wilayah Indonesia', 315, 965, 640, 34, 2);
 
+        // Sub details
+        const depthVal = latestEarthquake.depth || latestEarthquake.kedalaman || '-';
         ctx.fillStyle = '#64748B';
-        ctx.font = '500 22px sans-serif';
-        ctx.fillText(`Kedalaman: ${latestEarthquake.kedalaman} · ${latestEarthquake.date} ${latestEarthquake.time}`, 125, 1255);
-        ctx.fillText(latestEarthquake.potensi || 'Tidak berpotensi tsunami', 125, 1290);
+        ctx.font = '600 20px sans-serif';
+        ctx.fillText(`Kedalaman: ${depthVal} · ${latestEarthquake.date || ''} ${latestEarthquake.time || ''}`, 120, 1055);
+        ctx.fillText(latestEarthquake.potensi || 'Tidak berpotensi tsunami', 120, 1090);
       } else {
         ctx.fillStyle = '#64748B';
-        ctx.font = '500 28px sans-serif';
-        ctx.fillText('Tidak ada aktivitas gempa signifikan baru terdeteksi.', 125, 1180);
+        ctx.font = '600 24px sans-serif';
+        ctx.fillText('Tidak ada aktivitas gempa signifikan baru terdeteksi.', 120, 980);
       }
 
-      // --- ROW 3: FOREST FIRE / KARHUTLA & FDRS (y: 1390, h: 290) ---
-      drawCard(80, 1390, 920, 290, '#FFFFFF', '#E2E8F0');
+      // ==========================================
+      // 5. ROW 3: POTENSI KARHUTLA & HOTSPOT (y: 1180, h: 320)
+      // ==========================================
+      drawCard(80, 1180, 920, 320, '#FFFFFF', '#E2E8F0');
 
       ctx.fillStyle = '#EA580C';
-      ctx.font = 'bold 26px sans-serif';
-      ctx.fillText('🔥 POTENSI KARHUTLA & TITIK PANAS SATELIT', 125, 1450);
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText('🔥 POTENSI KARHUTLA & TITIK PANAS SATELIT', 120, 1235);
 
       // FDRS Badge
-      drawCard(125, 1485, 280, 75, fdrs.bg || '#ECFDF5', fdrs.color || '#10B981');
-      ctx.fillStyle = fdrs.color || '#10B981';
-      ctx.font = 'bold 28px sans-serif';
-      ctx.fillText(`FDRS: ${fdrs.code}`, 155, 1535);
+      const fdrsColor = fdrs.color || '#10B981';
+      const fdrsBg = fdrs.bg || '#ECFDF5';
+      drawCard(120, 1265, 260, 65, fdrsBg, fdrsColor, 16);
+
+      ctx.fillStyle = fdrsColor;
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText(`FDRS: ${fdrs.code}`, 150, 1307);
 
       ctx.fillStyle = '#0F172A';
-      ctx.font = 'bold 26px sans-serif';
-      ctx.fillText(fdrs.label, 430, 1520);
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillText(fdrs.label, 410, 1307);
 
-      ctx.fillStyle = '#64748B';
-      ctx.font = '500 22px sans-serif';
+      // FDRS condition desc
+      ctx.fillStyle = '#475569';
+      ctx.font = '500 20px sans-serif';
+      drawWrappedText(fdrs.desc, 120, 1370, 840, 28, 2);
+
+      // Hotspot Info
+      ctx.fillStyle = nearestFire && nearestFire.distanceKm <= 50 ? '#DC2626' : '#64748B';
+      ctx.font = '600 20px sans-serif';
       if (nearestFire) {
-        ctx.fillText(`Titik Panas Terdekat: ${nearestFire.regency} (${nearestFire.distanceKm} km dari lokasi)`, 125, 1600);
-        ctx.fillText(`Satelit: ${nearestFire.satellite} · Tipe: ${nearestFire.type}`, 125, 1635);
+        ctx.fillText(`Titik Panas Terdekat: ${nearestFire.regency} (${nearestFire.distanceKm} km dari lokasi) · Satelit ${nearestFire.satellite}`, 120, 1450);
       } else {
-        ctx.fillText('Nihil titik panas aktif dalam radius 400 km.', 125, 1600);
+        ctx.fillText('Nihil titik panas aktif dalam radius 400 km.', 120, 1450);
       }
 
-      // --- FOOTER SECTION (y: 1720) ---
+      // ==========================================
+      // 6. FOOTER SECTION (y: 1540 - 1880)
+      // ==========================================
       ctx.strokeStyle = '#E2E8F0';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(80, 1720);
-      ctx.lineTo(1000, 1720);
+      ctx.moveTo(80, 1550);
+      ctx.lineTo(1000, 1550);
       ctx.stroke();
 
       ctx.fillStyle = '#0F172A';
       ctx.font = 'bold 36px sans-serif';
-      ctx.fillText('sekitarku.vercel.app', 80, 1780);
+      ctx.fillText('sekitarku.vercel.app', 80, 1610);
 
       ctx.fillStyle = '#64748B';
       ctx.font = '500 22px sans-serif';
-      ctx.fillText('Sumber Resmi: BMKG, PVMBG Magma, NASA FIRMS & Copernicus', 80, 1825);
-      ctx.fillText('Data diperbarui secara real-time untuk mitigasi bencana', 80, 1855);
+      ctx.fillText('Sumber Resmi: BMKG, PVMBG Magma, NASA FIRMS & Copernicus', 80, 1655);
+      ctx.fillText('Data diperbarui secara real-time untuk mitigasi bencana', 80, 1690);
 
       // Export as Blob
       canvas.toBlob((blob) => {
@@ -426,7 +449,7 @@ export function ShareCardModal({
               <span style={{ fontSize: '0.675rem', fontWeight: '800', color: '#ea580c', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <Flame size={13} /> POTENSI KARHUTLA & TITIK PANAS (BMKG & NASA)
               </span>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.35rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.35rem', flexWrap: 'wrap', gap: '0.35rem' }}>
                 <span style={{
                   fontSize: '0.75rem',
                   fontWeight: '800',
