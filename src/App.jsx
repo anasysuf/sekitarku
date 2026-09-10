@@ -451,11 +451,11 @@ export function App() {
         <div className="pwa-banner animate-fade-in">
           <div className="pwa-banner-content">
             <div className="pwa-banner-icon">
-              <Download size={16} strokeWidth={2.5} />
+              <Download size={18} strokeWidth={2.5} />
             </div>
             <div className="pwa-banner-text">
-              <span className="pwa-banner-title">Pasang Sekitarku di HP</span>
-              <span className="pwa-banner-desc">Akses instan di layar utama & dapat digunakan saat offline.</span>
+              <span className="pwa-banner-title">Pasang Aplikasi Sekitarku</span>
+              <span className="pwa-banner-desc">Akses instan di layar utama HP & siap digunakan secara offline.</span>
             </div>
           </div>
           <div className="pwa-banner-actions">
@@ -467,7 +467,7 @@ export function App() {
             </button>
             <button
               onClick={() => setShowPwaBanner(false)}
-              aria-label="Tutup"
+              aria-label="Tutup Banner PWA"
               className="flat-btn-secondary pwa-btn-close"
             >
               <X size={16} />
@@ -499,13 +499,15 @@ export function App() {
       {/* Critical Alert Banner */}
       {(isAqiAlert || isQuakeAlert) && (
         <div className="alert-banner animate-fade-in">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-            <AlertTriangle size={20} color="var(--color-danger)" style={{ flexShrink: 0 }} />
-            <div>
-              <strong style={{ fontSize: '0.85rem', color: 'var(--color-danger)', display: 'block' }}>
+          <div className="alert-banner-content">
+            <div className="alert-banner-icon">
+              <AlertTriangle size={20} strokeWidth={2.5} />
+            </div>
+            <div className="alert-banner-text">
+              <strong className="alert-banner-title">
                 {isAqiAlert ? t.alertAqiTitle : t.alertQuakeTitle}
               </strong>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-main)', fontWeight: '600' }}>
+              <span className="alert-banner-desc">
                 {isAqiAlert
                   ? `${t.alertAqiDesc} (AQI: ${currentAqi})`
                   : `Gempa M ${latestEarthquake?.magnitude} terjadi di ${latestEarthquake?.wilayah}.`}

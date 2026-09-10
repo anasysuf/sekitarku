@@ -38,63 +38,22 @@ export function Header({
 
   return (
     <header className="app-header">
-      {/* Top Bar: Brand, Live Indicator & Primary Actions */}
-      <div className="header-top-row" style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '0.85rem'
-      }}>
-        
-        {/* Brand & Subtitle */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', minWidth: 0 }}>
-          <div
-            style={{
-              width: '42px',
-              height: '42px',
-              backgroundColor: 'var(--color-secondary)',
-              borderRadius: 'var(--radius-md)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--text-inverse)',
-              flexShrink: 0
-            }}
-          >
+      {/* Top Section: Brand & Primary Action Buttons */}
+      <div className="header-top-row">
+        {/* Brand Information */}
+        <div className="header-brand-box">
+          <div className="header-logo-icon">
             <Compass size={24} strokeWidth={2.5} />
           </div>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-              <h1 style={{ fontSize: '1.35rem', fontWeight: '900', letterSpacing: '-0.03em', margin: 0, color: 'var(--text-main)' }}>
-                {t.appName}
-              </h1>
-              <span style={{
-                fontSize: '0.65rem',
-                fontWeight: '900',
-                padding: '2px 6px',
-                borderRadius: 'var(--radius-sm)',
-                backgroundColor: 'var(--color-secondary)',
-                color: 'var(--text-inverse)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.04em'
-              }}>
-                {t.liveBadge}
-              </span>
+          <div className="header-brand-text">
+            <div className="header-title-wrap">
+              <h1 className="header-title">{t.appName}</h1>
+              <span className="header-live-badge">{t.liveBadge}</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '2px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '0.775rem', color: 'var(--text-muted)', fontWeight: '500' }}>
-                {t.appSubtitle}
-              </span>
-              <span style={{ color: 'var(--text-muted)', fontSize: '0.75rem' }}>•</span>
-              <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '0.25rem',
-                fontSize: '0.725rem',
-                fontWeight: '700',
-                color: 'var(--color-primary)'
-              }}>
+            <div className="header-subtitle-wrap">
+              <span className="header-subtitle">{t.appSubtitle}</span>
+              <span className="header-dot-sep">•</span>
+              <div className="header-date-badge">
                 <Calendar size={12} strokeWidth={2.5} />
                 <span>{formatFullCurrentDate(lastUpdated)}</span>
               </div>
@@ -102,195 +61,106 @@ export function Header({
           </div>
         </div>
 
-        {/* Priority Actions: Share & Emergency */}
-        <div className="header-action-buttons" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+        {/* Priority Actions: Bagikan & Darurat 112 */}
+        <div className="header-action-buttons">
           <button
             onClick={onOpenShare}
             aria-label="Bagikan Laporan"
-            className="flat-btn-secondary header-btn"
-            style={{
-              padding: '0.45rem 0.85rem',
-              minHeight: '38px',
-              color: 'var(--color-primary)',
-              borderColor: 'var(--color-primary)',
-              backgroundColor: 'var(--color-primary-bg)',
-              fontWeight: '700'
-            }}
+            className="flat-btn-secondary header-action-btn header-share-btn"
           >
-            <Share2 size={15} strokeWidth={2.5} />
+            <Share2 size={16} strokeWidth={2.5} />
             <span>{t.share || 'Bagikan'}</span>
           </button>
 
           <button
             onClick={onOpenEmergency}
             aria-label="Kontak Darurat & Tanggap Bencana"
-            className="flat-btn-secondary header-btn"
-            style={{
-              padding: '0.45rem 0.85rem',
-              minHeight: '38px',
-              color: 'var(--color-danger)',
-              borderColor: 'var(--color-danger)',
-              backgroundColor: 'var(--color-danger-bg)',
-              fontWeight: '700'
-            }}
+            className="flat-btn-secondary header-action-btn header-emergency-btn"
           >
-            <ShieldAlert size={15} strokeWidth={2.5} />
+            <ShieldAlert size={16} strokeWidth={2.5} />
             <span>{t.emergency || 'Darurat 112'}</span>
           </button>
         </div>
-
       </div>
 
-      {/* Bottom Bar: Search & Compact Utility Toolbar */}
-      <div className="header-bottom-row" style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        gap: '0.65rem',
-        marginTop: '0.85rem'
-      }}>
-        
-        {/* City Search Bar with integrated GPS trigger */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: '1 1 280px', minWidth: 0 }}>
-          
+      {/* Bottom Section: City Search & Unified Toolbar */}
+      <div className="header-bottom-row">
+        {/* City Search Button */}
+        <div className="header-search-container">
           <button
             onClick={onOpenSearch}
-            className="flat-btn-secondary"
-            style={{
-              flex: 1,
-              justifyContent: 'space-between',
-              padding: '0.5rem 0.85rem',
-              minHeight: '40px',
-              backgroundColor: 'var(--bg-card)'
-            }}
+            className="flat-btn-secondary header-search-btn"
+            aria-label="Cari Kota atau Lokasi"
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: 0 }}>
-              <MapPin size={16} color="var(--color-secondary)" style={{ flexShrink: 0 }} />
-              <div style={{ minWidth: 0, textAlign: 'left' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {displayName}
-                </span>
-                <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {displayProvince}
-                </span>
+            <div className="header-search-left">
+              <MapPin size={17} color="var(--color-secondary)" className="header-pin-icon" />
+              <div className="header-city-details">
+                <span className="header-city-name">{displayName}</span>
+                <span className="header-province-name">{displayProvince}</span>
               </div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', color: 'var(--text-muted)', fontSize: '0.7rem', backgroundColor: 'var(--bg-muted)', padding: '2px 7px', borderRadius: 'var(--radius-sm)', border: 'var(--border-thick)' }}>
-              <Search size={11} />
+            <div className="header-search-pill">
+              <Search size={12} />
               <span>{t.searchCity}</span>
             </div>
           </button>
+        </div>
 
+        {/* Unified Utility Toolbar (GPS, Notification, Refresh, Dark Mode) */}
+        <div className="header-utility-toolbar">
+          {/* GPS Location Trigger */}
           <button
             onClick={onGpsClick}
             disabled={gpsLoading}
             aria-label={t.gps}
             title={t.gps}
-            className={`flat-btn-secondary ${location?.isGps ? 'active' : ''}`}
-            style={{
-              minWidth: '40px',
-              minHeight: '40px',
-              padding: '0',
-              flexShrink: 0
-            }}
+            className={`header-tool-btn ${location?.isGps ? 'active' : ''}`}
           >
-            <Compass size={17} strokeWidth={2.2} className={gpsLoading ? 'animate-spin' : ''} />
+            <Compass size={16} strokeWidth={2.2} className={gpsLoading ? 'animate-spin' : ''} />
+            <span className="header-tool-label">GPS</span>
           </button>
 
-        </div>
-
-        {/* Compact Utility Icons Toolbar */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.35rem',
-          backgroundColor: 'var(--bg-muted)',
-          padding: '3px',
-          borderRadius: 'var(--radius-md)',
-          border: 'var(--border-thick)'
-        }}>
-          
-          {/* Notification */}
+          {/* Notifications */}
           <button
             onClick={onRequestNotification}
             aria-label={notificationsEnabled ? t.notifyActive : t.notifyEnable}
             title={notificationsEnabled ? t.notifyActive : t.notifyEnable}
-            style={{
-              width: '34px',
-              height: '34px',
-              borderRadius: 'var(--radius-sm)',
-              border: notificationsEnabled ? '1px solid var(--color-secondary)' : 'none',
-              backgroundColor: notificationsEnabled ? 'var(--color-secondary-bg)' : 'transparent',
-              color: notificationsEnabled ? 'var(--color-secondary)' : 'var(--text-main)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              transition: 'transform var(--anim-fast)'
-            }}
+            className={`header-tool-btn ${notificationsEnabled ? 'active-notify' : ''}`}
           >
-            {notificationsEnabled ? <BellRing size={15} strokeWidth={2.5} /> : <Bell size={15} strokeWidth={2.2} />}
+            {notificationsEnabled ? <BellRing size={16} strokeWidth={2.5} /> : <Bell size={16} strokeWidth={2.2} />}
           </button>
 
-          {/* Refresh */}
+          {/* Manual Refresh */}
           <button
             onClick={onRefresh}
             aria-label={t.refresh}
             title={t.refresh}
-            style={{
-              width: '34px',
-              height: '34px',
-              borderRadius: 'var(--radius-sm)',
-              border: 'none',
-              backgroundColor: 'transparent',
-              color: 'var(--text-main)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
+            className="header-tool-btn"
           >
-            <RefreshCw size={14} strokeWidth={2.2} />
+            <RefreshCw size={15} strokeWidth={2.2} />
           </button>
 
-          {/* Theme Toggle */}
+          {/* Dark/Light Mode Switcher */}
           <button
             onClick={onToggleDark}
             aria-label={t.themeToggle}
             title={isDark ? 'Beralih ke Mode Terang' : 'Beralih ke Mode Gelap'}
-            style={{
-              height: '34px',
-              padding: '0 9px',
-              borderRadius: 'var(--radius-sm)',
-              border: isDark ? '1px solid var(--color-accent)' : '1px solid var(--color-primary)',
-              backgroundColor: isDark ? 'var(--color-accent-bg)' : 'var(--color-primary-bg)',
-              color: isDark ? 'var(--color-accent)' : 'var(--color-primary)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              fontSize: '0.725rem',
-              fontWeight: '800'
-            }}
+            className="header-tool-btn header-theme-btn"
           >
             {isDark ? (
               <>
-                <Sun size={14} strokeWidth={2.5} />
+                <Sun size={15} strokeWidth={2.5} />
                 <span>{t.lightMode || 'Terang'}</span>
               </>
             ) : (
               <>
-                <Moon size={14} strokeWidth={2.5} />
+                <Moon size={15} strokeWidth={2.5} />
                 <span>{t.darkMode || 'Gelap'}</span>
               </>
             )}
           </button>
-
         </div>
-
       </div>
-
     </header>
   );
 }
