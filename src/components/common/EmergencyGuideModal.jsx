@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldAlert, PhoneCall, AlertTriangle, Wind, Waves, Sun, X, HeartHandshake, ShieldCheck, Flame, Activity } from 'lucide-react';
+import { ShieldAlert, PhoneCall, Wind, Waves, X, Activity } from 'lucide-react';
 
 const EMERGENCY_CONTACTS = [
   {

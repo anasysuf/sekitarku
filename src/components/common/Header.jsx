@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Moon, MapPin, RefreshCw, Compass, Bell, BellRing, Globe, Search, Calendar, Code, Share2, ShieldAlert } from 'lucide-react';
+import { Sun, Moon, MapPin, RefreshCw, Compass, Bell, BellRing, Search, Calendar, Share2, ShieldAlert } from 'lucide-react';
 import { formatFullCurrentDate } from '../../utils/format';
 import { translations } from '../../utils/i18n';
 

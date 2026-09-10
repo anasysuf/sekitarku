@@ -200,17 +200,9 @@ const dictionaryId = {
 };
 
 // Create a fail-safe proxy so missing keys return an empty string or the key itself instead of throwing undefined
-export const translations = new Proxy(dictionaryId, {
-  get(target, prop) {
-    if (prop === 'id' || prop === 'en') {
-      return target;
-    }
-    if (prop in target) {
-      return target[prop];
-    }
-    return '';
-  }
-});
+export const translations = dictionaryId;
+translations.id = translations;
+translations.en = translations;
 
 // Backward-compatibility aliases
 export const i18n = translations;

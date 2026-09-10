@@ -10,11 +10,11 @@
   },
   "devDependencies": {
     "typescript": "~6.0.2",
-    "vite": "^8.2.2"
+    "vite": "^8.2.2",
+    "@vitejs/plugin-react": "^6.1.1"
   },
   "dependencies": {
     "@vercel/og": "^1.0.2",
-    "@vitejs/plugin-react": "^6.1.1",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.43.0",
     "react": "^19.2.8",

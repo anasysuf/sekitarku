@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExternalLink, Wind, Droplets, RefreshCw } from 'lucide-react';
+import { ExternalLink, Wind, Droplets } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi';
 
 export function WidgetEmbedView({ location, weatherData, airQualityData, loading, onRefresh }) {

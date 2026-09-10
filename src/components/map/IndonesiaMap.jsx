@@ -6,7 +6,7 @@ import { INDONESIA_CITIES } from '../../utils/cities';
 import { INDONESIA_VOLCANOES, VOLCANO_STATUS_LEVELS } from '../../utils/volcanoes';
 import { SATELLITE_HOTSPOTS } from '../../utils/karhutla';
 import { translations } from '../../utils/i18n';
-import { MapPin, Compass, ZoomIn, ZoomOut, Flame, Mountain, Activity, Satellite, Thermometer, Zap, ShieldAlert } from 'lucide-react';
+import { MapPin, Compass, ZoomIn, ZoomOut, Flame, Mountain, Activity, Satellite } from 'lucide-react';
 
 // Inline SVG data URIs - 100% offline, 0 network requests, never broken image
 const cityPinSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`

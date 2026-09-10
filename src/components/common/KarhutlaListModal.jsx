@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Flame, X, Search, Satellite, Thermometer, Zap, TreePine, MapPin } from 'lucide-react';
+import { Flame, X, Search, Satellite, Thermometer, Zap } from 'lucide-react';
 import { SATELLITE_HOTSPOTS } from '../../utils/karhutla';
 import { calculateDistance } from '../../utils/geo';
 

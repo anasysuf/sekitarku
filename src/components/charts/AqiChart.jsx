@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine } from 'recharts';
-import { Activity, Wind, TrendingUp, TrendingDown, Clock, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { Activity, TrendingUp, TrendingDown, Clock } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi';
 import { translations } from '../../utils/i18n';
 
