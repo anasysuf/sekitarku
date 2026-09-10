@@ -24,6 +24,9 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
 
   const t = translations;
 
+  const locationName = location?.name || location?.city || 'Indonesia';
+  const locationProvince = location?.province || 'Indonesia';
+
   const aqi = Number(airQualityData?.current?.aqi) || 0;
   const pm25 = Number(airQualityData?.current?.pm25 ?? airQualityData?.current?.pm2_5) || 0;
   const temp = Number(weatherData?.current?.temp ?? weatherData?.current?.temperature ?? 28);
@@ -48,8 +51,9 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
   // Cross-Correlation Kabut Asap
   const { isHazeActive, isVeryNear } = getHazeStatus(nearestFire, aqi, pm25);
 
+  const hazeStatusText = isHazeActive ? '⚠️ Terpapar Asap Karhutla' : '🟢 Bebas Asap';
   const quakeText = latestEarthquake ? `• Gempa Terkini: M ${latestEarthquake.magnitude} (${latestEarthquake.wilayah})\n` : '';
-  const shareText = `📍 Laporan Lingkungan & Cuaca Real-Time: ${locationName}\n🌱 Kualitas Udara: AQI ${aqiVal} (${health.category})\n🌡️ Cuaca: ${tempStr} • ${weather?.condition || 'Cerah'}\n⚠️ Status Asap: ${hazeStatusText}\n\nPantau selengkapnya di Sekitarku: https://sekitarku.vercel.app`;
+  const shareText = `📍 Laporan Lingkungan & Cuaca Real-Time: ${locationName}\n🌱 Kualitas Udara: AQI ${aqi} (${health.category})\n🌡️ Cuaca: ${temp}°C • ${weatherVisual.label || 'Cerah'}\n⚠️ Status Asap: ${hazeStatusText}\n${quakeText}\nPantau selengkapnya di Sekitarku: https://sekitarku.vercel.app`;
 
   // Draw 9:16 high quality story infographic on HTML5 canvas (1080 x 1920)
   const generateCanvasImage = () => {
@@ -133,11 +137,11 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
 
       ctx.fillStyle = '#0F172A';
       ctx.font = '800 52px "Outfit", sans-serif';
-      drawWrappedText(location.name, 120, 295, 840, 56, 1);
+      drawWrappedText(locationName, 120, 295, 840, 56, 1);
 
       ctx.fillStyle = '#64748B';
       ctx.font = '600 28px "Outfit", sans-serif';
-      drawWrappedText(location.province || 'Indonesia', 120, 350, 840, 36, 1);
+      drawWrappedText(locationProvince, 120, 350, 840, 36, 1);
 
       ctx.fillStyle = '#059669';
       ctx.font = '700 26px "Outfit", sans-serif';
@@ -213,9 +217,9 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
       // Weather Card
       drawCard(560, 765, 440, 335, '#FFFFFF', '#E2E8F0');
 
-      ctx.fillStyle = '#0284C7';
+      ctx.fillStyle = '#3B82F6';
       ctx.font = '800 24px "Outfit", sans-serif';
-      ctx.fillText('CUACA & SUHU', 600, 820);
+      ctx.fillText('CUACA SAAT INI', 600, 820);
 
       ctx.fillStyle = '#0F172A';
       ctx.font = '800 80px "Outfit", sans-serif';
@@ -270,7 +274,7 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
       ctx.fillStyle = isHazeActive ? '#DC2626' : '#334155';
       ctx.font = isHazeActive ? '700 22px "Outfit", sans-serif' : '600 22px "Outfit", sans-serif';
       if (isHazeActive) {
-        const hazeWarnText = `⚠️ Terdeteksi paparan kabut asap (${isHazeActive && nearestHotspot ? `${nearestHotspot.distanceKm} km dari ${nearestHotspot.regency}` : 'partikel asap karhutla'}). Gunakan masker N95 / KN95.`;
+        const hazeWarnText = `⚠️ Terdeteksi paparan kabut asap (${isHazeActive && nearestFire ? `${nearestFire.distanceKm} km dari ${nearestFire.regency}` : 'partikel asap karhutla'}). Gunakan masker N95 / KN95.`;
         drawWrappedText(hazeWarnText, 120, 1290, 840, 32, 2);
       } else {
         const hazeSafeText = 'Kondisi udara bersih dari kabut asap kebakaran hutan dalam jarak dekat.';
@@ -280,7 +284,7 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
       ctx.fillStyle = '#64748B';
       ctx.font = '600 21px "Outfit", sans-serif';
       if (nearestFire) {
-        const hotspotText = nearestHotspot ? `Titik Panas: ${nearestHotspot.regency} (${nearestHotspot.distanceKm} km) • Satelit ${nearestHotspot.satellite}` : 'Tidak terdeteksi titik panas dalam radius 400 km';
+        const hotspotText = `Titik Panas: ${nearestFire.regency} (${nearestFire.distanceKm} km) • Satelit ${nearestFire.satellite || 'SNPP'}`;
         drawWrappedText(hotspotText, 120, 1392, 840, 26, 1);
       } else {
         const noFireText = '📍 Tidak terdeteksi titik panas dalam radius 400 km';
@@ -365,17 +369,18 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
       const dataUrl = await generateCanvasImage();
       const res = await fetch(dataUrl);
       const blob = await res.blob();
-      const file = new File([blob], `sekitarku-${location.name.toLowerCase().replace(/\s+/g, '-')}.png`, { type: 'image/png' });
+      const safeCityName = String(locationName).toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const file = new File([blob], `sekitarku-${safeCityName}.png`, { type: 'image/png' });
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
           files: [file],
-          title: `${location.name} - Sekitarku`,
+          title: `${locationName} - Sekitarku`,
           text: shareText
         });
       } else if (navigator.share) {
         await navigator.share({
-          title: `${location.name} - Sekitarku`,
+          title: `${locationName} - Sekitarku`,
           text: shareText,
           url: window.location.href
         });
@@ -396,8 +401,9 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
     setIsGenerating(true);
     try {
       const dataUrl = await generateCanvasImage();
+      const safeCityName = String(locationName).toLowerCase().replace(/[^a-z0-9]+/g, '-');
       const link = document.createElement('a');
-      link.download = `sekitarku-${location.name.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.png`;
+      link.download = `sekitarku-${safeCityName}-${Date.now()}.png`;
       link.href = dataUrl;
       link.click();
     } catch (err) {
@@ -420,12 +426,13 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
         inset: 0,
         backgroundColor: 'rgba(15, 23, 42, 0.75)',
         backdropFilter: 'blur(8px)',
-        zIndex: 1000,
+        WebkitBackdropFilter: 'blur(8px)',
+        zIndex: 9999,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         padding: '1rem',
-        animation: 'fadeIn 0.2s ease-out'
+        animation: 'fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
       }}
       onClick={onClose}
     >
@@ -433,142 +440,150 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
         className="flat-card"
         style={{
           width: '100%',
-          maxWidth: '480px',
-          maxHeight: '92vh',
+          maxWidth: '460px',
+          maxHeight: '90vh',
           display: 'flex',
           flexDirection: 'column',
           backgroundColor: 'var(--bg-card)',
-          boxShadow: '0 24px 48px -12px rgba(0, 0, 0, 0.25)',
-          borderRadius: 'var(--radius-xl)',
-          border: '1.5px solid var(--border-color)',
-          padding: 0,
-          overflow: 'hidden'
+          borderRadius: 'var(--radius-lg)',
+          overflow: 'hidden',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          animation: 'slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
         <div style={{
-          padding: '1.15rem 1.4rem',
-          borderBottom: 'var(--border-thick)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: 'var(--bg-muted)'
+          padding: '1.25rem 1.5rem',
+          borderBottom: 'var(--border-thick)',
+          backgroundColor: 'var(--bg-card)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <div style={{
-              width: '34px',
-              height: '34px',
-              borderRadius: 'var(--radius-full)',
-              backgroundColor: 'var(--color-primary-bg)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'var(--color-primary)'
-            }}>
-              <Share2 size={18} strokeWidth={2.5} />
-            </div>
-            <div>
-              <span style={{ fontSize: '1.05rem', fontWeight: '800', color: 'var(--text-main)', display: 'block' }}>
-                {t.shareModalTitle}
-              </span>
-              <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>
-                {t.shareModalSubtitle}
-              </span>
-            </div>
+          <div>
+            <h3 style={{ fontSize: '1.15rem', fontWeight: '800', margin: 0, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Sparkles size={18} color="var(--color-primary)" />
+              {t.shareModalTitle}
+            </h3>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '2px 0 0 0', fontWeight: '500' }}>
+              {t.shareModalSubtitle}
+            </p>
           </div>
           <button
             onClick={onClose}
-            className="flat-btn-secondary"
-            style={{ width: '32px', height: '32px', padding: 0, minHeight: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            aria-label="Tutup modal bagikan"
+            style={{
+              padding: '0.4rem',
+              borderRadius: 'var(--radius-sm)',
+              border: 'none',
+              background: 'var(--bg-muted)',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
           >
-            <X size={18} />
+            <X size={20} />
           </button>
         </div>
 
-        {/* Modal Body & Interactive Preview */}
-        <div style={{ padding: '1.25rem', overflowY: 'auto', flex: 1 }}>
+        {/* Modal Body / Scrollable Content */}
+        <div style={{ padding: '1.25rem 1.5rem', overflowY: 'auto', flex: 1 }}>
           
-          {/* Aesthetic Card Frame Mockup */}
+          {/* Aesthetic Live Card Preview */}
           <div style={{
             borderRadius: 'var(--radius-lg)',
             padding: '1.25rem',
-            backgroundColor: 'var(--bg-muted)',
-            border: 'var(--border-flat)',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.04)',
+            background: 'var(--bg-muted)',
+            border: '1px solid var(--border-flat)',
             position: 'relative'
           }}>
-            
-            {/* Top Brand Banner in Preview */}
+            {/* Top Badge */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem' }}>
-              <span style={{
-                fontSize: '0.7rem',
-                fontWeight: '800',
-                color: '#059669',
-                backgroundColor: '#ecfdf5',
-                padding: '3px 10px',
-                borderRadius: 'var(--radius-full)',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px'
-              }}>
-                <Sparkles size={11} /> SEKITARKU LIVE
+              <span style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Sekitarku • Infografis
               </span>
-              <span style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-muted)' }}>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '600' }}>
                 {dateFormatted}
               </span>
             </div>
 
-            {/* City Title & EcoHealth Score */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.85rem', gap: '0.5rem' }}>
-              <div style={{ minWidth: 0 }}>
-                <h4 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, color: 'var(--text-main)', letterSpacing: '-0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {location.name}
-                </h4>
-                <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>
-                  {location.province || 'Indonesia'}
-                </span>
-              </div>
-              <div style={{
-                padding: '4px 12px',
-                borderRadius: 'var(--radius-full)',
-                backgroundColor: health.score >= 80 ? 'var(--color-secondary-bg)' : health.score >= 50 ? 'var(--color-warning-bg)' : 'var(--color-danger-bg)',
-                color: health.score >= 80 ? 'var(--color-secondary)' : health.score >= 50 ? '#b45309' : 'var(--color-danger)',
-                fontSize: '0.75rem',
-                fontWeight: '800',
-                whiteSpace: 'nowrap',
-                flexShrink: 0
-              }}>
-                Skor: {health.score}/100
-              </div>
+            {/* City & Province Header */}
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ fontSize: '1.35rem', fontWeight: '900', color: 'var(--text-main)', margin: 0, lineHeight: 1.2 }}>
+                {locationName}
+              </h4>
+              <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', margin: '2px 0 0 0', fontWeight: '600' }}>
+                {locationProvince}
+              </p>
             </div>
 
-            {/* AQI & Weather Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.65rem', marginBottom: '0.85rem' }}>
-              <div style={{
-                padding: '0.85rem',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: 'var(--bg-card)',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
-              }}>
-                <span style={{ fontSize: '0.675rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t.aqiTitle}</span>
-                <div style={{ fontSize: '1.45rem', fontWeight: '800', color: aqiInfo.color, margin: '0.15rem 0' }}>
-                  {aqi} AQI
+            {/* Eco-Health Score Preview Banner */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '0.85rem 1rem',
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: 'var(--bg-card)',
+              marginBottom: '0.85rem',
+              boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
+            }}>
+              <div>
+                <span style={{ fontSize: '0.675rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  {t.ecoScoreTitle}
+                </span>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                  <span style={{ fontSize: '1.6rem', fontWeight: '900', color: health.color }}>
+                    {health.score}
+                  </span>
+                  <span style={{ fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-muted)' }}>
+                    /100
+                  </span>
                 </div>
-                <span style={{ fontSize: '0.725rem', fontWeight: '700', color: aqiInfo.color, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{aqiInfo.label}</span>
+              </div>
+              <span style={{
+                padding: '4px 10px',
+                borderRadius: 'var(--radius-full)',
+                backgroundColor: health.color,
+                color: '#ffffff',
+                fontWeight: '800',
+                fontSize: '0.75rem',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+              }}>
+                {health.category}
+              </span>
+            </div>
+
+            {/* AQI and Weather Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.65rem', marginBottom: '0.85rem' }}>
+              
+              {/* AQI */}
+              <div style={{ padding: '0.75rem', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+                <span style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  {t.airQualityTitle}
+                </span>
+                <div style={{ fontSize: '1.25rem', fontWeight: '900', color: aqiInfo.color, margin: '2px 0' }}>
+                  {aqi} <span style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-muted)' }}>AQI</span>
+                </div>
+                <span style={{ fontSize: '0.725rem', fontWeight: '800', color: 'var(--text-main)' }}>
+                  {aqiInfo.label}
+                </span>
               </div>
 
-              <div style={{
-                padding: '0.85rem',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: 'var(--bg-card)',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.03)'
-              }}>
-                <span style={{ fontSize: '0.675rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase' }}>{t.weatherTitle}</span>
-                <div style={{ fontSize: '1.45rem', fontWeight: '800', color: 'var(--text-main)', margin: '0.15rem 0' }}>
+              {/* Weather */}
+              <div style={{ padding: '0.75rem', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card)', boxShadow: '0 1px 3px rgba(0,0,0,0.03)' }}>
+                <span style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' }}>
+                  {t.weatherTitle}
+                </span>
+                <div style={{ fontSize: '1.25rem', fontWeight: '900', color: 'var(--text-main)', margin: '2px 0' }}>
                   {temp}°C
                 </div>
-                <span style={{ fontSize: '0.725rem', fontWeight: '700', color: 'var(--text-main)', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{weatherVisual.label}</span>
+                <span style={{ fontSize: '0.725rem', fontWeight: '800', color: 'var(--text-main)' }}>
+                  {weatherVisual.label}
+                </span>
               </div>
             </div>
 
@@ -764,3 +779,5 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
     </div>
   );
 }
+
+export default ShareCardModal;
