@@ -7,15 +7,7 @@ import {
   X,
   Flame,
   Wind,
-  ShieldCheck,
-  Sparkles,
-  Activity,
-  Calendar,
-  MapPin,
-  Thermometer,
-  Sun,
-  Droplets,
-  AlertTriangle
+  Sparkles
 } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi';
 import { calculateEcoHealthScore } from '../../utils/healthIndex';
@@ -65,7 +57,7 @@ export function ShareCardModal({
   const quakeText = latestEarthquake ? `• Gempa Terkini: M ${latestEarthquake.magnitude} (${latestEarthquake.wilayah})\n` : '';
   const shareText = `🌿 Pantauan Lingkungan ${location.name} (${dateFormatted}):\n• Kualitas Udara: AQI ${aqi} (${aqiInfo.label})\n• Cuaca: ${temp}°C, ${weatherVisual.label}\n• Skor Kesehatan: ${health.score}/100 (${health.category})\n• Status Kabut Asap: ${isHazeActive ? `⚠️ TERPAPAR KABUT ASAP (Asap dari titik api ${nearestFire?.regency || 'wilayah sekitar'} sejauh ${nearestFire?.distanceKm || 0} km)` : '🟢 Bersih'}\n• Potensi Api Lahan Lokal: ${fdrs.code} (${fdrs.label})\n${quakeText}🌐 Cek real-time di https://sekitarku.vercel.app`;
 
-  // Draw 9:16 high quality story infographic on HTML5 canvas (1080 x 1920)
+  // Draw 9:16 high quality story infographic on HTML5 canvas (1080 x 1920) - Branch Main Aesthetic
   const generateCanvasImage = () => {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas');
@@ -73,63 +65,31 @@ export function ShareCardModal({
       canvas.height = 1920;
       const ctx = canvas.getContext('2d');
 
-      // 1. Sleek Modern Clean Canvas Background
-      ctx.fillStyle = '#F4F6F9';
+      // 1. Clean Canvas Background (Classic Main Style)
+      ctx.fillStyle = '#F8FAFC';
       ctx.fillRect(0, 0, 1080, 1920);
 
-      // Top Brand Header Bar
-      const topBar = ctx.createLinearGradient(0, 0, 1080, 0);
-      topBar.addColorStop(0, '#059669');
-      topBar.addColorStop(0.5, '#10B981');
-      topBar.addColorStop(1, '#0284C7');
-      ctx.fillStyle = topBar;
-      ctx.fillRect(0, 0, 1080, 16);
+      // Top Decorative Brand Banner
+      ctx.fillStyle = '#10B981';
+      ctx.fillRect(0, 0, 1080, 24);
 
-      // Helper for clean rounded card
-      const drawCard = (x, y, w, h, fill, radius = 28, border = null) => {
-        ctx.save();
-        ctx.shadowColor = 'rgba(15, 23, 42, 0.05)';
-        ctx.shadowBlur = 16;
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 6;
-
+      // Helper for clean rounded cards
+      const drawCard = (x, y, w, h, fill, border) => {
         ctx.beginPath();
         if (ctx.roundRect) {
-          ctx.roundRect(x, y, w, h, radius);
+          ctx.roundRect(x, y, w, h, 28);
         } else {
           ctx.rect(x, y, w, h);
         }
         ctx.fillStyle = fill;
         ctx.fill();
-        ctx.restore();
-
-        if (border) {
-          ctx.beginPath();
-          if (ctx.roundRect) {
-            ctx.roundRect(x, y, w, h, radius);
-          } else {
-            ctx.rect(x, y, w, h);
-          }
-          ctx.strokeStyle = border;
-          ctx.lineWidth = 2;
-          ctx.stroke();
-        }
+        ctx.strokeStyle = border || '#E2E8F0';
+        ctx.lineWidth = 4;
+        ctx.stroke();
       };
 
-      // Helper for soft solid badge pill (no harsh borders)
-      const drawPill = (x, y, w, h, bg, radius = 14) => {
-        ctx.beginPath();
-        if (ctx.roundRect) {
-          ctx.roundRect(x, y, w, h, radius);
-        } else {
-          ctx.rect(x, y, w, h);
-        }
-        ctx.fillStyle = bg;
-        ctx.fill();
-      };
-
-      // Helper for wrapped text
-      const drawWrappedText = (text, x, y, maxWidth, lineHeight, maxLines = 3) => {
+      // Helper: Draw Wrapped and Truncated Text with Strict Bounds
+      const drawWrappedText = (text, x, y, maxWidth, lineHeight, maxLines = 2) => {
         if (!text) return y;
         const words = String(text).split(' ');
         let line = '';
@@ -143,7 +103,11 @@ export function ShareCardModal({
           if (metrics.width > maxWidth && n > 0) {
             linesCount++;
             if (linesCount >= maxLines) {
-              ctx.fillText(line + '...', x, currentY);
+              let truncated = line;
+              while (truncated.length > 0 && ctx.measureText(truncated + '...').width > maxWidth) {
+                truncated = truncated.slice(0, -1);
+              }
+              ctx.fillText(truncated + '...', x, currentY);
               return currentY + lineHeight;
             }
             ctx.fillText(line, x, currentY);
@@ -153,227 +117,244 @@ export function ShareCardModal({
             line = testLine;
           }
         }
-        if (line && linesCount < maxLines) {
-          ctx.fillText(line, x, currentY);
-          currentY += lineHeight;
-        }
-        return currentY;
+        ctx.fillText(line, x, currentY);
+        return currentY + lineHeight;
       };
 
       // =========================================================================
-      // 1. BRAND HEADER (y: 60 - 170)
+      // 2. HEADER
       // =========================================================================
-      
-      // Brand Pill
-      drawPill(70, 70, 230, 48, '#ECFDF5', 24);
+      ctx.fillStyle = '#0F172A';
+      ctx.font = '800 68px "Outfit", sans-serif';
+      ctx.fillText('Sekitarku', 80, 135);
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '700 30px "Outfit", sans-serif';
+      ctx.fillText('Laporan Lingkungan & Cuaca Real-Time', 80, 185);
+
+      // =========================================================================
+      // 3. LOCATION HERO CARD
+      // =========================================================================
+      drawCard(80, 225, 920, 220, '#FFFFFF', '#E2E8F0');
+
+      ctx.fillStyle = '#0F172A';
+      ctx.font = '800 52px "Outfit", sans-serif';
+      drawWrappedText(location.name, 120, 295, 840, 56, 1);
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '600 28px "Outfit", sans-serif';
+      drawWrappedText(location.province || 'Indonesia', 120, 350, 840, 36, 1);
+
+      ctx.fillStyle = '#059669';
+      ctx.font = '700 26px "Outfit", sans-serif';
+      ctx.fillText(`📅 ${dateFormatted}`, 120, 405);
+
+      // =========================================================================
+      // 4. ECO-HEALTH COMPOSITE SCORE CARD
+      // =========================================================================
+      drawCard(80, 470, 920, 270, '#FFFFFF', '#E2E8F0');
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '800 24px "Outfit", sans-serif';
+      ctx.fillText('SKOR KUALITAS LINGKUNGAN', 120, 525);
+
+      ctx.fillStyle = health.color || '#10B981';
+      ctx.font = '800 92px "Outfit", sans-serif';
+      ctx.fillText(`${health.score}`, 120, 625);
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '800 42px "Outfit", sans-serif';
+      ctx.fillText('/100', 250, 625);
+
+      // Dynamic Score Badge
+      const badgeText = health.category || 'Baik';
+      ctx.font = '800 30px "Outfit", sans-serif';
+      const badgeTextWidth = ctx.measureText(badgeText).width;
+      const badgeWidth = Math.min(420, Math.max(240, badgeTextWidth + 50));
+      const badgeX = 960 - badgeWidth;
+
       ctx.beginPath();
-      ctx.arc(96, 94, 6, 0, Math.PI * 2);
-      ctx.fillStyle = '#10B981';
+      if (ctx.roundRect) ctx.roundRect(badgeX, 555, badgeWidth, 75, 18);
+      else ctx.rect(badgeX, 555, badgeWidth, 75);
+      ctx.fillStyle = health.color || '#10B981';
       ctx.fill();
 
-      ctx.fillStyle = '#065F46';
-      ctx.font = 'bold 22px sans-serif';
-      ctx.fillText('SEKITARKU', 116, 102);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.textAlign = 'center';
+      ctx.fillText(badgeText, badgeX + (badgeWidth / 2), 603);
+      ctx.textAlign = 'left';
 
-      // Live tag right
-      drawPill(740, 70, 270, 48, '#FFFFFF', 24);
-      ctx.fillStyle = '#64748B';
-      ctx.font = 'bold 16px sans-serif';
-      ctx.fillText('LIVE DATA INDONESIA', 765, 100);
-
-      // Subtitle
-      ctx.fillStyle = '#64748B';
-      ctx.font = '700 18px sans-serif';
-      ctx.fillText('LAPORAN RESMI KONDISI LINGKUNGAN & MITIGASI BENCANA', 70, 155);
+      ctx.fillStyle = '#334155';
+      ctx.font = '600 26px "Outfit", sans-serif';
+      drawWrappedText(`Perkiraan setara paparan ${health.cigs || '0'} batang rokok/hari.`, 120, 700, 840, 34, 1);
 
       // =========================================================================
-      // 2. HERO LOCATION & ECO-HEALTH CARD (y: 180, h: 250)
+      // 5. GRID: AQI & WEATHER CARDS
       // =========================================================================
-      drawCard(70, 180, 940, 250, '#FFFFFF', 28);
+      
+      // AQI Card
+      drawCard(80, 765, 440, 335, '#FFFFFF', '#E2E8F0');
 
-      // Clean City Name (Auto-truncate smoothly)
-      const cleanCityName = location.name.length > 26 ? location.name.substring(0, 25) + '...' : location.name;
+      ctx.fillStyle = aqiInfo.color || '#10B981';
+      ctx.font = '800 24px "Outfit", sans-serif';
+      ctx.fillText('KUALITAS UDARA', 120, 820);
+
+      ctx.fillStyle = aqiInfo.color || '#10B981';
+      ctx.font = '800 80px "Outfit", sans-serif';
+      ctx.fillText(`${aqi}`, 120, 915);
+
+      ctx.fillStyle = '#64748B';
+      ctx.font = '700 28px "Outfit", sans-serif';
+      ctx.fillText('AQI US', 270, 915);
+
       ctx.fillStyle = '#0F172A';
-      ctx.font = 'bold 48px sans-serif';
-      ctx.fillText(cleanCityName, 110, 250);
+      ctx.font = '800 30px "Outfit", sans-serif';
+      drawWrappedText(aqiInfo.label, 120, 980, 360, 36, 1);
 
-      // Sub-location and Date
       ctx.fillStyle = '#64748B';
-      ctx.font = '600 21px sans-serif';
-      ctx.fillText(`${location.province || 'Indonesia'} · ${dateFormatted}`, 110, 290);
+      ctx.font = '600 24px "Outfit", sans-serif';
+      ctx.fillText(`PM2.5: ${pm25} µg/m³`, 120, 1045);
 
-      // EcoHealth Score Filled Strip
-      const scoreBg = health.score >= 80 ? '#ECFDF5' : health.score >= 50 ? '#FEF3C7' : '#FEE2E2';
-      const scoreColor = health.score >= 80 ? '#047857' : health.score >= 50 ? '#B45309' : '#B91C1C';
-      drawPill(110, 325, 860, 70, scoreBg, 16);
+      // Weather Card
+      drawCard(560, 765, 440, 335, '#FFFFFF', '#E2E8F0');
 
-      ctx.fillStyle = scoreColor;
-      ctx.font = 'bold 24px sans-serif';
-      ctx.fillText(`Skor Kesehatan Lingkungan: ${health.score}/100`, 135, 368);
+      ctx.fillStyle = '#0284C7';
+      ctx.font = '800 24px "Outfit", sans-serif';
+      ctx.fillText('CUACA & SUHU', 600, 820);
 
-      ctx.font = '700 20px sans-serif';
-      ctx.fillText(`(${health.category})`, 720, 368);
-
-      // =========================================================================
-      // 3. ROW 1: AQI & CUACA TWIN CARDS (y: 460, h: 360)
-      // =========================================================================
-
-      // Left Card: AQI
-      drawCard(70, 460, 455, 360, '#FFFFFF', 28);
-
-      // AQI Category Header
-      ctx.fillStyle = '#64748B';
-      ctx.font = '800 16px sans-serif';
-      ctx.fillText('KUALITAS UDARA (AQI)', 105, 505);
-
-      // Giant AQI Value
-      ctx.fillStyle = aqiInfo.color;
-      ctx.font = 'bold 88px sans-serif';
-      ctx.fillText(String(aqi), 105, 600);
-
-      // AQI Status Label
       ctx.fillStyle = '#0F172A';
-      ctx.font = 'bold 23px sans-serif';
-      drawWrappedText(aqiInfo.label, 105, 650, 385, 28, 2);
+      ctx.font = '800 80px "Outfit", sans-serif';
+      ctx.fillText(`${temp}°C`, 600, 915);
 
-      // AQI Subtext
-      ctx.fillStyle = '#64748B';
-      ctx.font = '600 19px sans-serif';
-      ctx.fillText(`PM2.5: ${pm25} µg/m³`, 105, 745);
-      ctx.fillText('Standar US-EPA & ISPU', 105, 780);
-
-      // Right Card: Weather
-      drawCard(555, 460, 455, 360, '#FFFFFF', 28);
-
-      // Weather Category Header
-      ctx.fillStyle = '#64748B';
-      ctx.font = '800 16px sans-serif';
-      ctx.fillText('CUACA & SUHU', 590, 505);
-
-      // Giant Temp Value
       ctx.fillStyle = '#0F172A';
-      ctx.font = 'bold 88px sans-serif';
-      ctx.fillText(`${temp}°C`, 590, 600);
+      ctx.font = '800 30px "Outfit", sans-serif';
+      drawWrappedText(weatherVisual.label, 600, 980, 360, 36, 1);
 
-      // Weather Status Label
-      ctx.fillStyle = '#0F172A';
-      ctx.font = 'bold 23px sans-serif';
-      drawWrappedText(weatherVisual.label, 590, 650, 385, 28, 2);
-
-      // Weather Subtext
       ctx.fillStyle = '#64748B';
-      ctx.font = '600 19px sans-serif';
-      ctx.fillText(`Kelembapan: ${humidity}%`, 590, 745);
-      ctx.fillText(`Indeks UV: ${uvIndex} / 12`, 590, 780);
+      ctx.font = '600 24px "Outfit", sans-serif';
+      ctx.fillText(`Kelembapan: ${humidity}%`, 600, 1045);
 
       // =========================================================================
-      // 4. ROW 2: KARHUTLA & KABUT ASAP ALERT CARD (y: 850, h: 420)
+      // 6. KARHUTLA & KABUT ASAP ALERT CARD
       // =========================================================================
-      const karhutlaCardBg = isHazeActive ? '#FFFBFB' : '#FFFFFF';
-      drawCard(70, 850, 940, 420, karhutlaCardBg, 28, isHazeActive ? '#FCA5A5' : null);
+      const hazeCardBorder = isHazeActive ? '#EF4444' : '#E2E8F0';
+      drawCard(80, 1125, 920, 315, '#FFFFFF', hazeCardBorder);
 
-      // Section Title
       ctx.fillStyle = '#EA580C';
-      ctx.font = 'bold 20px sans-serif';
-      ctx.fillText('STATUS KARHUTLA & KABUT ASAP', 110, 895);
+      ctx.font = '800 24px "Outfit", sans-serif';
+      ctx.fillText('POTENSI KARHUTLA & KABUT ASAP', 120, 1175);
 
-      // Badges Row
-      // 1. Lahan Lokal Pill
-      drawPill(110, 920, 320, 54, fdrs.bg, 14);
-      ctx.fillStyle = fdrs.color;
-      ctx.font = 'bold 20px sans-serif';
-      ctx.fillText(`Lahan Lokal: ${fdrs.code}`, 130, 954);
+      // Status Badges Row
+      // Lahan Lokal Badge
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(120, 1200, 270, 52, 14);
+      else ctx.rect(120, 1200, 270, 52);
+      ctx.fillStyle = fdrs.bg || '#ECFDF5';
+      ctx.fill();
 
-      // 2. Kabut Asap Status Pill
+      ctx.fillStyle = fdrs.color || '#10B981';
+      ctx.font = '800 22px "Outfit", sans-serif';
+      ctx.fillText(`Lahan: ${fdrs.code}`, 140, 1235);
+
+      // Kabut Asap Badge
+      const hazeBadgeBg = isHazeActive ? '#FEE2E2' : '#ECFDF5';
+      const hazeBadgeColor = isHazeActive ? '#DC2626' : '#059669';
+      const hazeBadgeText = isHazeActive ? '⚠️ TERPAPAR KABUT ASAP' : '🟢 Kabut Asap: Bersih';
+
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(410, 1200, 470, 52, 14);
+      else ctx.rect(410, 1200, 470, 52);
+      ctx.fillStyle = hazeBadgeBg;
+      ctx.fill();
+
+      ctx.fillStyle = hazeBadgeColor;
+      ctx.font = '800 22px "Outfit", sans-serif';
+      ctx.fillText(hazeBadgeText, 430, 1235);
+
+      // Plain language advisory
+      ctx.fillStyle = isHazeActive ? '#DC2626' : '#334155';
+      ctx.font = isHazeActive ? '700 22px "Outfit", sans-serif' : '600 22px "Outfit", sans-serif';
       if (isHazeActive) {
-        drawPill(450, 920, 520, 54, '#FEE2E2', 14);
-        ctx.fillStyle = '#DC2626';
-        ctx.font = 'bold 20px sans-serif';
-        ctx.fillText('⚠️ TERPAPAR KABUT ASAP', 475, 954);
+        drawWrappedText(`🚨 Peringatan: Udara terpapar kabut asap kiriman dari titik api ${nearestFire?.regency || 'wilayah sekitar'} (${nearestFire?.distanceKm || 0} km). Gunakan masker N95!`, 120, 1290, 840, 32, 2);
       } else {
-        drawPill(450, 920, 520, 54, '#ECFDF5', 14);
-        ctx.fillStyle = '#059669';
-        ctx.font = 'bold 20px sans-serif';
-        ctx.fillText('🟢 Kabut Asap: Bersih / Aman', 475, 954);
+        drawWrappedText('Kondisi tanah & vegetasi lokal basah/aman dari potensi kebakaran baru. Udara bebas kabut asap.', 120, 1290, 840, 32, 2);
       }
 
-      // Clear Advisory Box
-      const advBoxBg = isHazeActive ? '#FEE2E2' : '#F8FAFC';
-      drawPill(110, 995, 860, 160, advBoxBg, 18);
-
-      ctx.fillStyle = isHazeActive ? '#991B1B' : '#334155';
-      ctx.font = isHazeActive ? 'bold 21px sans-serif' : '500 20px sans-serif';
-      if (isHazeActive) {
-        drawWrappedText(`Peringatan: Udara terpapar kabut asap kiriman dari titik api ${nearestFire?.regency || 'wilayah sekitar'} (${nearestFire?.distanceKm || 0} km). Lahan setempat aman dari api, namun gunakan masker N95 untuk aktivitas pernapasan!`, 135, 1045, 810, 32, 3);
-      } else {
-        drawWrappedText('Kondisi tanah & vegetasi lokal basah/aman dari potensi kebakaran baru. Udara terpantau bersih & bebas dari kabut asap karhutla.', 135, 1055, 810, 32, 2);
-      }
-
-      // Nearest Fire Proximity Details
       ctx.fillStyle = '#64748B';
-      ctx.font = '600 19px sans-serif';
+      ctx.font = '600 22px "Outfit", sans-serif';
       if (nearestFire) {
-        ctx.fillText(`Titik Panas Terdekat: ${nearestFire.regency} (${nearestFire.distanceKm} km) · Satelit ${nearestFire.satellite}`, 110, 1225);
+        ctx.fillText(`📍 Titik Panas Terdekat: ${nearestFire.regency} (${nearestFire.distanceKm} km) · Satelit ${nearestFire.satellite}`, 120, 1395);
       } else {
-        ctx.fillText('Tidak terdeteksi titik panas satelit dalam radius 400 km', 110, 1225);
+        ctx.fillText('📍 Tidak terdeteksi titik panas dalam radius 400 km', 120, 1395);
       }
 
       // =========================================================================
-      // 5. ROW 3: GEMPA BUMI TERKINI / KESELAMATAN (y: 1300, h: 290)
+      // 7. SEISMIC / EARTHQUAKE CARD (Adaptive Multi-line Layout)
       // =========================================================================
-      if (latestEarthquake && latestEarthquake.magnitude) {
-        drawCard(70, 1300, 940, 290, '#FFFFFF', 28);
+      if (latestEarthquake) {
+        drawCard(80, 1465, 920, 245, '#FFFFFF', '#E2E8F0');
 
-        ctx.fillStyle = '#DC2626';
-        ctx.font = 'bold 20px sans-serif';
-        ctx.fillText('GEMPA BUMI TERKINI (BMKG)', 110, 1345);
+        ctx.fillStyle = '#EF4444';
+        ctx.font = '800 24px "Outfit", sans-serif';
+        ctx.fillText('GEMPA TERKINI (BMKG)', 120, 1515);
 
-        // Magnitude Pill
-        drawPill(110, 1370, 160, 120, '#FEE2E2', 20);
-        ctx.fillStyle = '#DC2626';
-        ctx.font = 'bold 44px sans-serif';
-        ctx.fillText(`M ${latestEarthquake.magnitude}`, 125, 1445);
+        // Magnitude Pill Badge
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(120, 1540, 150, 135, 18);
+        else ctx.rect(120, 1540, 150, 135);
+        ctx.fillStyle = '#FEF2F2';
+        ctx.fill();
+        ctx.strokeStyle = '#EF4444';
+        ctx.lineWidth = 3;
+        ctx.stroke();
 
-        // Quake Location
+        ctx.fillStyle = '#EF4444';
+        ctx.font = '800 46px "Outfit", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(`M ${latestEarthquake.magnitude}`, 195, 1615);
+        ctx.font = '700 20px "Outfit", sans-serif';
+        ctx.fillText('MAGNITUDO', 195, 1650);
+        ctx.textAlign = 'left';
+
+        // Location & Depth with auto-wrap
         ctx.fillStyle = '#0F172A';
-        ctx.font = 'bold 24px sans-serif';
-        drawWrappedText(latestEarthquake.wilayah, 295, 1405, 675, 32, 2);
+        ctx.font = '700 26px "Outfit", sans-serif';
+        const nextY = drawWrappedText(latestEarthquake.wilayah || 'Indonesia', 295, 1575, 665, 34, 2);
 
-        // Depth and Time (Guarded against undefined)
-        const depthStr = latestEarthquake.depth || latestEarthquake.kedalaman || '10 km';
-        const dateStr = latestEarthquake.dateTime || latestEarthquake.date || latestEarthquake.time || 'Waktu Terkini';
         ctx.fillStyle = '#64748B';
-        ctx.font = '600 19px sans-serif';
-        ctx.fillText(`Kedalaman: ${depthStr} · ${dateStr}`, 295, 1475);
+        ctx.font = '600 22px "Outfit", sans-serif';
+        const depthStr = latestEarthquake.depth || latestEarthquake.kedalaman || '-';
+        const quakeDetails = `Kedalaman: ${depthStr} • ${latestEarthquake.potensi || 'Tidak berpotensi tsunami'}`;
+        drawWrappedText(quakeDetails, 295, Math.max(1645, nextY + 8), 665, 30, 2);
       } else {
-        drawCard(70, 1300, 940, 290, '#FFFFFF', 28);
-        ctx.fillStyle = '#059669';
-        ctx.font = 'bold 20px sans-serif';
-        ctx.fillText('PANDUAN KESELAMATAN & KESEHATAN', 110, 1345);
+        drawCard(80, 1465, 920, 245, '#FFFFFF', '#E2E8F0');
 
-        ctx.fillStyle = '#334155';
-        ctx.font = '600 21px sans-serif';
-        ctx.fillText('• Pantau kondisi cuaca dan indeks polusi udara secara berkala.', 110, 1400);
-        ctx.fillText('• Cukupi kebutuhan hidrasi harian saat beraktivitas di luar ruangan.', 110, 1445);
-        ctx.fillText('• Gunakan masker bila kualitas udara berada pada level tidak sehat.', 110, 1490);
+        ctx.fillStyle = '#10B981';
+        ctx.font = '800 24px "Outfit", sans-serif';
+        ctx.fillText('INFORMASI KESELAMATAN', 120, 1515);
+
+        ctx.fillStyle = '#0F172A';
+        ctx.font = '700 26px "Outfit", sans-serif';
+        ctx.fillText('Tidak ada peringatan bencana kritis saat ini.', 120, 1580);
+
+        ctx.fillStyle = '#64748B';
+        ctx.font = '600 22px "Outfit", sans-serif';
+        ctx.fillText('Tetap pantau pembaruan berkala dari BMKG & Sekitarku.', 120, 1635);
       }
 
       // =========================================================================
-      // 6. FOOTER ANCHOR (y: 1620, h: 220)
+      // 8. FOOTER BRANDING
       // =========================================================================
-      drawCard(70, 1620, 940, 220, '#FFFFFF', 28);
-
       ctx.fillStyle = '#0F172A';
-      ctx.font = 'bold 26px sans-serif';
-      ctx.fillText('Pantau Lingkungan & Mitigasi Bencana Real-Time', 110, 1675);
+      ctx.font = '800 32px "Outfit", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('sekitarku.vercel.app', 540, 1775);
 
       ctx.fillStyle = '#64748B';
-      ctx.font = '600 19px sans-serif';
-      ctx.fillText('Sumber Resmi: BMKG · PVMBG (MAGMA) · NASA FIRMS · COPERNICUS', 110, 1720);
+      ctx.font = '600 24px "Outfit", sans-serif';
+      ctx.fillText('Data Resmi BMKG, PVMBG & NASA • Dipantau Secara Real-Time', 540, 1825);
 
-      ctx.fillStyle = '#10B981';
-      ctx.font = 'bold 22px sans-serif';
-      ctx.fillText('sekitarku.vercel.app · Peduli Udara & Keselamatan Anda', 110, 1775);
+      ctx.textAlign = 'left';
 
       resolve(canvas.toDataURL('image/png', 0.95));
     });
