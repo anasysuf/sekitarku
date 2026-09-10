@@ -179,7 +179,7 @@ function CustomMapControls({ onResetNusantara, onFocusCity, cityName }) {
           minHeight: '36px',
           borderRadius: 'var(--radius-sm)',
           backgroundColor: 'var(--bg-card)',
-          color: 'var(--color-primary)',
+          color: '#2563eb',
           border: '1px solid var(--border-flat)',
           boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
           cursor: 'pointer',
@@ -428,12 +428,12 @@ export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLIT
               <Circle
                 center={[currentLocation.lat, currentLocation.lon]}
                 radius={25000}
-                pathOptions={{ color: '#10b981', fillColor: '#10b981', fillOpacity: 0.25, weight: 2 }}
+                pathOptions={{ color: '#3b82f6', fillColor: '#3b82f6', fillOpacity: 0.20, weight: 2 }}
               />
               <Circle
                 center={[currentLocation.lat, currentLocation.lon]}
                 radius={8000}
-                pathOptions={{ color: '#059669', fillColor: '#059669', fillOpacity: 0.65, weight: 3 }}
+                pathOptions={{ color: '#2563eb', fillColor: '#2563eb', fillOpacity: 0.50, weight: 2.5 }}
               />
             </>
           )}
