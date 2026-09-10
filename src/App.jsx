@@ -297,6 +297,7 @@ export function App() {
             airQualityData={airQualityData}
             weatherData={weatherData}
             latestEarthquake={latestEarthquake}
+            karhutlaData={karhutlaData}
             lang={lang}
           />
         </Suspense>

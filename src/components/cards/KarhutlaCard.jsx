@@ -1,5 +1,6 @@
 import React from 'react';
-import { Flame, Compass, ChevronRight, AlertTriangle, ShieldCheck, ShieldAlert, Wind } from 'lucide-react';
+import { Flame, Compass, ChevronRight, AlertTriangle, ShieldCheck, Wind } from 'lucide-react';
+import { getHazeStatus } from '../../utils/karhutla';
 
 export function KarhutlaCard({
   karhutlaData,
@@ -18,21 +19,19 @@ export function KarhutlaCard({
     );
   }
 
-  const { fdrs, nearest, totalInIndo } = karhutlaData;
-  const currentAqi = airQualityData?.current?.aqi || 0;
+  const fdrs = karhutlaData.fdrs;
+  const nearest = karhutlaData.nearest;
+  const totalInIndo = karhutlaData.allHotspots?.length || 0;
+
+  const aqi = airQualityData?.current?.aqi || 0;
   const pm25 = airQualityData?.current?.pm25 || airQualityData?.current?.pm2_5 || 0;
 
-  const isVeryNear = nearest && nearest.distanceKm <= 50;
-  const isNearby = nearest && nearest.distanceKm <= 150;
-  const isElevatedAir = currentAqi >= 60 || pm25 >= 20;
-
-  // Korelasi Cerdas Kabut Asap: Jika ada hotspot sangat dekat (<= 50km) ATAU hotspot regional (<= 150km) + udara sedang/buruk
-  const isHazeActive = isVeryNear || (isNearby && isElevatedAir);
+  // Evaluasi Status Kabut Asap Terkini (Standard Terpadu)
+  const { isHazeActive, isVeryNear } = getHazeStatus(nearest, aqi, pm25);
 
   const isHighRisk = fdrs.code === 'TINGGI' || fdrs.code === 'EKSTREM';
   const isModerateRisk = fdrs.code === 'SEDANG';
 
-  // Status Banner styling & text
   let statusBannerBg = 'var(--bg-subtle)';
   let statusBorder = 'var(--border-flat)';
   let statusTextColor = 'var(--text-main)';
@@ -44,7 +43,7 @@ export function KarhutlaCard({
     statusBorder = 'var(--color-danger)';
     statusTextColor = 'var(--color-danger)';
     statusIcon = <Wind size={16} color="var(--color-danger)" />;
-    statusMessage = `🚨 PERINGATAN KABUT ASAP: Udara terpapar asap kiriman dari titik api ${nearest.regency} (${nearest.distanceKm} km). Lahan setempat aman dari api, namun gunakan masker N95 untuk pernapasan!`;
+    statusMessage = `🚨 PERINGATAN KABUT ASAP: Udara terpapar asap kiriman dari titik api ${nearest?.regency || 'wilayah sekitar'} (${nearest?.distanceKm || 0} km). Lahan setempat aman dari api, namun gunakan masker N95 untuk pernapasan!`;
   } else if (isHighRisk) {
     statusBannerBg = 'var(--color-danger-bg)';
     statusBorder = 'var(--color-danger)';

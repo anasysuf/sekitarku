@@ -1,4 +1,4 @@
-import { calculateDistance } from './geo';
+import { calculateDistance } from './geo.js';
 
 /**
  * Kategori Tingkat Kemudahan Terjadinya Kebakaran (FDRS - BMKG Standard)
@@ -272,5 +272,23 @@ export function getNearbyHotspots(userLat, userLon, maxRadiusKm = 400) {
     nearbyList,
     allHotspots: withDist,
     totalInIndo: SATELLITE_HOTSPOTS.length
+  };
+}
+
+
+/**
+ * Evaluasi Status Kabut Asap Terkini (Cross-Correlation Titik Panas & Kualitas Udara)
+ */
+export function getHazeStatus(nearestHotspot, aqi = 0, pm25 = 0) {
+  const isVeryNear = Boolean(nearestHotspot && nearestHotspot.distanceKm <= 50);
+  const isNearby = Boolean(nearestHotspot && nearestHotspot.distanceKm <= 150);
+  const isElevatedAir = Number(aqi) >= 60 || Number(pm25) >= 20;
+  const isHazeActive = Boolean(isVeryNear || (isNearby && isElevatedAir));
+
+  return {
+    isHazeActive,
+    isVeryNear,
+    isNearby,
+    isElevatedAir
   };
 }
