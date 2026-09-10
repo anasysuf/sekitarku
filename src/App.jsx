@@ -449,26 +449,25 @@ export function App() {
       {/* PWA Install Banner */}
       {installPrompt && showPwaBanner && (
         <div className="pwa-banner animate-fade-in">
-          <div className="pwa-banner-content">
-            <div className="pwa-banner-icon">
-              <Download size={18} strokeWidth={2.5} />
-            </div>
-            <div className="pwa-banner-text">
-              <span className="pwa-banner-title">Pasang Aplikasi Sekitarku</span>
-              <span className="pwa-banner-desc">Akses instan di layar utama HP & siap digunakan secara offline.</span>
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <Download size={18} color="var(--color-primary)" />
+            <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)' }}>
+              Pasang aplikasi Sekitarku di layar utama HP Anda untuk akses instan & offline.
+            </span>
           </div>
-          <div className="pwa-banner-actions">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <button
               onClick={handleInstallPwa}
-              className="flat-btn-primary pwa-btn-install"
+              className="flat-btn-primary"
+              style={{ minHeight: '36px', padding: '6px 14px', fontSize: '0.8rem' }}
             >
               {t.pwaInstall || 'Pasang Aplikasi'}
             </button>
             <button
               onClick={() => setShowPwaBanner(false)}
-              aria-label="Tutup Banner PWA"
-              className="flat-btn-secondary pwa-btn-close"
+              aria-label="Tutup"
+              className="flat-btn-secondary"
+              style={{ minHeight: '36px', padding: '6px 10px' }}
             >
               <X size={16} />
             </button>
@@ -499,15 +498,13 @@ export function App() {
       {/* Critical Alert Banner */}
       {(isAqiAlert || isQuakeAlert) && (
         <div className="alert-banner animate-fade-in">
-          <div className="alert-banner-content">
-            <div className="alert-banner-icon">
-              <AlertTriangle size={20} strokeWidth={2.5} />
-            </div>
-            <div className="alert-banner-text">
-              <strong className="alert-banner-title">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <AlertTriangle size={20} color="var(--color-danger)" style={{ flexShrink: 0 }} />
+            <div>
+              <strong style={{ fontSize: '0.85rem', color: 'var(--color-danger)', display: 'block' }}>
                 {isAqiAlert ? t.alertAqiTitle : t.alertQuakeTitle}
               </strong>
-              <span className="alert-banner-desc">
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-main)', fontWeight: '600' }}>
                 {isAqiAlert
                   ? `${t.alertAqiDesc} (AQI: ${currentAqi})`
                   : `Gempa M ${latestEarthquake?.magnitude} terjadi di ${latestEarthquake?.wilayah}.`}
