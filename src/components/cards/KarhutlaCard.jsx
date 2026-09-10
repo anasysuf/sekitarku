@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame, Compass, ChevronRight, AlertTriangle, ShieldCheck, ShieldAlert, Satellite } from 'lucide-react';
+import { Flame, Compass, ChevronRight, AlertTriangle, ShieldCheck, ShieldAlert } from 'lucide-react';
 
 export function KarhutlaCard({
   karhutlaData,
@@ -19,7 +19,42 @@ export function KarhutlaCard({
 
   const { fdrs, nearest, totalInIndo } = karhutlaData;
   const isHighRisk = fdrs.code === 'TINGGI' || fdrs.code === 'EKSTREM';
-  const isNear = nearest && nearest.distanceKm <= 50;
+  const isModerateRisk = fdrs.code === 'SEDANG';
+  const isVeryNear = nearest && nearest.distanceKm <= 50;
+  const isNearby = nearest && nearest.distanceKm <= 150;
+
+  // Compute status banner styling & copy
+  let statusBannerBg = 'var(--bg-subtle)';
+  let statusBorder = 'var(--border-flat)';
+  let statusTextColor = 'var(--text-main)';
+  let statusIcon = <ShieldCheck size={16} color="var(--color-primary)" />;
+  let statusMessage = `Tingkat potensi kebakaran di wilayah ${location.name} terpantau AMAN dan terkendali.`;
+
+  if (isVeryNear) {
+    statusBannerBg = 'var(--color-danger-bg)';
+    statusBorder = 'var(--color-danger)';
+    statusTextColor = 'var(--color-danger)';
+    statusIcon = <ShieldAlert size={16} color="var(--color-danger)" />;
+    statusMessage = `PERINGATAN: Titik panas satelit terdeteksi hanya berjarak ${nearest.distanceKm} km dari ${location.name}. Waspadai potensi kabut asap!`;
+  } else if (isHighRisk) {
+    statusBannerBg = 'var(--color-danger-bg)';
+    statusBorder = 'var(--color-danger)';
+    statusTextColor = 'var(--color-danger)';
+    statusIcon = <AlertTriangle size={16} color="var(--color-danger)" />;
+    statusMessage = `STATUS RAWAN: Vegetasi di wilayah ${location.name} sangat kering & mudah terbakar akibat suhu panas/rendah hujan.`;
+  } else if (isNearby) {
+    statusBannerBg = 'var(--color-warning-bg)';
+    statusBorder = 'var(--color-warning)';
+    statusTextColor = '#b45309';
+    statusIcon = <AlertTriangle size={16} color="#b45309" />;
+    statusMessage = `Titik panas terdekat berada di ${nearest.regency} (${nearest.distanceKm} km dari ${location.name}). Kondisi lokal masih terpantau aman.`;
+  } else if (isModerateRisk) {
+    statusBannerBg = 'var(--color-warning-bg)';
+    statusBorder = 'var(--color-warning)';
+    statusTextColor = '#b45309';
+    statusIcon = <AlertTriangle size={16} color="#b45309" />;
+    statusMessage = `STATUS WASPADA: Semak & alang-alang mulai mengering. Hindari pembakaran sampah sembarangan di ${location.name}.`;
+  }
 
   return (
     <div className="flat-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
@@ -93,7 +128,7 @@ export function KarhutlaCard({
               <div style={{ marginTop: '0.45rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                 <Compass size={16} color="var(--color-primary)" />
                 <span style={{ fontSize: '0.85rem', fontWeight: '700', color: 'var(--text-main)' }}>
-                  Jarak: <span style={{ color: nearest.distanceKm <= 50 ? 'var(--color-danger)' : 'var(--color-primary)' }}>{nearest.distanceKm} km</span> dari {location.name}
+                  Jarak: <span style={{ color: isVeryNear ? 'var(--color-danger)' : 'var(--color-primary)' }}>{nearest.distanceKm} km</span> dari {location.name}
                 </span>
               </div>
             </div>
@@ -121,27 +156,21 @@ export function KarhutlaCard({
       {/* Safety Evaluation Status Strip */}
       <div style={{
         padding: '0.65rem 0.95rem',
-        backgroundColor: isNear ? 'var(--color-danger-bg)' : isHighRisk ? 'var(--color-warning-bg)' : 'var(--bg-subtle)',
-        border: `1.5px solid ${isNear ? 'var(--color-danger)' : isHighRisk ? 'var(--color-warning)' : 'var(--border-flat)'}`,
+        backgroundColor: statusBannerBg,
+        border: `1.5px solid ${statusBorder}`,
         borderRadius: 'var(--radius-sm)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
         fontSize: '0.775rem',
         fontWeight: '600',
-        color: isNear ? 'var(--color-danger)' : isHighRisk ? '#b45309' : 'var(--text-main)',
+        color: statusTextColor,
         flexWrap: 'wrap',
         gap: '0.5rem'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          {isNear ? <ShieldAlert size={16} /> : isHighRisk ? <AlertTriangle size={16} /> : <ShieldCheck size={16} color="var(--color-primary)" />}
-          <span>
-            {isNear
-              ? `Titik panas terdeteksi hanya berjarak ${nearest.distanceKm} km dari ${location.name}. Waspadai asap tebal!`
-              : isHighRisk
-              ? `Peringatan: Vegetasi di wilayah ${location.name} sangat mudah tersulut api karena cuaca kering/panas.`
-              : `Tingkat kemudahan kebakaran di wilayah ${location.name} terpantau rendah dan terkendali.`}
-          </span>
+          {statusIcon}
+          <span>{statusMessage}</span>
         </div>
 
         <button

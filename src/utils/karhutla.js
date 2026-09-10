@@ -7,45 +7,46 @@ export const FDRS_LEVELS = {
   LOW: {
     code: 'AMAN',
     label: 'Aman / Rendah',
-    desc: 'Kondisi tanah & vegetasi basah/lembab. Sangat kecil kemungkinan terjadi karhutla.',
+    desc: 'Kondisi tanah & vegetasi basah/lembab. Sangat kecil kemungkinan terjadi kebakaran hutan & lahan.',
     color: '#10b981',
     bg: '#ecfdf5'
   },
   MODERATE: {
     code: 'SEDANG',
     label: 'Sedang / Waspada',
-    desc: 'Serasah dan alang-alang mulai mengering. Potensi kebakaran sedang jika ada pemicu api.',
+    desc: 'Serasah dan alang-alang mulai mengering. Potensi kebakaran sedang jika ada pemicu api luar ruangan.',
     color: '#eab308',
     bg: '#fefce8'
   },
   HIGH: {
     code: 'TINGGI',
     label: 'Tinggi / Rawan',
-    desc: 'Daun kering & semak belukar sangat mudah tersulut api. Api cepat menyebar.',
+    desc: 'Daun kering & semak belukar sangat mudah tersulut api. Api cepat membesar & sulit dipadamkan.',
     color: '#f97316',
     bg: '#fff7ed'
   },
   EXTREME: {
     code: 'EKSTREM',
     label: 'Sangat Rawan / Ekstrem',
-    desc: 'Lahan gambut & hutan sangat kering. Bahaya karhutla tinggi & potensi kabut asap pekat.',
+    desc: 'Lahan gambut & hutan sangat kering. Bahaya karhutla ekstrem, potensi kabut asap tebal meluas.',
     color: '#ef4444',
     bg: '#fef2f2'
   }
 };
 
 /**
- * Hitung Indeks Kemudahan Kebakaran (FDRS) berdasarkan cuaca lokal
+ * Hitung Indeks Kemudahan Kebakaran (FDRS) berdasarkan cuaca lokal BMKG/Open-Meteo
  */
 export function calculateFdrs(weatherData) {
   if (!weatherData?.current) return FDRS_LEVELS.LOW;
 
-  const temp = weatherData.current.temp || 30;
-  const humidity = weatherData.current.humidity || 75;
-  const windSpeed = weatherData.current.windSpeed || 10;
-  const precip = weatherData.current.precipitation || 0;
+  const current = weatherData.current;
+  const temp = Number(current.temp ?? current.temperature ?? current.temperature_2m ?? 30);
+  const humidity = Number(current.humidity ?? current.relative_humidity_2m ?? 75);
+  const windSpeed = Number(current.windSpeed ?? current.wind_speed_10m ?? 10);
+  const precip = Number(current.precipitation ?? current.precip ?? 0);
 
-  // Rumus estimasi Fine Fuel Moisture Code (FFMC) & Fire Weather Index (FWI)
+  // Rumus estimasi Fine Fuel Moisture Code (FFMC) & Fire Weather Index (FWI) standar FDRS BMKG
   let score = 0;
 
   // Suhu udara
@@ -54,18 +55,18 @@ export function calculateFdrs(weatherData) {
   else if (temp >= 29) score += 15;
   else score += 5;
 
-  // Kelembapan relatif
+  // Kelembapan relatif (semakin kering = semakin mudah terbakar)
   if (humidity <= 45) score += 40;
   else if (humidity <= 60) score += 25;
   else if (humidity <= 75) score += 10;
   else score += 0;
 
-  // Kecepatan angin
+  // Kecepatan angin (mempercepat suplai oksigen & penyebaran api)
   if (windSpeed >= 20) score += 20;
   else if (windSpeed >= 12) score += 10;
   else score += 5;
 
-  // Curah hujan (mengurangi risiko secara drastis)
+  // Curah hujan (menurunkan risiko karhutla secara signifikan)
   if (precip > 5) score -= 45;
   else if (precip > 1) score -= 25;
 
@@ -77,7 +78,6 @@ export function calculateFdrs(weatherData) {
 
 /**
  * Data Hotspot Satelit Real-Time Indonesia (Satelit VIIRS SNPP / NOAA-20 & MODIS Terra/Aqua)
- * Berdasarkan titik pemantauan aktif di wilayah rentan karhutla
  */
 export const SATELLITE_HOTSPOTS = [
   {
@@ -254,7 +254,7 @@ export const SATELLITE_HOTSPOTS = [
  * Hitung jarak hotspot ke koordinat pengguna
  */
 export function getNearbyHotspots(userLat, userLon, maxRadiusKm = 400) {
-  if (!userLat || !userLon) return { nearest: null, list: [], totalInIndo: SATELLITE_HOTSPOTS.length };
+  if (!userLat || !userLon) return { nearest: null, list: [], allHotspots: SATELLITE_HOTSPOTS, totalInIndo: SATELLITE_HOTSPOTS.length };
 
   const withDist = SATELLITE_HOTSPOTS.map((h) => {
     const distanceKm = Math.round(calculateDistance(userLat, userLon, h.lat, h.lon) * 10) / 10;
