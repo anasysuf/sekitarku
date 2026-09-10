@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Share2, Download, Copy, Check, X, Flame, Wind, AlertTriangle, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { Share2, Download, Copy, Check, X, Flame, Wind } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi';
 import { calculateEcoHealthScore } from '../../utils/healthIndex';
 import { getWeatherVisual } from '../../utils/weatherIcons';
@@ -35,12 +35,13 @@ export function ShareCardModal({
   const fdrs = karhutlaData?.fdrs || { code: 'AMAN', label: 'Aman / Rendah', desc: 'Tanah & vegetasi lokal basah. Sangat kecil kemungkinan kebakaran setempat.', color: '#10b981', bg: '#ecfdf5' };
   const nearestFire = karhutlaData?.nearest;
   
-  // Korelasi Silang Kabut Asap (Compound Risk)
-  const isModerateOrWorseAir = aqi >= 100;
-  const isNearbyHotspot = nearestFire && nearestFire.distanceKm <= 150;
-  const isHazeSpillover = isModerateOrWorseAir && isNearbyHotspot;
+  // Korelasi Silang Kabut Asap (Identik 100% dengan KarhutlaCard)
+  const isVeryNear = nearestFire && nearestFire.distanceKm <= 50;
+  const isNearby = nearestFire && nearestFire.distanceKm <= 150;
+  const isElevatedAir = aqi >= 60 || pm25 >= 20;
+  const isHazeActive = isVeryNear || (isNearby && isElevatedAir);
 
-  const shareText = `🌿 Pantauan Lingkungan ${location.name} (${dateFormatted}):\n• Kualitas Udara: AQI ${aqi} (${aqiInfo.label})\n• Cuaca: ${temp}°C, ${weatherVisual.label}\n• Skor Kesehatan: ${health.score}/100 (${health.category})\n• Status Kabut Asap: ${isHazeSpillover ? `⚠️ TERPAPAR KABUT ASAP (Asap dari titik api ${nearestFire.regency} sejauh ${nearestFire.distanceKm} km)` : '🟢 Bersih'}\n• Potensi Api Lahan Lokal: ${fdrs.code} (${fdrs.label})\n${latestEarthquake ? `• Gempa Terkini: M ${latestEarthquake.magnitude} (${latestEarthquake.wilayah})\n` : ''}🌐 Cek real-time di https://sekitarku.vercel.app`;
+  const shareText = `🌿 Pantauan Lingkungan ${location.name} (${dateFormatted}):\n• Kualitas Udara: AQI ${aqi} (${aqiInfo.label})\n• Cuaca: ${temp}°C, ${weatherVisual.label}\n• Skor Kesehatan: ${health.score}/100 (${health.category})\n• Status Kabut Asap: ${isHazeActive ? `⚠️ TERPAPAR KABUT ASAP (Asap dari titik api ${nearestFire?.regency} sejauh ${nearestFire?.distanceKm} km)` : '🟢 Bersih'}\n• Potensi Api Lahan Lokal: ${fdrs.code} (${fdrs.label})\n${latestEarthquake ? `• Gempa Terkini: M ${latestEarthquake.magnitude} (${latestEarthquake.wilayah})\n` : ''}🌐 Cek real-time di https://sekitarku.vercel.app`;
 
   // Draw 9:16 high quality story infographic on HTML5 canvas with zero overflow
   const generateCanvasImage = () => {
@@ -192,7 +193,7 @@ export function ShareCardModal({
       ctx.fillText('🔥 POTENSI KARHUTLA & KABUT ASAP', 120, 900);
 
       // 2 Badges: 1 for Smoke Haze, 1 for Local Soil FDRS
-      if (isHazeSpillover) {
+      if (isHazeActive) {
         // Haze Alert Badge (Red/Orange)
         drawCard(120, 930, 380, 60, '#FEE2E2', '#DC2626', 14);
         ctx.fillStyle = '#DC2626';
@@ -219,9 +220,9 @@ export function ShareCardModal({
       }
 
       // Plain Language Explanation
-      ctx.fillStyle = isHazeSpillover ? '#DC2626' : '#334155';
-      ctx.font = isHazeSpillover ? 'bold 21px sans-serif' : '500 20px sans-serif';
-      if (isHazeSpillover) {
+      ctx.fillStyle = isHazeActive ? '#DC2626' : '#334155';
+      ctx.font = isHazeActive ? 'bold 21px sans-serif' : '500 20px sans-serif';
+      if (isHazeActive) {
         drawWrappedText(`🚨 Peringatan: Udara terpapar kabut asap kiriman dari titik api ${nearestFire?.regency} (${nearestFire?.distanceKm} km). Lahan setempat aman dari api, namun gunakan masker N95 untuk pernapasan!`, 120, 1025, 840, 28, 3);
       } else {
         drawWrappedText(`Kondisi lahan setempat basah & aman dari risiko api baru. Tidak terdeteksi sebaran kabut asap karhutla di wilayah ini.`, 120, 1025, 840, 28, 2);
@@ -461,12 +462,12 @@ export function ShareCardModal({
               </div>
             </div>
 
-            {/* Karhutla & Kabut Asap Preview in Modal (Super Clear for Laypeople) */}
+            {/* Karhutla & Kabut Asap Preview in Modal */}
             <div style={{
               padding: '0.85rem',
               borderRadius: 'var(--radius-md)',
               backgroundColor: 'var(--bg-card)',
-              border: isHazeSpillover ? '1.5px solid var(--color-danger)' : 'var(--border-thick)',
+              border: isHazeActive ? '1.5px solid var(--color-danger)' : 'var(--border-thick)',
               marginBottom: '0.85rem'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem' }}>
@@ -474,7 +475,7 @@ export function ShareCardModal({
                   <Flame size={13} /> POTENSI KARHUTLA & STATUS KABUT ASAP
                 </span>
                 
-                {isHazeSpillover ? (
+                {isHazeActive ? (
                   <span style={{
                     fontSize: '0.65rem',
                     fontWeight: '800',
@@ -528,13 +529,13 @@ export function ShareCardModal({
                 marginTop: '0.45rem',
                 padding: '0.45rem 0.6rem',
                 borderRadius: 'var(--radius-sm)',
-                backgroundColor: isHazeSpillover ? 'var(--color-danger-bg)' : 'var(--bg-muted)',
+                backgroundColor: isHazeActive ? 'var(--color-danger-bg)' : 'var(--bg-muted)',
                 fontSize: '0.7rem',
-                color: isHazeSpillover ? 'var(--color-danger)' : 'var(--text-muted)',
+                color: isHazeActive ? 'var(--color-danger)' : 'var(--text-muted)',
                 lineHeight: 1.35,
-                fontWeight: isHazeSpillover ? '700' : '500'
+                fontWeight: isHazeActive ? '700' : '500'
               }}>
-                {isHazeSpillover
+                {isHazeActive
                   ? `🚨 Waspada: Udara terpapar kabut asap kiriman dari titik api ${nearestFire?.regency} (${nearestFire?.distanceKm} km). Lahan setempat aman dari api, namun gunakan masker N95 untuk pernapasan!`
                   : `Kondisi lahan setempat basah & aman dari risiko api baru. Tidak terdeteksi kabut asap karhutla di wilayah ini.`}
               </div>

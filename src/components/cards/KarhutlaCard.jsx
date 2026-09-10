@@ -20,33 +20,31 @@ export function KarhutlaCard({
 
   const { fdrs, nearest, totalInIndo } = karhutlaData;
   const currentAqi = airQualityData?.current?.aqi || 0;
-  const isModerateOrWorseAir = currentAqi >= 100;
-  const isNearbyHotspot = nearest && nearest.distanceKm <= 150;
-  const isHazeSpillover = isModerateOrWorseAir && isNearbyHotspot;
+  const pm25 = airQualityData?.current?.pm25 || airQualityData?.current?.pm2_5 || 0;
+
+  const isVeryNear = nearest && nearest.distanceKm <= 50;
+  const isNearby = nearest && nearest.distanceKm <= 150;
+  const isElevatedAir = currentAqi >= 60 || pm25 >= 20;
+
+  // Korelasi Cerdas Kabut Asap: Jika ada hotspot sangat dekat (<= 50km) ATAU hotspot regional (<= 150km) + udara sedang/buruk
+  const isHazeActive = isVeryNear || (isNearby && isElevatedAir);
 
   const isHighRisk = fdrs.code === 'TINGGI' || fdrs.code === 'EKSTREM';
   const isModerateRisk = fdrs.code === 'SEDANG';
-  const isVeryNear = nearest && nearest.distanceKm <= 50;
 
-  // Compute status banner styling & copy
+  // Status Banner styling & text
   let statusBannerBg = 'var(--bg-subtle)';
   let statusBorder = 'var(--border-flat)';
   let statusTextColor = 'var(--text-main)';
   let statusIcon = <ShieldCheck size={16} color="var(--color-primary)" />;
   let statusMessage = `Kondisi lahan di wilayah ${location.name} terpantau AMAN dan bebas dari kabut asap.`;
 
-  if (isHazeSpillover) {
+  if (isHazeActive) {
     statusBannerBg = 'var(--color-danger-bg)';
     statusBorder = 'var(--color-danger)';
     statusTextColor = 'var(--color-danger)';
     statusIcon = <Wind size={16} color="var(--color-danger)" />;
     statusMessage = `🚨 PERINGATAN KABUT ASAP: Udara terpapar asap kiriman dari titik api ${nearest.regency} (${nearest.distanceKm} km). Lahan setempat aman dari api, namun gunakan masker N95 untuk pernapasan!`;
-  } else if (isVeryNear) {
-    statusBannerBg = 'var(--color-danger-bg)';
-    statusBorder = 'var(--color-danger)';
-    statusTextColor = 'var(--color-danger)';
-    statusIcon = <ShieldAlert size={16} color="var(--color-danger)" />;
-    statusMessage = `PERINGATAN TITIK API: Titik panas satelit aktif hanya berjarak ${nearest.distanceKm} km dari ${location.name}. Waspadai perambatan api & asap tebal!`;
   } else if (isHighRisk) {
     statusBannerBg = 'var(--color-danger-bg)';
     statusBorder = 'var(--color-danger)';
@@ -71,7 +69,7 @@ export function KarhutlaCard({
             width: '32px',
             height: '32px',
             borderRadius: 'var(--radius-full)',
-            backgroundColor: isHazeSpillover ? '#ef4444' : fdrs.color,
+            backgroundColor: isHazeActive ? '#ef4444' : fdrs.color,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -89,9 +87,9 @@ export function KarhutlaCard({
           </div>
         </div>
 
-        {/* Status Badges: Clear Distinction */}
+        {/* Status Badges */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-          {isHazeSpillover ? (
+          {isHazeActive ? (
             <span style={{
               fontSize: '0.725rem',
               fontWeight: '800',
