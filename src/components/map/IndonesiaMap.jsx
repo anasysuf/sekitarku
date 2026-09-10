@@ -16,7 +16,7 @@ const cityPinSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
       <feDropShadow dx="0" dy="1.5" stdDeviation="1.2" flood-color="#000000" flood-opacity="0.3"/>
     </filter>
   </defs>
-  <path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 18 8 18s8-12.75 8-18c0-4.42-3.58-8-8-8z" fill="#059669" stroke="#ffffff" stroke-width="1.5" filter="url(#sh)"/>
+  <path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 18 8 18s8-12.75 8-18c0-4.42-3.58-8-8-8z" fill="#2563eb" stroke="#ffffff" stroke-width="1.5" filter="url(#sh)"/>
   <circle cx="12" cy="10" r="3" fill="#ffffff"/>
 </svg>
 `)}`;
@@ -25,10 +25,10 @@ const activeCityPinSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 34" width="26" height="34">
   <defs>
     <filter id="sh-act" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#059669" flood-opacity="0.6"/>
+      <feDropShadow dx="0" dy="2" stdDeviation="2.5" flood-color="#2563eb" flood-opacity="0.6"/>
     </filter>
   </defs>
-  <path d="M13 2C7.5 2 3 6.5 3 12c0 6.5 10 20 10 20s10-13.5 10-20c0-5.5-4.5-10-10-10z" fill="#10b981" stroke="#ffffff" stroke-width="2" filter="url(#sh-act)"/>
+  <path d="M13 2C7.5 2 3 6.5 3 12c0 6.5 10 20 10 20s10-13.5 10-20c0-5.5-4.5-10-10-10z" fill="#3b82f6" stroke="#ffffff" stroke-width="2" filter="url(#sh-act)"/>
   <circle cx="13" cy="12" r="4" fill="#ffffff"/>
 </svg>
 `)}`;
@@ -306,8 +306,8 @@ export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLIT
               padding: '5px 10px',
               minHeight: '32px',
               borderRadius: 'var(--radius-sm)',
-              backgroundColor: showCities ? 'rgba(16, 185, 129, 0.15)' : 'var(--bg-muted)',
-              color: showCities ? 'var(--color-primary)' : 'var(--text-muted)',
+              backgroundColor: showCities ? 'rgba(37, 99, 235, 0.15)' : 'var(--bg-muted)',
+              color: showCities ? '#2563eb' : 'var(--text-muted)',
               border: '1px solid var(--border-flat)',
               cursor: 'pointer',
               fontWeight: '700',
@@ -460,7 +460,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLIT
                       style={{
                         padding: '6px 12px',
                         borderRadius: '4px',
-                        backgroundColor: '#10b981',
+                        backgroundColor: '#2563eb',
                         color: '#fff',
                         border: 'none',
                         cursor: 'pointer',
