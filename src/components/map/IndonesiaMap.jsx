@@ -221,7 +221,7 @@ function CustomMapControls({ onResetNusantara, onFocusCity, cityName }) {
   );
 }
 
-export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLITE_HOTSPOTS, fdrs = null, onSelectCity, isDark = false, lang = 'id' }) {
+export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLITE_HOTSPOTS, onSelectCity, isDark = false, lang = 'id' }) {
   const t = translations[lang] || translations.id;
   const initialCenter = useMemo(() => [currentLocation?.lat || -2.5489, currentLocation?.lon || 118.0149], [currentLocation?.lat, currentLocation?.lon]);
   
@@ -290,23 +290,7 @@ export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLIT
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
             <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>{t.mapTitle}</h3>
-            {fdrs && (
-              <span style={{
-                fontSize: '0.7rem',
-                padding: '3px 9px',
-                borderRadius: '4px',
-                backgroundColor: fdrs.bg,
-                color: fdrs.color,
-                fontWeight: '800',
-                border: `1px solid ${fdrs.color}44`,
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '4px'
-              }}>
-                <Flame size={12} strokeWidth={2.5} />
-                <span>Indeks Kebakaran: {fdrs.code}</span>
-              </span>
-            )}
+            
           </div>
           <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', margin: '2px 0 0 0', fontWeight: '500' }}>
             Peta sebaran lingkungan real-time: Kualitas Udara, Seismik Gempa, Erupsi PVMBG & Karhutla Satelit

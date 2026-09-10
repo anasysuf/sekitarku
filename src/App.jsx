@@ -460,7 +460,6 @@ export function App() {
             currentLocation={location}
             earthquakes={recentEarthquakes}
             hotspots={karhutlaData?.allHotspots || []}
-            fdrs={karhutlaData?.fdrs || null}
             onSelectCity={selectCity}
             lang={lang}
           />
