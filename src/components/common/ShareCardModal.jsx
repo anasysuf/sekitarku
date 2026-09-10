@@ -32,15 +32,15 @@ export function ShareCardModal({
   const weatherVisual = getWeatherVisual(weatherCode, lang);
   const dateFormatted = formatFullCurrentDate(new Date(), lang);
 
-  const fdrs = karhutlaData?.fdrs || { code: 'AMAN', label: 'Aman / Rendah', desc: 'Kondisi tanah & vegetasi basah/lembab. Sangat kecil kemungkinan kebakaran.', color: '#10b981', bg: '#ecfdf5' };
+  const fdrs = karhutlaData?.fdrs || { code: 'AMAN', label: 'Aman / Rendah', desc: 'Tanah & vegetasi lokal basah. Sangat kecil kemungkinan kebakaran setempat.', color: '#10b981', bg: '#ecfdf5' };
   const nearestFire = karhutlaData?.nearest;
   
   // Korelasi Silang Kabut Asap (Compound Risk)
-  const isUnhealthyAir = aqi >= 150;
-  const isNearbyHotspot = nearestFire && nearestFire.distanceKm <= 120;
-  const isHazeSpillover = isUnhealthyAir && isNearbyHotspot;
+  const isModerateOrWorseAir = aqi >= 100;
+  const isNearbyHotspot = nearestFire && nearestFire.distanceKm <= 150;
+  const isHazeSpillover = isModerateOrWorseAir && isNearbyHotspot;
 
-  const shareText = `🌿 Pantauan Lingkungan ${location.name} (${dateFormatted}):\n• Kualitas Udara (AQI): ${aqi} (${aqiInfo.label})\n• Cuaca: ${temp}°C, ${weatherVisual.label}\n• Skor Kesehatan Lingkungan: ${health.score}/100 (${health.category})\n• Potensi Karhutla (FDRS): ${fdrs.code} (${fdrs.label})${isHazeSpillover ? ' [⚠️ Waspada Asap Karhutla]' : ''}\n${latestEarthquake ? `• Gempa Terkini: M ${latestEarthquake.magnitude} (${latestEarthquake.wilayah})\n` : ''}🌐 Cek real-time di https://sekitarku.vercel.app`;
+  const shareText = `🌿 Pantauan Lingkungan ${location.name} (${dateFormatted}):\n• Kualitas Udara: AQI ${aqi} (${aqiInfo.label})\n• Cuaca: ${temp}°C, ${weatherVisual.label}\n• Skor Kesehatan: ${health.score}/100 (${health.category})\n• Status Kabut Asap: ${isHazeSpillover ? `⚠️ TERPAPAR KABUT ASAP (Asap dari titik api ${nearestFire.regency} sejauh ${nearestFire.distanceKm} km)` : '🟢 Bersih'}\n• Potensi Api Lahan Lokal: ${fdrs.code} (${fdrs.label})\n${latestEarthquake ? `• Gempa Terkini: M ${latestEarthquake.magnitude} (${latestEarthquake.wilayah})\n` : ''}🌐 Cek real-time di https://sekitarku.vercel.app`;
 
   // Draw 9:16 high quality story infographic on HTML5 canvas with zero overflow
   const generateCanvasImage = () => {
@@ -136,7 +136,7 @@ export function ShareCardModal({
       drawCard(120, 330, 840, 70, scoreBg, scoreColor, 16);
       ctx.fillStyle = scoreColor;
       ctx.font = 'bold 26px sans-serif';
-      ctx.fillText(`Skor Kesehatan Lingkungan: ${health.score}/100 (${health.category})`, 150, 374);
+      ctx.fillText(`Skor Kesehatan: ${health.score}/100 (${health.category})`, 150, 374);
 
       // ==========================================
       // 3. ROW 1: AQI & WEATHER (y: 460, h: 360)
@@ -183,84 +183,90 @@ export function ShareCardModal({
       ctx.fillText(`Indeks Radiasi UV: ${uvIndex}`, 590, 775);
 
       // ==========================================
-      // 4. ROW 2: POTENSI KARHUTLA & KABUT ASAP (y: 850, h: 320)
+      // 4. ROW 2: POTENSI KARHUTLA & KABUT ASAP (y: 850, h: 340)
       // ==========================================
-      drawCard(80, 850, 920, 320, '#FFFFFF', '#E2E8F0');
+      drawCard(80, 850, 920, 340, '#FFFFFF', '#E2E8F0');
 
       ctx.fillStyle = '#EA580C';
       ctx.font = 'bold 24px sans-serif';
-      ctx.fillText('🔥 POTENSI KARHUTLA & PETA KABUT ASAP', 120, 905);
+      ctx.fillText('🔥 POTENSI KARHUTLA & KABUT ASAP', 120, 900);
 
-      // FDRS Badge
-      const fdrsColor = fdrs.color || '#10B981';
-      const fdrsBg = fdrs.bg || '#ECFDF5';
-      drawCard(120, 935, 260, 65, fdrsBg, fdrsColor, 16);
-
-      ctx.fillStyle = fdrsColor;
-      ctx.font = 'bold 24px sans-serif';
-      ctx.fillText(`FDRS: ${fdrs.code}`, 150, 977);
-
-      ctx.fillStyle = '#0F172A';
-      ctx.font = 'bold 24px sans-serif';
-      ctx.fillText(fdrs.label, 410, 977);
-
-      // Haze Warning Badge if active
+      // 2 Badges: 1 for Smoke Haze, 1 for Local Soil FDRS
       if (isHazeSpillover) {
-        drawCard(680, 935, 280, 65, '#FEE2E2', '#DC2626', 16);
+        // Haze Alert Badge (Red/Orange)
+        drawCard(120, 930, 380, 60, '#FEE2E2', '#DC2626', 14);
         ctx.fillStyle = '#DC2626';
         ctx.font = 'bold 22px sans-serif';
-        ctx.fillText('⚠️ Waspada Kabut Asap', 700, 976);
+        ctx.fillText('⚠️ TERPAPAR KABUT ASAP', 145, 968);
+
+        // Local Soil FDRS Badge (Secondary)
+        drawCard(520, 930, 340, 60, '#F1F5F9', '#94A3B8', 14);
+        ctx.fillStyle = '#475569';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.fillText(`Lahan Lokal: ${fdrs.code}`, 545, 968);
+      } else {
+        // Safe Soil Badge
+        drawCard(120, 930, 320, 60, fdrs.bg || '#ECFDF5', fdrs.color || '#10B981', 14);
+        ctx.fillStyle = fdrs.color || '#10B981';
+        ctx.font = 'bold 22px sans-serif';
+        ctx.fillText(`Lahan Lokal: ${fdrs.code}`, 145, 968);
+
+        // No Haze Badge
+        drawCard(460, 930, 320, 60, '#ECFDF5', '#10B981', 14);
+        ctx.fillStyle = '#059669';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.fillText('🟢 Kabut Asap: Nihil', 485, 968);
       }
 
-      // Condition Message
-      ctx.fillStyle = isHazeSpillover ? '#DC2626' : '#475569';
-      ctx.font = isHazeSpillover ? 'bold 20px sans-serif' : '500 20px sans-serif';
+      // Plain Language Explanation
+      ctx.fillStyle = isHazeSpillover ? '#DC2626' : '#334155';
+      ctx.font = isHazeSpillover ? 'bold 21px sans-serif' : '500 20px sans-serif';
       if (isHazeSpillover) {
-        drawWrappedText(`🚨 Terdeteksi kabut asap: Kualitas udara buruk (AQI ${aqi}) terindikasi kuat dipicu sebaran asap kebakaran dari ${nearestFire?.regency} (${nearestFire?.distanceKm} km). Disarankan masker N95!`, 120, 1040, 840, 28, 2);
+        drawWrappedText(`🚨 Peringatan: Udara terpapar kabut asap kiriman dari titik api ${nearestFire?.regency} (${nearestFire?.distanceKm} km). Lahan setempat aman dari api, namun gunakan masker N95 untuk pernapasan!`, 120, 1025, 840, 28, 3);
       } else {
-        drawWrappedText(fdrs.desc, 120, 1040, 840, 28, 2);
+        drawWrappedText(`Kondisi lahan setempat basah & aman dari risiko api baru. Tidak terdeteksi sebaran kabut asap karhutla di wilayah ini.`, 120, 1025, 840, 28, 2);
       }
 
       // Hotspot Distance Info
-      ctx.fillStyle = nearestFire && nearestFire.distanceKm <= 50 ? '#DC2626' : '#64748B';
-      ctx.font = '600 20px sans-serif';
+      ctx.fillStyle = '#64748B';
+      ctx.font = '600 19px sans-serif';
       if (nearestFire) {
-        ctx.fillText(`Titik Panas Terdekat: ${nearestFire.regency} (${nearestFire.distanceKm} km dari lokasi) · Satelit ${nearestFire.satellite}`, 120, 1125);
+        ctx.fillText(`📍 Titik Panas Terdekat: ${nearestFire.regency} (${nearestFire.distanceKm} km) · Satelit ${nearestFire.satellite}`, 120, 1150);
       } else {
-        ctx.fillText('Nihil titik panas aktif terpantau dalam radius 400 km.', 120, 1125);
+        ctx.fillText('Nihil titik panas aktif terpantau dalam radius 400 km.', 120, 1150);
       }
 
       // ==========================================
-      // 5. ROW 3: GEMPA TERKINI (y: 1200, h: 300)
+      // 5. ROW 3: GEMPA TERKINI (y: 1220, h: 290)
       // ==========================================
-      drawCard(80, 1200, 920, 300, '#FFFFFF', '#E2E8F0');
+      drawCard(80, 1220, 920, 290, '#FFFFFF', '#E2E8F0');
 
       ctx.fillStyle = '#DC2626';
       ctx.font = 'bold 24px sans-serif';
-      ctx.fillText('⚡ GEMPA BUMI TERKINI (BMKG)', 120, 1255);
+      ctx.fillText('⚡ GEMPA BUMI TERKINI (BMKG)', 120, 1270);
 
       if (latestEarthquake) {
         // Magnitude Pill
-        drawCard(120, 1285, 170, 75, '#FEE2E2', '#DC2626', 16);
+        drawCard(120, 1300, 170, 75, '#FEE2E2', '#DC2626', 16);
         ctx.fillStyle = '#DC2626';
         ctx.font = 'bold 38px sans-serif';
-        ctx.fillText(`M ${latestEarthquake.magnitude}`, 150, 1337);
+        ctx.fillText(`M ${latestEarthquake.magnitude}`, 150, 1352);
 
         // Location text
         ctx.fillStyle = '#0F172A';
         ctx.font = 'bold 24px sans-serif';
-        drawWrappedText(latestEarthquake.wilayah || 'Wilayah Indonesia', 315, 1315, 640, 34, 2);
+        drawWrappedText(latestEarthquake.wilayah || 'Wilayah Indonesia', 315, 1330, 640, 34, 2);
 
         // Sub details
         const depthVal = latestEarthquake.depth || latestEarthquake.kedalaman || '-';
         ctx.fillStyle = '#64748B';
         ctx.font = '600 20px sans-serif';
-        ctx.fillText(`Kedalaman: ${depthVal} · ${latestEarthquake.date || ''} ${latestEarthquake.time || ''}`, 120, 1405);
-        ctx.fillText(latestEarthquake.potensi || 'Tidak berpotensi tsunami', 120, 1440);
+        ctx.fillText(`Kedalaman: ${depthVal} · ${latestEarthquake.date || ''} ${latestEarthquake.time || ''}`, 120, 1420);
+        ctx.fillText(latestEarthquake.potensi || 'Tidak berpotensi tsunami', 120, 1455);
       } else {
         ctx.fillStyle = '#64748B';
         ctx.font = '600 24px sans-serif';
-        ctx.fillText('Tidak ada aktivitas gempa signifikan baru terdeteksi.', 120, 1330);
+        ctx.fillText('Tidak ada aktivitas gempa signifikan baru terdeteksi.', 120, 1345);
       }
 
       // ==========================================
@@ -269,18 +275,18 @@ export function ShareCardModal({
       ctx.strokeStyle = '#E2E8F0';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(80, 1550);
-      ctx.lineTo(1000, 1550);
+      ctx.moveTo(80, 1540);
+      ctx.lineTo(1000, 1540);
       ctx.stroke();
 
       ctx.fillStyle = '#0F172A';
       ctx.font = 'bold 36px sans-serif';
-      ctx.fillText('sekitarku.vercel.app', 80, 1610);
+      ctx.fillText('sekitarku.vercel.app', 80, 1600);
 
       ctx.fillStyle = '#64748B';
       ctx.font = '500 22px sans-serif';
-      ctx.fillText('Sumber Resmi: BMKG, PVMBG Magma, NASA FIRMS & Copernicus', 80, 1655);
-      ctx.fillText('Data diperbarui secara real-time untuk mitigasi bencana', 80, 1690);
+      ctx.fillText('Sumber Resmi: BMKG, PVMBG Magma, NASA FIRMS & Copernicus', 80, 1645);
+      ctx.fillText('Data diperbarui secara real-time untuk mitigasi bencana', 80, 1680);
 
       // Export as Blob
       canvas.toBlob((blob) => {
@@ -401,7 +407,7 @@ export function ShareCardModal({
           </button>
         </div>
 
-        {/* Story Card Visual Preview (100% Synchronized with Generated Image) */}
+        {/* Story Card Visual Preview */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '1.25rem 1.5rem', backgroundColor: 'var(--bg-card)' }}>
           
           <div
@@ -455,24 +461,25 @@ export function ShareCardModal({
               </div>
             </div>
 
-            {/* Karhutla Preview in Modal (with Haze Alert Status) */}
+            {/* Karhutla & Kabut Asap Preview in Modal (Super Clear for Laypeople) */}
             <div style={{
-              padding: '0.75rem',
+              padding: '0.85rem',
               borderRadius: 'var(--radius-md)',
               backgroundColor: 'var(--bg-card)',
-              border: 'var(--border-thick)',
+              border: isHazeSpillover ? '1.5px solid var(--color-danger)' : 'var(--border-thick)',
               marginBottom: '0.85rem'
             }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.45rem' }}>
                 <span style={{ fontSize: '0.675rem', fontWeight: '800', color: '#ea580c', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <Flame size={13} /> POTENSI KARHUTLA & KABUT ASAP
+                  <Flame size={13} /> POTENSI KARHUTLA & STATUS KABUT ASAP
                 </span>
-                {isHazeSpillover && (
+                
+                {isHazeSpillover ? (
                   <span style={{
                     fontSize: '0.65rem',
                     fontWeight: '800',
-                    padding: '2px 6px',
-                    borderRadius: '3px',
+                    padding: '2px 7px',
+                    borderRadius: '4px',
                     backgroundColor: 'rgba(239, 68, 68, 0.15)',
                     color: '#dc2626',
                     border: '1px solid #dc2626',
@@ -480,32 +487,57 @@ export function ShareCardModal({
                     alignItems: 'center',
                     gap: '3px'
                   }}>
-                    <Wind size={10} /> Waspada Asap
+                    <Wind size={10} /> ⚠️ Terpapar Asap
+                  </span>
+                ) : (
+                  <span style={{
+                    fontSize: '0.65rem',
+                    fontWeight: '800',
+                    padding: '2px 7px',
+                    borderRadius: '4px',
+                    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                    color: '#059669',
+                    border: '1px solid rgba(16, 185, 129, 0.3)'
+                  }}>
+                    🟢 Asap: Bersih
                   </span>
                 )}
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.25rem', flexWrap: 'wrap', gap: '0.35rem' }}>
+              {/* Status Row */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', margin: '0.35rem 0' }}>
                 <span style={{
-                  fontSize: '0.75rem',
+                  fontSize: '0.725rem',
                   fontWeight: '800',
                   padding: '2px 8px',
                   borderRadius: 'var(--radius-sm)',
-                  backgroundColor: fdrs.color,
-                  color: '#fff'
+                  backgroundColor: fdrs.bg,
+                  color: fdrs.color,
+                  border: `1px solid ${fdrs.color}40`
                 }}>
-                  FDRS: {fdrs.code} ({fdrs.label})
+                  Lahan Lokal: {fdrs.code}
                 </span>
-                <span style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)' }}>
-                  {nearestFire ? `📍 ${nearestFire.regency} (${nearestFire.distanceKm} km)` : 'Nihil titik panas dekat'}
+
+                <span style={{ fontSize: '0.725rem', fontWeight: '600', color: 'var(--text-muted)' }}>
+                  {nearestFire ? `📍 Titik Api: ${nearestFire.regency} (${nearestFire.distanceKm} km)` : 'Nihil titik panas dekat'}
                 </span>
               </div>
 
-              {isHazeSpillover && (
-                <div style={{ marginTop: '0.4rem', fontSize: '0.7rem', color: '#dc2626', fontWeight: '700', lineHeight: 1.3 }}>
-                  🚨 Terdeteksi kabut asap: Kualitas udara buruk (AQI {aqi}) terindikasi dipicu titik api {nearestFire?.regency}.
-                </div>
-              )}
+              {/* Plain language note */}
+              <div style={{
+                marginTop: '0.45rem',
+                padding: '0.45rem 0.6rem',
+                borderRadius: 'var(--radius-sm)',
+                backgroundColor: isHazeSpillover ? 'var(--color-danger-bg)' : 'var(--bg-muted)',
+                fontSize: '0.7rem',
+                color: isHazeSpillover ? 'var(--color-danger)' : 'var(--text-muted)',
+                lineHeight: 1.35,
+                fontWeight: isHazeSpillover ? '700' : '500'
+              }}>
+                {isHazeSpillover
+                  ? `🚨 Waspada: Udara terpapar kabut asap kiriman dari titik api ${nearestFire?.regency} (${nearestFire?.distanceKm} km). Lahan setempat aman dari api, namun gunakan masker N95 untuk pernapasan!`
+                  : `Kondisi lahan setempat basah & aman dari risiko api baru. Tidak terdeteksi kabut asap karhutla di wilayah ini.`}
+              </div>
             </div>
 
             {/* Quake Preview in Modal */}

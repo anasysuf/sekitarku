@@ -20,47 +20,39 @@ export function KarhutlaCard({
 
   const { fdrs, nearest, totalInIndo } = karhutlaData;
   const currentAqi = airQualityData?.current?.aqi || 0;
-  const isUnhealthyAir = currentAqi >= 150;
+  const isModerateOrWorseAir = currentAqi >= 100;
+  const isNearbyHotspot = nearest && nearest.distanceKm <= 150;
+  const isHazeSpillover = isModerateOrWorseAir && isNearbyHotspot;
 
   const isHighRisk = fdrs.code === 'TINGGI' || fdrs.code === 'EKSTREM';
   const isModerateRisk = fdrs.code === 'SEDANG';
   const isVeryNear = nearest && nearest.distanceKm <= 50;
-  const isNearby = nearest && nearest.distanceKm <= 120;
-
-  // Korelasi Silang Cerdas (Compound Risk): Udara Berbahaya + Ada Titik Api Terdekat
-  const isHazeSpillover = isUnhealthyAir && isNearby;
 
   // Compute status banner styling & copy
   let statusBannerBg = 'var(--bg-subtle)';
   let statusBorder = 'var(--border-flat)';
   let statusTextColor = 'var(--text-main)';
   let statusIcon = <ShieldCheck size={16} color="var(--color-primary)" />;
-  let statusMessage = `Tingkat potensi kebakaran di wilayah ${location.name} terpantau AMAN dan terkendali.`;
+  let statusMessage = `Kondisi lahan di wilayah ${location.name} terpantau AMAN dan bebas dari kabut asap.`;
 
   if (isHazeSpillover) {
     statusBannerBg = 'var(--color-danger-bg)';
     statusBorder = 'var(--color-danger)';
     statusTextColor = 'var(--color-danger)';
     statusIcon = <Wind size={16} color="var(--color-danger)" />;
-    statusMessage = `🚨 TERDETEKSI KABUT ASAP: Kualitas udara buruk (AQI ${currentAqi}) di ${location.name} terindikasi kuat dipicu sebaran asap karhutla dari ${nearest.regency} (${nearest.distanceKm} km). Gunakan masker N95 & tutup ventilasi!`;
+    statusMessage = `🚨 PERINGATAN KABUT ASAP: Udara terpapar asap kiriman dari titik api ${nearest.regency} (${nearest.distanceKm} km). Lahan setempat aman dari api, namun gunakan masker N95 untuk pernapasan!`;
   } else if (isVeryNear) {
     statusBannerBg = 'var(--color-danger-bg)';
     statusBorder = 'var(--color-danger)';
     statusTextColor = 'var(--color-danger)';
     statusIcon = <ShieldAlert size={16} color="var(--color-danger)" />;
-    statusMessage = `PERINGATAN: Titik panas satelit aktif hanya berjarak ${nearest.distanceKm} km dari ${location.name}. Waspadai potensi kabut asap tebal!`;
+    statusMessage = `PERINGATAN TITIK API: Titik panas satelit aktif hanya berjarak ${nearest.distanceKm} km dari ${location.name}. Waspadai perambatan api & asap tebal!`;
   } else if (isHighRisk) {
     statusBannerBg = 'var(--color-danger-bg)';
     statusBorder = 'var(--color-danger)';
     statusTextColor = 'var(--color-danger)';
     statusIcon = <AlertTriangle size={16} color="var(--color-danger)" />;
     statusMessage = `STATUS RAWAN: Vegetasi di wilayah ${location.name} sangat kering & mudah terbakar akibat suhu panas / rendah hujan.`;
-  } else if (isNearby) {
-    statusBannerBg = 'var(--color-warning-bg)';
-    statusBorder = 'var(--color-warning)';
-    statusTextColor = '#b45309';
-    statusIcon = <AlertTriangle size={16} color="#b45309" />;
-    statusMessage = `Titik panas terdekat berada di ${nearest.regency} (${nearest.distanceKm} km dari ${location.name}). Kondisi lahan lokal masih terpantau aman.`;
   } else if (isModerateRisk) {
     statusBannerBg = 'var(--color-warning-bg)';
     statusBorder = 'var(--color-warning)';
@@ -89,7 +81,7 @@ export function KarhutlaCard({
           </div>
           <div>
             <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>
-              Indeks Kebakaran Hutan & Titik Panas
+              Indeks Kebakaran Hutan & Status Kabut Asap
             </h3>
             <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: '600' }}>
               Data FDRS BMKG · Satelit NASA FIRMS · Deteksi Asap Lintas Wilayah
@@ -97,9 +89,9 @@ export function KarhutlaCard({
           </div>
         </div>
 
-        {/* Status Badges */}
+        {/* Status Badges: Clear Distinction */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-          {isHazeSpillover && (
+          {isHazeSpillover ? (
             <span style={{
               fontSize: '0.725rem',
               fontWeight: '800',
@@ -113,7 +105,22 @@ export function KarhutlaCard({
               gap: '4px'
             }}>
               <Wind size={12} strokeWidth={2.5} />
-              <span>Waspada Asap Karhutla</span>
+              <span>⚠️ Terpapar Kabut Asap</span>
+            </span>
+          ) : (
+            <span style={{
+              fontSize: '0.725rem',
+              fontWeight: '800',
+              padding: '4px 10px',
+              borderRadius: 'var(--radius-sm)',
+              backgroundColor: 'rgba(16, 185, 129, 0.12)',
+              color: '#059669',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}>
+              <span>🟢 Asap: Bersih</span>
             </span>
           )}
 
@@ -129,7 +136,7 @@ export function KarhutlaCard({
             color: '#ffffff'
           }}>
             <Flame size={13} strokeWidth={2.5} />
-            <span>FDRS: {fdrs.code} ({fdrs.label})</span>
+            <span>Lahan Lokal: {fdrs.code}</span>
           </div>
         </div>
       </div>
@@ -172,16 +179,16 @@ export function KarhutlaCard({
           )}
         </div>
 
-        {/* Right: FDRS Condition & Explanation */}
+        {/* Right: FDRS Condition & Plain Language Explanation */}
         <div>
           <span style={{ fontSize: '0.7rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            Potensi Kebakaran Lahan Lokal ({location.name})
+            Kondisi Lahan & Vegetasi ({location.name})
           </span>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-main)', margin: '0.25rem 0 0 0', fontWeight: '600', lineHeight: 1.4 }}>
             {fdrs.desc}
           </p>
           <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: '500', display: 'block', marginTop: '0.35rem' }}>
-            *FDRS mengukur kemudahan tersulutnya vegetasi setempat, sedangkan sebaran asap luar dipantau via korelasi AQI.
+            *💡 Penjelasan: Status "Lahan Aman" berarti rumput/tanah lokal sedang basah & tidak mudah menyala, tetapi udara tetap bisa terpapar asap dari titik api di wilayah sekitar.
           </span>
         </div>
       </div>
