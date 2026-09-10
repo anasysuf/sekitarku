@@ -1,4 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { Header } from './components/common/Header';
 import { EcoHealthCard } from './components/cards/EcoHealthCard';
 import { AqiCard } from './components/cards/AqiCard';
@@ -433,6 +434,9 @@ export function App() {
 
       {/* Footer */}
       <Footer onOpenWidget={() => setIsWidgetOpen(true)} />
+
+      {/* Vercel Web Analytics */}
+      <Analytics />
     </div>
   );
 }
