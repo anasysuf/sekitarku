@@ -676,9 +676,9 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
                   marginBottom: '0.35rem',
                   fontFamily: 'Outfit, sans-serif'
                 }}>
-                  isHazeActive
-                    ? `Terdeteksi paparan kabut asap (${nearestFire ? `${nearestFire.distanceKm} km dari ${nearestFire.regency}` : 'partikel asap karhutla'}). Gunakan masker N95 / KN95.`
-                    : 'Kondisi udara bersih dari kabut asap kebakaran hutan dalam jarak dekat.'
+                  {isHazeActive
+                    ? `Peringatan: Terdeteksi paparan kabut asap (${nearestFire ? `${nearestFire.distanceKm} km dari ${nearestFire.regency}` : 'partikel asap karhutla'}). Gunakan masker N95 / KN95.`
+                    : 'Kondisi udara bersih dari kabut asap kebakaran hutan dalam jarak dekat.'}
                 </div>
 
                 {/* Hotspot details */}
