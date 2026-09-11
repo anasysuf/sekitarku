@@ -42,15 +42,15 @@ export function Footer({ onOpenWidget }) {
         </a>
       </div>
 
-      {/* Footer Navigation Links */}
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1.25rem', marginTop: '1.25rem', fontSize: '0.8rem', flexWrap: 'wrap' }}>
+      {/* Footer Navigation Links: Row 1 (App & Dev Actions) */}
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1.25rem', marginTop: '1.25rem', fontSize: '0.825rem', flexWrap: 'wrap' }}>
         <a
           href="https://github.com/anasysuf/sekitarku"
           target="_blank"
           rel="noopener noreferrer"
           style={{ color: 'var(--color-primary)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: '700' }}
         >
-          <Code2 size={15} strokeWidth={2.5} /> {t.repoLink}
+          <Code2 size={16} strokeWidth={2.5} /> {t.repoLink}
         </a>
 
         {onOpenWidget && (
@@ -65,21 +65,24 @@ export function Footer({ onOpenWidget }) {
               alignItems: 'center',
               gap: '0.35rem',
               fontWeight: '700',
-              fontSize: '0.8rem',
+              fontSize: '0.825rem',
               padding: 0
             }}
           >
-            <Code size={15} strokeWidth={2.5} /> {t.embedWidget}
+            <Code size={16} strokeWidth={2.5} /> {t.embedWidget}
           </button>
         )}
+      </div>
 
+      {/* Footer Navigation Links: Row 2 (Official Open Data Sources) */}
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1.15rem', marginTop: '0.75rem', fontSize: '0.775rem', flexWrap: 'wrap' }}>
         <a
           href="https://data.bmkg.go.id"
           target="_blank"
           rel="noopener noreferrer"
           style={{ color: 'var(--color-secondary)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: '700' }}
         >
-          <Globe size={15} strokeWidth={2.5} /> BMKG Open Data
+          <Globe size={14} strokeWidth={2.5} /> BMKG Open Data
         </a>
 
         <a
@@ -88,7 +91,7 @@ export function Footer({ onOpenWidget }) {
           rel="noopener noreferrer"
           style={{ color: '#d97706', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: '700' }}
         >
-          <Mountain size={15} strokeWidth={2.5} /> PVMBG Magma
+          <Mountain size={14} strokeWidth={2.5} /> PVMBG Magma
         </a>
 
         <a
@@ -97,7 +100,7 @@ export function Footer({ onOpenWidget }) {
           rel="noopener noreferrer"
           style={{ color: '#ea580c', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: '700' }}
         >
-          <Flame size={15} strokeWidth={2.5} /> KLHK SiPongi+
+          <Flame size={14} strokeWidth={2.5} /> KLHK SiPongi+
         </a>
 
         <a
@@ -106,7 +109,7 @@ export function Footer({ onOpenWidget }) {
           rel="noopener noreferrer"
           style={{ color: '#ef4444', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: '700' }}
         >
-          <Flame size={15} strokeWidth={2.5} /> NASA FIRMS
+          <Flame size={14} strokeWidth={2.5} /> NASA FIRMS
         </a>
 
         <a
@@ -115,7 +118,7 @@ export function Footer({ onOpenWidget }) {
           rel="noopener noreferrer"
           style={{ color: '#059669', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: '700' }}
         >
-          <Globe size={15} strokeWidth={2.5} /> Open-Meteo
+          <Globe size={14} strokeWidth={2.5} /> Open-Meteo
         </a>
       </div>
     </footer>
