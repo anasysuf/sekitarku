@@ -93,10 +93,10 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
               gap: '0.65rem'
             }}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Leaf size={16} color="var(--color-primary)" />
-                <strong style={{ fontSize: '0.9rem', color: 'var(--text-main)', fontWeight: '800' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flex: 1 }}>
+                <Leaf size={16} color="var(--color-primary)" style={{ flexShrink: 0 }} />
+                <strong style={{ fontSize: '0.9rem', color: 'var(--text-main)', fontWeight: '800', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   Sekitarku • {cityName}
                 </strong>
               </div>
@@ -107,7 +107,9 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
                   borderRadius: '6px',
                   backgroundColor: aqiInfo.bg,
                   color: aqiInfo.color,
-                  fontWeight: '800'
+                  fontWeight: '800',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0
                 }}
               >
                 AQI {aqiVal} ({aqiInfo.label})
@@ -121,19 +123,20 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
                 alignItems: 'center',
                 backgroundColor: 'var(--bg-muted)',
                 padding: '0.55rem 0.85rem',
-                borderRadius: '8px'
+                borderRadius: '8px',
+                gap: '0.5rem'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0 }}>
                 <strong style={{ fontSize: '1.05rem', fontWeight: '900', color: 'var(--text-main)' }}>
                   {temp}°C
                 </strong>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {weatherLabel}
                 </span>
               </div>
-              <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: '500' }}>
-                Sumber: BMKG
+              <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: '600', whiteSpace: 'nowrap', flexShrink: 0 }}>
+                BMKG · Open-Meteo
               </span>
             </div>
           </div>
@@ -146,23 +149,24 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
             <div
               style={{
                 display: 'inline-flex',
-                alignItems: 'center',
+                alignItems: 'stretch',
                 borderRadius: '6px',
                 overflow: 'hidden',
-                fontSize: '0.775rem',
+                fontSize: '0.75rem',
                 fontWeight: '800',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                lineHeight: '1.2'
+                boxShadow: '0 2px 8px rgba(0,0,0,0.12)',
+                lineHeight: '1.2',
+                maxWidth: '100%'
               }}
             >
-              <div style={{ backgroundColor: '#10b981', color: '#ffffff', padding: '5px 10px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <Leaf size={14} color="var(--color-primary)" />
+              <div style={{ backgroundColor: '#10b981', color: '#ffffff', padding: '6px 10px', display: 'inline-flex', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
+                <Leaf size={13} color="#ffffff" strokeWidth={2.5} />
                 <span>Sekitarku</span>
               </div>
-              <div style={{ backgroundColor: '#1e293b', color: '#f8fafc', padding: '5px 10px' }}>
+              <div style={{ backgroundColor: '#1e293b', color: '#f8fafc', padding: '6px 10px', display: 'inline-flex', alignItems: 'center', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '200px' }}>
                 {cityName} ({temp}°C)
               </div>
-              <div style={{ backgroundColor: aqiInfo.color || '#ef4444', color: '#ffffff', padding: '5px 10px' }}>
+              <div style={{ backgroundColor: aqiInfo.color || '#ef4444', color: '#ffffff', padding: '6px 10px', display: 'inline-flex', alignItems: 'center', whiteSpace: 'nowrap', flexShrink: 0 }}>
                 AQI {aqiVal} • {aqiInfo.label}
               </div>
             </div>
@@ -238,7 +242,7 @@ export function EmbedWidgetModal({ isOpen, onClose, location, airQualityData, we
 
         {/* Footer info */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '0.5rem', borderTop: 'var(--border-thick)', fontSize: '0.725rem', color: 'var(--text-muted)' }}>
-          <span>100% Gratis & Real-Time Open Data BMKG</span>
+          <span>100% Gratis & Data Terbuka Resmi (BMKG, PVMBG, NASA & SiPongi+)</span>
           <button onClick={onClose} className="flat-btn-primary" style={{ padding: '5px 14px', fontSize: '0.775rem' }}>
             Selesai
           </button>
