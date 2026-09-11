@@ -126,7 +126,7 @@ export function AqiChart({ hourlyData }) {
           </div>
           <div>
             <h3 style={{ fontSize: '1.05rem', fontWeight: '800', margin: 0, color: 'var(--text-main)' }}>
-              {t.aqiTrend || 'Tren Kualitas Udara'} (24 Jam)
+              {t.aqiTrend || 'Tren Kualitas Udara (24 Jam)'}
             </h3>
             <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)', fontWeight: '600' }}>
               Riwayat Polutan & Indeks Standar Kualitas Udara (US-EPA & ISPU)

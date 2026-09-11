@@ -431,6 +431,7 @@ export function App() {
             isOpen={isKarhutlaOpen}
             onClose={() => setIsKarhutlaOpen(false)}
             userLocation={location}
+            hotspots={karhutlaData?.allHotspots || []}
           />
         </Suspense>
       )}
@@ -521,20 +522,28 @@ export function App() {
         loading={loading}
       />
 
-      {/* Row 1: AQI, Weather, Quake */}
+      {/* Row 1: Atmospheric & Environmental Readouts (AQI, Weather, UV Radiation) */}
       <div className="dashboard-grid-3">
         <AqiCard data={airQualityData} loading={loading} />
         <WeatherCard data={weatherData} locationName={location.name} loading={loading} />
+        <UvCard uvIndex={weatherData?.current?.uvIndex || 0} loading={loading} />
+      </div>
+
+      {/* Row 2: Geological & Seismic Hazards (Earthquake BMKG & Volcano PVMBG Side by Side) */}
+      <div className="dashboard-grid-2" style={{ marginBottom: '1.5rem' }}>
         <EarthquakeCard
           earthquake={latestEarthquake}
           recentQuakes={recentEarthquakes}
           onFocusQuake={handleFocusQuake}
           loading={loading}
         />
+        <VolcanoCard
+          location={location}
+          onOpenModal={() => setIsVolcanoOpen(true)}
+        />
       </div>
 
-      
-      {/* Karhutla & Fire Danger Rating Card (BMKG FDRS & NASA FIRMS) */}
+      {/* Row 3: Wildfire & Haze Alert (BMKG FDRS, NASA FIRMS & KLHK SiPongi+) */}
       <KarhutlaCard
         karhutlaData={karhutlaData}
         airQualityData={airQualityData}
@@ -543,16 +552,9 @@ export function App() {
         loading={loading}
       />
 
-      {/* Volcano Proximity & Monitoring Card (PVMBG / MAGMA Indonesia) */}
-      <VolcanoCard
-        location={location}
-        onOpenModal={() => setIsVolcanoOpen(true)}
-      />
-
-      {/* Row 2: UV + Hourly Chart */}
-      <div className="dashboard-grid-2">
-        <UvCard uvIndex={weatherData?.current?.uvIndex || 0} loading={loading} />
-        <Suspense fallback={<ComponentSkeleton height="240px" label="Memuat Grafik Tren AQI..." />}>
+      {/* Row 4: 24-Hour Air Quality Trend Chart (Dedicated Full Width) */}
+      <div style={{ marginBottom: '1.5rem' }}>
+        <Suspense fallback={<ComponentSkeleton height="260px" label="Memuat Grafik Tren AQI..." />}>
           <AqiChart hourlyData={airQualityData?.hourly} />
         </Suspense>
       </div>

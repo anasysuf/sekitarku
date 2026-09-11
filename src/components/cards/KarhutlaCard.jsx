@@ -32,7 +32,9 @@ export function KarhutlaCard({ karhutlaData, airQualityData, location, onOpenMod
   let statusBorder = 'var(--border-flat)';
   let statusTextColor = 'var(--text-main)';
   let statusIcon = <ShieldCheck size={16} color="var(--color-primary)" />;
-  let statusMessage = 'Terdeteksi titik kebakaran lahan sangat dekat (' + nearest.distanceKm + ' km). Risiko asap pekat tinggi.';
+  let statusMessage = nearest && nearest.distanceKm <= 50
+    ? `Terdeteksi titik kebakaran lahan sangat dekat (${nearest.distanceKm} km dari ${nearest.regency}). Risiko asap pekat tinggi.`
+    : (t.statusSafeMsg || `Kondisi lahan di ${location.name} terpantau AMAN dan bebas dari paparan kabut asap karhutla.`);
 
   if (isHazeActive) {
     statusBannerBg = 'var(--color-danger-bg)';

@@ -62,6 +62,8 @@ const dictionaryId = {
   so2: 'Sulfur Dioksida (SO2)',
   healthAdvice: 'Saran Kesehatan',
   dominantPollutant: 'Polutan Utama',
+  aqiTrend: 'Tren Kualitas Udara (24 Jam)',
+  metricAqi: 'Indeks AQI',
 
   // Weather Card
   weatherTitle: 'Cuaca & Iklim',

@@ -13,7 +13,7 @@ export function VolcanoCard({ location, onOpenModal, onFocusVolcano }) {
   const isNear = nearest.distanceKm <= 50;
 
   return (
-    <div className="flat-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+    <div className="flat-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
       
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.85rem', flexWrap: 'wrap', gap: '0.5rem' }}>
