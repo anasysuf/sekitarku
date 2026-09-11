@@ -92,7 +92,7 @@ const dictionaryId = {
 
   // Karhutla & Wildfire Card
   karhutlaTitle: 'Indeks Kebakaran Hutan & Lahan (Karhutla)',
-  karhutlaSubtitle: 'Data FDRS BMKG · Satelit NASA FIRMS · Deteksi Kabut Asap Lintas Wilayah',
+  karhutlaSubtitle: 'Data FDRS BMKG · KLHK SiPongi+ & NASA FIRMS · Deteksi Kabut Asap Lintas Wilayah',
   karhutlaCardHeader: 'STATUS KARHUTLA & KABUT ASAP',
   hazeActiveBadge: 'Terdeteksi Paparan Asap',
   hazeCleanBadge: 'Kabut Asap: Bersih / Aman',
@@ -109,7 +109,7 @@ const dictionaryId = {
   waspadaAlertMsg: 'STATUS WASPADA: Semak & alang-alang mulai mengering. Hindari pembakaran sampah.',
   hotspotsNearby: 'Titik Panas Satelit (400 km)',
   activeHotspots: 'Titik Panas Terdeteksi',
-  satelliteSource: 'Sumber Satelit: NASA FIRMS (VIIRS & MODIS)',
+  satelliteSource: 'Sumber Satelit: KLHK SiPongi+ & NASA FIRMS (VIIRS & MODIS)',
   fdrsIndex: 'Tingkat Kerawanan FDRS',
   fdrsLow: 'Rendah (Aman)',
   fdrsModerate: 'Sedang (Waspada)',
@@ -188,7 +188,7 @@ const dictionaryId = {
 
   // Footer & Common
   footerTitle: 'Sekitarku: Pantauan Lingkungan Hidup & Mitigasi Bencana Real-Time',
-  footerSources: 'Sumber Data Resmi: BMKG (Meteorologi, Klimatologi & Geofisika), PVMBG / Magma Indonesia (Aktivitas Gunung Api), NASA FIRMS (Satelit Titik Panas Karhutla), dan Open-Meteo / Copernicus (Kualitas Udara ISPU & AQI).',
+  footerSources: 'Sumber Data Resmi: BMKG (Meteorologi, Klimatologi & Geofisika), PVMBG / Magma Indonesia (Aktivitas Gunung Api), KLHK SiPongi+ & NASA FIRMS (Satelit Titik Panas Karhutla), serta Open-Meteo / Copernicus Atmosphere (Kualitas Udara ISPU & AQI).',
   treatCoffee: 'Traktir Kopi',
   embedWidget: 'Pasang Widget',
   repoLink: 'GitHub Repository',

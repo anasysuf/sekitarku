@@ -92,12 +92,30 @@ export function Footer({ onOpenWidget }) {
         </a>
 
         <a
+          href="https://sipongi.gakkum.kehutanan.go.id"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: '#ea580c', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: '700' }}
+        >
+          <Flame size={15} strokeWidth={2.5} /> KLHK SiPongi+
+        </a>
+
+        <a
           href="https://firms.modaps.eosdis.nasa.gov"
           target="_blank"
           rel="noopener noreferrer"
           style={{ color: '#ef4444', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: '700' }}
         >
           <Flame size={15} strokeWidth={2.5} /> NASA FIRMS
+        </a>
+
+        <a
+          href="https://open-meteo.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: '#059669', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.35rem', fontWeight: '700' }}
+        >
+          <Globe size={15} strokeWidth={2.5} /> Open-Meteo
         </a>
       </div>
     </footer>

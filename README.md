@@ -9,7 +9,7 @@
   <a href="https://sekitarku.vercel.app" target="_blank">
     <img src="https://img.shields.io/badge/Akses_Website-sekitarku.vercel.app-2563eb?style=for-the-badge&logo=vercel&logoColor=white" alt="Website" />
   </a>
-  <img src="https://img.shields.io/badge/Versi-1.2.0-10b981?style=for-the-badge" alt="Versi" />
+  <img src="https://img.shields.io/badge/Versi-1.2.1-10b981?style=for-the-badge" alt="Versi" />
   <img src="https://img.shields.io/badge/Lisensi-MIT-f59e0b?style=for-the-badge" alt="Lisensi" />
   <img src="https://img.shields.io/badge/Status_Data-100%25_Real--Time-059669?style=for-the-badge" alt="Realtime" />
 </p>
@@ -18,9 +18,13 @@
 
 ## 📖 Tentang Sekitarku
 
-**Sekitarku** adalah platform web progresif (*Progressive Web App*) karya anak bangsa yang dirancang untuk mendemokratisasi akses data lingkungan hidup dan mitigasi bencana di Indonesia. Mengintegrasikan berbagai API data terbuka resmi dari **BMKG (Badan Meteorologi, Klimatologi, dan Geofisika)**, **PVMBG / MAGMA Indonesia (Pusat Vulkanologi dan Mitigasi Bencana Geologi)**, **NASA FIRMS**, dan **Open-Meteo**, Sekitarku menyajikan gambaran menyeluruh kondisi ekologis di lebih dari 500 kota dan kabupaten di 38 provinsi di seluruh Nusantara.
+**Sekitarku** adalah platform web progresif (*Progressive Web App*) karya anak bangsa yang dirancang untuk mendemokratisasi akses data lingkungan hidup dan mitigasi bencana di Indonesia. Mengintegrasikan berbagai API data terbuka resmi dari:
+- **BMKG (Badan Meteorologi, Klimatologi, dan Geofisika)**: Parameter cuaca, prakiraan 7 hari, FDRS bahaya kebakaran hutan, dan *InaTEWS* sistem peringatan gempa & tsunami.
+- **PVMBG / MAGMA Indonesia (Badan Geologi ESDM)**: Status 4 level erupsi gunung api, radius bahaya kawah, dan rekomendasi mitigasi vulkanik.
+- **KLHK SiPongi+ & NASA FIRMS**: Data satelit titik panas kebakaran hutan dan lahan (*NRT VIIRS 375m & MODIS*) mencakup 38 provinsi di seluruh Nusantara.
+- **Open-Meteo & Copernicus Atmosphere Service**: Indeks Kualitas Udara (ISPU & US-EPA AQI), spektrum polutan partikulat mikro (PM2.5, PM10, CO, NO2, SO2, O3), dan radiasi ultraviolet (UV).
 
-Dirancang dengan prinsip desain antarmuka modern yang bersih (*clean flat aesthetic*), kontras tinggi, navigasi intuitif, serta arsitektur data instan (**Zero-Latency SWR Cache & Infallible Fallback**), pengguna dapat memantau kesehatan lingkungan di sekitar mereka secara akurat kapan pun dan di mana pun.
+Sekitarku menyajikan gambaran menyeluruh kondisi ekologis di lebih dari 500 kota dan kabupaten di seluruh Indonesia. Dirancang dengan prinsip desain antarmuka modern yang bersih (*clean flat aesthetic*), kontras tinggi, navigasi intuitif, serta arsitektur data instan (**Zero-Latency SWR Cache & Infallible Fallback**), pengguna dapat memantau kesehatan lingkungan di sekitar mereka secara akurat kapan pun dan di mana pun.
 
 ---
 
@@ -29,11 +33,11 @@ Dirancang dengan prinsip desain antarmuka modern yang bersih (*clean flat aesthe
 ```mermaid
 flowchart TD
     subgraph Sumber_Data_Resmi ["📡 Sumber Data Resmi Terbuka"]
-        BMKG_API["🏛️ BMKG InaTEWS\n(Gempa & Seismik Real-Time)"]
-        NASA_API["🛰️ NASA FIRMS VIIRS/MODIS\n(Titik Panas Karhutla)"]
+        BMKG_API["🏛️ BMKG InaTEWS & Cuaca\n(Gempa, Seismik & FDRS)"]
+        KLHK_API["🔥 KLHK SiPongi+ & NASA FIRMS\n(Titik Panas Satelit Karhutla)"]
         PVMBG_API["🌋 PVMBG / MAGMA ESDM\n(Status Vulkanik & Bahaya)"]
-        Meteo_API["⛅ Open-Meteo API\n(Cuaca, Radiasi UV & FDRS)"]
-        AQI_API["🏭 Open-Meteo Air Quality\n(PM2.5, PM10, AQI US EPA)"]
+        Meteo_API["⛅ Open-Meteo API\n(Cuaca, Radiasi UV & Iklim)"]
+        AQI_API["🏭 Open-Meteo / Copernicus\n(PM2.5, PM10, AQI US EPA & ISPU)"]
     end
 
     subgraph Service_Layer ["⚙️ Service & Caching Layer"]
@@ -65,7 +69,7 @@ flowchart TD
     end
 
     BMKG_API --> BMKG_Svc
-    NASA_API --> Karhutla_Svc
+    KLHK_API --> Karhutla_Svc
     PVMBG_API --> Volcano_Svc
     Meteo_API --> Weather_Svc
     AQI_API --> AQI_Svc
@@ -113,7 +117,7 @@ flowchart TD
 
 ### 3. Pusat Pemantauan Karhutla & Deteksi Kabut Asap (Haze Detection)
 - **Sistem Peringkat Bahaya Kebakaran Hutan BMKG (FDRS)**: Menghitung status kerawanan lahan (*Aman/Rendah, Sedang, Rawan/Tinggi, Sangat Rawan/Ekstrem*) berdasarkan kelembapan, suhu, dan curah hujan.
-- **Titik Panas Satelit NASA (VIIRS/SNPP & MODIS)**: Pemantauan koordinat kebakaran hutan real-time, daya radiasi api (*FRP MW*), dan tingkat kepercayaan satelit.
+- **Titik Panas Satelit KLHK SiPongi+ & NASA FIRMS (VIIRS/SNPP & MODIS)**: Pemantauan koordinat kebakaran hutan real-time, daya radiasi api (*FRP MW*), dan tingkat kepercayaan satelit di seluruh 38 provinsi di Indonesia.
 - **Korelasi Cerdas Kabut Asap (*Smart Haze Cross-Correlation*)**: Mengkorelasikan jarak titik api terdekat dengan lonjakan partikulat PM2.5 lokal untuk membedakan antara kabut biasa (*mist/fog*) dan asap kebakaran beracun (*toxic wildfire haze*).
 
 ### 4. Pemantauan Aktivitas Gunung Api PVMBG / MAGMA Indonesia
@@ -183,11 +187,12 @@ Sistem Sekitarku dirancang dengan standar performa tinggi untuk menjamin kecepat
 - **Ikonografi**: [Lucide React](https://lucide.dev/)
 - **Manipulasi Waktu**: [date-fns](https://date-fns.org/)
 - **Dynamic OG Image**: `@vercel/og`
-- **Sumber Data Terbuka**:
-  - BMKG Indonesia Open Data (TEWS Seismik & Gempa Bumi)
-  - PVMBG / MAGMA Indonesia (Pusat Vulkanologi & Mitigasi Bencana Geologi)
+- **Sumber Data Terbuka Resmi**:
+  - BMKG Indonesia Open Data (TEWS Seismik Gempa Bumi, FDRS & Cuaca)
+  - PVMBG / MAGMA Indonesia (Pusat Vulkanologi & Mitigasi Bencana Geologi ESDM)
+  - KLHK SiPongi+ (Sistem Informasi Karhutla Kementerian LHK)
   - NASA FIRMS (Fire Information for Resource Management System)
-  - Open-Meteo Weather & Air Quality API
+  - Open-Meteo & Copernicus Atmosphere Service (Kualitas Udara & Indeks UV)
 
 ---
 
