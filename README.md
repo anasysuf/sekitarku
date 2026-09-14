@@ -9,7 +9,7 @@
   <a href="https://sekitarku.vercel.app" target="_blank">
     <img src="https://img.shields.io/badge/Akses_Website-sekitarku.vercel.app-2563eb?style=for-the-badge&logo=vercel&logoColor=white" alt="Website" />
   </a>
-  <img src="https://img.shields.io/badge/Versi-1.2.1-10b981?style=for-the-badge" alt="Versi" />
+  <img src="https://img.shields.io/badge/Versi-1.2.2-10b981?style=for-the-badge" alt="Versi" />
   <img src="https://img.shields.io/badge/Lisensi-MIT-f59e0b?style=for-the-badge" alt="Lisensi" />
   <img src="https://img.shields.io/badge/Status_Data-100%25_Real--Time-059669?style=for-the-badge" alt="Realtime" />
 </p>
