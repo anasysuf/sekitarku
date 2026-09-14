@@ -46,7 +46,19 @@ export async function fetchLiveFirmsHotspots(mapKey) {
         id: `firms-live-${idx}`,
         regency: `Titik Panas (${lat.toFixed(2)}, ${lon.toFixed(2)})`,
         province: 'Wilayah Terdeteksi Satelit',
-        island: lon < 108 ? (lat > -2 ? 'Sumatera' : 'Jawa') : lon < 118 ? (lat > 0 ? 'Kalimantan' : 'Jawa') : 'Indonesia',
+        island: (lon < 106 && lat > -6)
+          ? 'Sumatera'
+          : (lon >= 105 && lon <= 116 && lat <= -5.5)
+            ? 'Jawa'
+            : (lon >= 108 && lon <= 119 && lat > -5)
+              ? 'Kalimantan'
+              : (lon >= 118 && lon <= 126 && lat > -6)
+                ? 'Sulawesi'
+                : (lon >= 114 && lon <= 126 && lat <= -6)
+                  ? 'Bali & Nusa Tenggara'
+                  : (lon > 126)
+                    ? 'Maluku & Papua'
+                    : 'Indonesia',
         lat,
         lon,
         satellite: sat || 'VIIRS SNPP (375m)',
@@ -83,7 +95,7 @@ export function fetchKarhutlaData(lat, lon, weatherData, forceRefresh = false) {
     nearbyList: hotspotInfo.nearbyList,
     allHotspots: hotspotInfo.allHotspots,
     totalInIndo: hotspotInfo.totalInIndo,
-    dataSource: 'NASA FIRMS (VIIRS 375m / NOAA-20) & KLHK SiPongi+',
+    dataSource: 'NASA FIRMS (VIIRS SNPP / NOAA-20 / NOAA-21 / MODIS) & KLHK SiPongi+',
     lastSync: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
   };
 
