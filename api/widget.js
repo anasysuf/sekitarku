@@ -60,7 +60,7 @@ export default async function handler(request) {
         'Access-Control-Allow-Origin': '*'
       }
     });
-  } catch (err) {
+  } catch {
     const fallbackPayload = {
       app: 'Sekitarku',
       city,

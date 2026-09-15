@@ -40,8 +40,3 @@ export function calculateDistance(lat1, lon1, lat2, lon2) {
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return Math.round(R * c);
 }
-
-export const INDONESIA_BOUNDS = {
-  center: [-2.5489, 118.0149],
-  zoom: 5
-};

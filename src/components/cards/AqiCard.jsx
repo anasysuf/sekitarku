@@ -3,7 +3,7 @@ import { Wind } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi';
 import { translations } from '../../utils/i18n';
 
-export function AqiCard({ data, loading }) {
+export function AqiCard({ data }) {
   const t = translations;
 
   

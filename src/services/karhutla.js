@@ -1,6 +1,5 @@
 import { apiCache } from '../utils/apiCache.js';
-import { calculateFdrs, getNearbyHotspots, SATELLITE_HOTSPOTS } from '../utils/karhutla.js';
-import { calculateDistance } from '../utils/geo.js';
+import { calculateFdrs, getNearbyHotspots } from '../utils/karhutla.js';
 
 /**
  * Layanan data Karhutla (Kebakaran Hutan & Lahan) & Hotspot Satelit KLHK SiPongi+ / NASA FIRMS / BMKG

@@ -1,32 +1,3 @@
-export function formatDateTime(dateStr) {
-  if (!dateStr) return '-';
-  try {
-    const date = new Date(dateStr);
-    return new Intl.DateTimeFormat('id-ID', {
-      dateStyle: 'medium',
-      timeStyle: 'short'
-    }).format(date);
-  } catch (e) {
-    return dateStr;
-  }
-}
-
-export function formatRelativeTime(dateStr) {
-  if (!dateStr) return '';
-  try {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMin = Math.round((now - date) / 60000);
-    if (diffMin < 1) return 'Baru saja';
-    if (diffMin < 60) return `${diffMin} menit yang lalu`;
-    const diffHours = Math.floor(diffMin / 60);
-    if (diffHours < 24) return `${diffHours} jam yang lalu`;
-    return formatDateTime(dateStr);
-  } catch (e) {
-    return dateStr;
-  }
-}
-
 export function formatFullCurrentDate(date = new Date()) {
   const d = date instanceof Date ? date : new Date(date);
   const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -51,7 +22,7 @@ export function formatShortDate(dateStr) {
       day: 'numeric',
       month: 'short'
     }).format(date);
-  } catch (e) {
+  } catch {
     return dateStr;
   }
 }

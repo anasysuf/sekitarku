@@ -10,7 +10,7 @@ const STATUS_FILTERS = [
   { id: 'NORMAL', label: 'Normal (Level I)' }
 ];
 
-export function VolcanoListModal({ isOpen, onClose, userLocation, onSelectVolcano }) {
+export function VolcanoListModal({ isOpen, onClose, userLocation }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('Semua');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -138,6 +138,29 @@ export function VolcanoListModal({ isOpen, onClose, userLocation, onSelectVolcan
               </button>
             ))}
           </div>
+
+          {/* Status Filter Tabs */}
+          <div style={{ display: 'flex', gap: '0.35rem', overflowX: 'auto', paddingTop: '0.35rem' }}>
+            {STATUS_FILTERS.map((sf) => (
+              <button
+                key={sf.id}
+                onClick={() => setStatusFilter(sf.id)}
+                style={{
+                  padding: '3px 8px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '0.7rem',
+                  fontWeight: statusFilter === sf.id ? '800' : '600',
+                  border: statusFilter === sf.id ? '1px solid var(--color-primary)' : 'var(--border-thick)',
+                  backgroundColor: statusFilter === sf.id ? 'var(--color-primary-bg)' : 'var(--bg-muted)',
+                  color: statusFilter === sf.id ? 'var(--color-primary)' : 'var(--text-muted)',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {sf.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Volcano Items List */}
@@ -197,7 +220,7 @@ export function VolcanoListModal({ isOpen, onClose, userLocation, onSelectVolcan
                     fontWeight: '600'
                   }}>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><MapPin size={13} /> Jarak: <strong style={{ color: 'var(--color-primary)' }}>{v.distanceKm} km</strong> dari posisi Anda</span>
-                    <span>`Radius bahaya: ${v.dangerRadiusKm} km`</span>
+                    <span>Radius bahaya: {v.dangerRadiusKm} km</span>
                   </div>
                 </div>
               ))

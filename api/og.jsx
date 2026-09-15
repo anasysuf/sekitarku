@@ -273,7 +273,7 @@ export default function handler(request) {
         height: 630,
       }
     );
-  } catch (e) {
+  } catch {
     return new Response('Failed to generate OG image', { status: 500 });
   }
 }

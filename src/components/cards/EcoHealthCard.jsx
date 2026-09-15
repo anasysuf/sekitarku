@@ -3,7 +3,7 @@ import { HeartPulse, Bike, Footprints, Baby, Wind, ShieldCheck } from 'lucide-re
 import { calculateEcoHealthScore } from '../../utils/healthIndex';
 import { translations } from '../../utils/i18n';
 
-export function EcoHealthCard({ aqiData, weatherData, loading }) {
+export function EcoHealthCard({ aqiData, weatherData }) {
   const t = translations;
 
   

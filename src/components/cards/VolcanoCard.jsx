@@ -3,9 +3,9 @@ import { Flame, Compass, ChevronRight, AlertTriangle, ShieldCheck } from 'lucide
 import { getNearbyVolcanoes } from '../../services/volcano.js';
 import { translations } from '../../utils/i18n.js';
 
-export function VolcanoCard({ location, onOpenModal, onFocusVolcano }) {
+export function VolcanoCard({ location, onOpenModal }) {
   const t = translations;
-  const { nearest, alertCount } = getNearbyVolcanoes(location?.lat, location?.lon);
+  const { nearest } = getNearbyVolcanoes(location?.lat, location?.lon);
 
   if (!nearest) return null;
 

@@ -10,7 +10,7 @@ const CONFIDENCE_FILTERS = [
   { id: 'MODERATE', label: 'Sedang (70-85%)' }
 ];
 
-export function KarhutlaListModal({ isOpen, onClose, userLocation, hotspots = SATELLITE_HOTSPOTS, onSelectHotspot }) {
+export function KarhutlaListModal({ isOpen, onClose, userLocation, hotspots = SATELLITE_HOTSPOTS }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRegion, setSelectedRegion] = useState('Semua');
   const [confidenceFilter, setConfidenceFilter] = useState('ALL');

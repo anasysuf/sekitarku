@@ -17,8 +17,8 @@ import { useGeolocation } from './hooks/useGeolocation';
 import { useDarkMode } from './hooks/useDarkMode';
 import { triggerHaptic } from './utils/haptics';
 import { fetchWeatherData, getDefaultWeather } from './services/weather';
-import { fetchAirQualityData, getDefaultAqi } from './services/airQuality';
-import { fetchLatestEarthquake, fetchRecentEarthquakes, getDefaultEarthquake } from './services/bmkg';
+import { fetchAirQualityData } from './services/airQuality';
+import { fetchLatestEarthquake, fetchRecentEarthquakes } from './services/bmkg';
 import { i18n } from './utils/i18n';
 import { Download, AlertTriangle, X, Loader2, WifiOff } from 'lucide-react';
 

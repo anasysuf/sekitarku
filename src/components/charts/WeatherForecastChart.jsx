@@ -8,9 +8,7 @@ export function WeatherForecastChart({ dailyData }) {
   const t = translations;
   if (!dailyData || !dailyData.time) return null;
 
-  const daysId = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-  const daysEn = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const days = daysId;
+  const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
   // Calculate weekly extremes
   const maxTemps = dailyData.temperature_2m_max?.slice(0, 7) || [];

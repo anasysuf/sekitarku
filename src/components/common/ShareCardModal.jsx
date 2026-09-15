@@ -9,11 +9,9 @@ import {
   Calendar,
   Flame,
   Zap,
-  MapPin,
   AlertTriangle,
   ShieldCheck,
-  Cigarette,
-  Wind
+  Cigarette
 } from 'lucide-react';
 import { getAqiInfo } from '../../utils/aqi.js';
 import { calculateEcoHealthScore } from '../../utils/healthIndex.js';
@@ -55,7 +53,7 @@ export function ShareCardModal({ isOpen, onClose, location, airQualityData, weat
   const nearestFire = activeKarhutla?.nearest || (location?.lat ? getNearbyHotspots(location.lat, location.lon).nearest : null);
   
   // Cross-Correlation Kabut Asap
-  const { isHazeActive, isVeryNear } = getHazeStatus(nearestFire, aqi, pm25);
+  const { isHazeActive } = getHazeStatus(nearestFire, aqi, pm25);
 
   const hazeStatusText = isHazeActive ? '⚠️ Terpapar Asap Karhutla' : '🟢 Bebas Asap';
   const fireProximityText = nearestFire ? ` (Titik Api Terdekat: ${nearestFire.regency}, ${nearestFire.distanceKm} km)` : '';

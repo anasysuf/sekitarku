@@ -3,7 +3,7 @@ import { Droplets, Wind, Gauge } from 'lucide-react';
 import { getWeatherVisual } from '../../utils/weatherIcons';
 import { translations } from '../../utils/i18n';
 
-export function WeatherCard({ data, locationName, loading }) {
+export function WeatherCard({ data, locationName }) {
   const t = translations;
 
   

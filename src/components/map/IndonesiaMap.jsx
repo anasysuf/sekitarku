@@ -6,7 +6,7 @@ import { INDONESIA_CITIES } from '../../utils/cities';
 import { INDONESIA_VOLCANOES, VOLCANO_STATUS_LEVELS } from '../../utils/volcanoes';
 import { SATELLITE_HOTSPOTS } from '../../utils/karhutla';
 import { translations } from '../../utils/i18n';
-import { MapPin, Compass, ZoomIn, ZoomOut, Flame, Mountain, Activity, Satellite } from 'lucide-react';
+import { MapPin, Compass, ZoomIn, ZoomOut, Flame, Mountain, Activity } from 'lucide-react';
 
 // Inline SVG data URIs - 100% offline, 0 network requests, never broken image
 const cityPinSvg = `data:image/svg+xml;utf8,${encodeURIComponent(`
@@ -221,7 +221,7 @@ function CustomMapControls({ onResetNusantara, onFocusCity, cityName }) {
   );
 }
 
-export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLITE_HOTSPOTS, onSelectCity, isDark = false }) {
+export function IndonesiaMap({ currentLocation, earthquakes, hotspots = SATELLITE_HOTSPOTS, onSelectCity }) {
   const t = translations;
   const initialCenter = useMemo(() => [currentLocation?.lat || -2.5489, currentLocation?.lon || 118.0149], [currentLocation?.lat, currentLocation?.lon]);
   

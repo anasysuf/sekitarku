@@ -23,7 +23,7 @@ export class ErrorBoundary extends React.Component {
           for (const reg of registrations) reg.unregister();
         });
       }
-    } catch (e) {}
+    } catch {}
     window.location.reload();
   };
 
