@@ -8,11 +8,11 @@ export function EcoHealthCard({ aqiData, weatherData }) {
 
   
 
-  const aqi = aqiData?.current?.aqi || 0;
-  const pm25 = aqiData?.current?.pm25 || 0;
-  const temp = weatherData?.current?.temp || 28;
-  const humidity = weatherData?.current?.humidity || 70;
-  const uvIndex = weatherData?.current?.uvIndex || 0;
+  const aqi = aqiData?.current?.aqi ?? 0;
+  const pm25 = aqiData?.current?.pm25 ?? 0;
+  const temp = weatherData?.current?.temp ?? 28;
+  const humidity = weatherData?.current?.humidity ?? 70;
+  const uvIndex = weatherData?.current?.uvIndex ?? 0;
 
   const health = calculateEcoHealthScore(aqi, temp, humidity, uvIndex, pm25);
 

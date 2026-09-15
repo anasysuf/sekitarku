@@ -24,9 +24,12 @@ export function AqiChart({ hourlyData }) {
     const pm25Val = Math.round((hourlyData.pm2_5 ? hourlyData.pm2_5[index] : 0) * 10) / 10;
     const aqiMeta = getAqiInfo(aqiVal);
 
+    const offset = d.getTimezoneOffset();
+    const tzName = offset === -420 ? 'WIB' : offset === -480 ? 'WITA' : offset === -540 ? 'WIT' : 'WIB';
+
     return {
       time: hour,
-      fullTime: `${hour} WIB`,
+      fullTime: `${hour} ${tzName}`,
       aqi: aqiVal,
       pm25: pm25Val,
       label: aqiMeta.label,

@@ -47,7 +47,7 @@ export function AqiCard({ data }) {
           color: aqiInfo.color,
           letterSpacing: '-0.04em'
         }}>
-          {current.aqi || '--'}
+          {current.aqi !== undefined && current.aqi !== null ? current.aqi : '--'}
         </div>
         <div>
           <strong style={{ fontSize: '1.15rem', color: 'var(--text-main)', display: 'block', fontWeight: '800', lineHeight: 1.2 }}>
@@ -116,19 +116,19 @@ export function AqiCard({ data }) {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.5rem' }}>
         <div style={{ padding: '0.5rem 0.35rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--bg-muted)', textAlign: 'center', border: 'var(--border-thick)' }}>
           <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)', fontWeight: '700' }}>PM2.5</span>
-          <div style={{ fontSize: '0.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{current.pm25 || 0}</div>
+          <div style={{ fontSize: '0.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{current.pm25 ?? 0}</div>
         </div>
         <div style={{ padding: '0.5rem 0.35rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--bg-muted)', textAlign: 'center', border: 'var(--border-thick)' }}>
           <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)', fontWeight: '700' }}>PM10</span>
-          <div style={{ fontSize: '0.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{current.pm10 || 0}</div>
+          <div style={{ fontSize: '0.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{current.pm10 ?? 0}</div>
         </div>
         <div style={{ padding: '0.5rem 0.35rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--bg-muted)', textAlign: 'center', border: 'var(--border-thick)' }}>
           <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)', fontWeight: '700' }}>NO₂</span>
-          <div style={{ fontSize: '0.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{current.no2 || 0}</div>
+          <div style={{ fontSize: '0.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{current.no2 ?? 0}</div>
         </div>
         <div style={{ padding: '0.5rem 0.35rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--bg-muted)', textAlign: 'center', border: 'var(--border-thick)' }}>
           <span style={{ fontSize: '0.675rem', color: 'var(--text-muted)', fontWeight: '700' }}>SO₂</span>
-          <div style={{ fontSize: '0.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{current.so2 || 0}</div>
+          <div style={{ fontSize: '0.875rem', fontWeight: '800', color: 'var(--text-main)' }}>{current.so2 ?? 0}</div>
         </div>
       </div>
 

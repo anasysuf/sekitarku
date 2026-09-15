@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
-import { Activity, AlertTriangle, ShieldCheck, MapPin, Clock, ChevronDown, ChevronUp, List } from 'lucide-react';
+import { Activity, AlertTriangle, ShieldCheck, MapPin, Clock, ChevronDown, ChevronUp, List, Compass } from 'lucide-react';
 import { getEarthquakeColor } from '../../utils/aqi';
+import { calculateDistance } from '../../utils/geo';
 import { translations } from '../../utils/i18n';
 
-export function EarthquakeCard({ earthquake, recentQuakes = [], onFocusQuake }) {
+export function EarthquakeCard({ earthquake, recentQuakes = [], onFocusQuake, userLocation }) {
   const [showList, setShowList] = useState(false);
   const t = translations;
-
-  
 
   if (!earthquake) {
     return (
@@ -25,6 +24,11 @@ export function EarthquakeCard({ earthquake, recentQuakes = [], onFocusQuake }) 
 
   const magColor = getEarthquakeColor(earthquake.magnitude);
   const isMajor = earthquake.magnitude >= 5.0;
+
+  // Accurate Geodesic Epicenter Distance calculation
+  const distanceKm = (userLocation?.lat && userLocation?.lon && earthquake.lat && earthquake.lon)
+    ? calculateDistance(userLocation.lat, userLocation.lon, earthquake.lat, earthquake.lon)
+    : null;
 
   return (
     <div className="flat-card" style={{ padding: '1.5rem' }}>
@@ -59,7 +63,7 @@ export function EarthquakeCard({ earthquake, recentQuakes = [], onFocusQuake }) 
           letterSpacing: '-0.04em'
         }}>
           {earthquake.magnitude}
-          <span style={{ fontSize: '1.2rem', fontWeight: '700', marginLeft: '4px' }}>SR</span>
+          <span style={{ fontSize: '1.2rem', fontWeight: '700', marginLeft: '4px' }}>M</span>
         </div>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.775rem', color: 'var(--text-muted)', fontWeight: '600' }}>
@@ -72,9 +76,9 @@ export function EarthquakeCard({ earthquake, recentQuakes = [], onFocusQuake }) 
         </div>
       </div>
 
-      {/* Location Area */}
+      {/* Location Area & Distance */}
       <div style={{
-        padding: '0.7rem 0.85rem',
+        padding: '0.75rem 0.85rem',
         borderRadius: 'var(--radius-md)',
         backgroundColor: 'var(--bg-muted)',
         border: 'var(--border-thick)',
@@ -83,11 +87,19 @@ export function EarthquakeCard({ earthquake, recentQuakes = [], onFocusQuake }) 
         fontWeight: '600',
         color: 'var(--text-main)',
         display: 'flex',
-        alignItems: 'flex-start',
-        gap: '0.5rem'
+        flexDirection: 'column',
+        gap: '0.35rem'
       }}>
-        <MapPin size={16} color={magColor} strokeWidth={2.5} style={{ flexShrink: 0, marginTop: '1px' }} />
-        <span>{earthquake.wilayah}</span>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.5rem' }}>
+          <MapPin size={16} color={magColor} strokeWidth={2.5} style={{ flexShrink: 0, marginTop: '1px' }} />
+          <span>{earthquake.wilayah}</span>
+        </div>
+        {distanceKm !== null && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginLeft: '1.5rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            <Compass size={13} color="var(--color-primary)" />
+            <span>Jarak ke episenter: <strong style={{ color: 'var(--color-primary)' }}>{distanceKm} km</strong> dari lokasi Anda</span>
+          </div>
+        )}
       </div>
 
       {/* Tsunami Status & List Toggle */}
@@ -126,6 +138,9 @@ export function EarthquakeCard({ earthquake, recentQuakes = [], onFocusQuake }) 
         <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: 'var(--border-thick)', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
           {recentQuakes.slice(0, 5).map((q, idx) => {
             const color = getEarthquakeColor(q.magnitude);
+            const qDist = (userLocation?.lat && userLocation?.lon && q.lat && q.lon)
+              ? calculateDistance(userLocation.lat, userLocation.lon, q.lat, q.lon)
+              : null;
             return (
               <div
                 key={q.id || idx}
@@ -148,7 +163,14 @@ export function EarthquakeCard({ earthquake, recentQuakes = [], onFocusQuake }) 
                   <span style={{ fontWeight: '800', color: color, marginRight: '6px' }}>M {q.magnitude}</span>
                   <span style={{ color: 'var(--text-main)', fontWeight: '600' }}>{q.wilayah}</span>
                 </div>
-                <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem', whiteSpace: 'nowrap', fontWeight: '500' }}>{q.time}</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
+                  {qDist !== null && (
+                    <span style={{ fontSize: '0.675rem', fontWeight: '700', color: 'var(--color-primary)' }}>
+                      {qDist} km
+                    </span>
+                  )}
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem', whiteSpace: 'nowrap', fontWeight: '500' }}>{q.time}</span>
+                </div>
               </div>
             );
           })}

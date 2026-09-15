@@ -9,8 +9,10 @@ export function formatFullCurrentDate(date = new Date()) {
   const year = d.getFullYear();
   const hours = d.getHours().toString().padStart(2, '0');
   const minutes = d.getMinutes().toString().padStart(2, '0');
+  const offset = d.getTimezoneOffset();
+  const tzName = offset === -420 ? 'WIB' : offset === -480 ? 'WITA' : offset === -540 ? 'WIT' : 'WIB';
 
-  return `${dayName}, ${dayNum} ${monthName} ${year} • ${hours}.${minutes} WIB`;
+  return `${dayName}, ${dayNum} ${monthName} ${year} • ${hours}.${minutes} ${tzName}`;
 }
 
 export function formatShortDate(dateStr) {

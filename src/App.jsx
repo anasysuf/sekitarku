@@ -535,7 +535,7 @@ export function App() {
           earthquake={latestEarthquake}
           recentQuakes={recentEarthquakes}
           onFocusQuake={handleFocusQuake}
-          loading={loading}
+          userLocation={location}
         />
         <VolcanoCard
           location={location}

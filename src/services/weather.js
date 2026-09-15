@@ -56,7 +56,7 @@ export async function fetchWeatherData(lat, lon, forceRefresh = false) {
   const timeoutId = controller ? setTimeout(() => controller.abort(), 6000) : null;
 
   try {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${safeLat}&longitude=${safeLon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m,uv_index&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,weather_code,uv_index&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_sum,precipitation_probability_max,wind_speed_10m_max&timezone=Asia%2FJakarta&forecast_days=7`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${safeLat}&longitude=${safeLon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,surface_pressure,wind_speed_10m,wind_direction_10m,uv_index&hourly=temperature_2m,relative_humidity_2m,precipitation_probability,weather_code,uv_index&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_sum,precipitation_probability_max,wind_speed_10m_max&timezone=auto&forecast_days=7`;
     
     const res = await fetch(url, {
       headers: { 'Accept': 'application/json' },
@@ -78,15 +78,15 @@ export async function fetchWeatherData(lat, lon, forceRefresh = false) {
         pressure: data.current?.surface_pressure ?? 1010,
         time: data.current?.time || new Date().toISOString()
       },
-      hourly: data.hourly || getDefaultWeather(safeLat, safeLon).hourly,
-      daily: data.daily || getDefaultWeather(safeLat, safeLon).daily
+      hourly: data.hourly || getDefaultWeather().hourly,
+      daily: data.daily || getDefaultWeather().daily
     };
 
     apiCache.set(cacheKey, formatted, 5 * 60 * 1000);
     return formatted;
   } catch (error) {
     console.warn('Gagal mengambil data cuaca Open-Meteo, menggunakan fallback:', error.message);
-    const stale = apiCache.get(cacheKey) || getDefaultWeather(safeLat, safeLon);
+    const stale = apiCache.get(cacheKey) || getDefaultWeather();
     return stale;
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
